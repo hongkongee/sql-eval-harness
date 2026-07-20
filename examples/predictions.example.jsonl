@@ -1,0 +1,5 @@
+{"id": "nlsql_001", "predicted_sql": "SELECT name FROM employees WHERE salary >= 50000000;"}
+{"id": "nlsql_002", "predicted_sql": "select name from departments where location='Seoul'"}
+{"id": "nlsql_003", "predicted_sql": "SELECT COUNT(id) FROM departments;"}
+{"id": "nlsql_005", "predicted_sql": "SELECT name, email FROM customers WHERE country = 'USA';"}
+{"id": "nlsql_010", "predicted_sql": "SELECT name FROM employees WHERE name LIKE '김%"}
