@@ -16,7 +16,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from eval_harness.db import load_fixture
+from eval_harness.db import get_connection
 from eval_harness.exact_match import is_exact_match
 from eval_harness.execution import is_execution_match
 from eval_harness.validity import is_valid_sql
@@ -45,25 +45,29 @@ def main() -> None:
             file=sys.stderr,
         )
 
-    fixtures: dict[str, object] = {}
+    connections: dict[str, object] = {}
     results = []
 
-    for qid, gold in testset.items():
-        if qid not in predictions:
-            continue
-        db_id = gold["db_id"]
-        if db_id not in fixtures:
-            fixtures[db_id] = load_fixture(db_id)
-        conn = fixtures[db_id]
+    try:
+        for qid, gold in testset.items():
+            if qid not in predictions:
+                continue
+            db_id = gold["db_id"]
+            if db_id not in connections:
+                connections[db_id] = get_connection(db_id)
+            conn = connections[db_id]
 
-        pred_sql = predictions[qid]
-        results.append({
-            "id": qid,
-            "difficulty": gold.get("difficulty"),
-            "valid": is_valid_sql(conn, pred_sql),
-            "em": is_exact_match(pred_sql, gold["query"]),
-            "ex": is_execution_match(conn, pred_sql, gold["query"]),
-        })
+            pred_sql = predictions[qid]
+            results.append({
+                "id": qid,
+                "difficulty": gold.get("difficulty"),
+                "valid": is_valid_sql(conn, pred_sql),
+                "em": is_exact_match(pred_sql, gold["query"]),
+                "ex": is_execution_match(conn, pred_sql, gold["query"]),
+            })
+    finally:
+        for conn in connections.values():
+            conn.close()
 
     n = len(results)
     if n == 0:
