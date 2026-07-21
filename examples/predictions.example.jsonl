@@ -1,5 +1,5 @@
-{"id": "nlsql_001", "predicted_sql": "SELECT name FROM employees WHERE salary >= 50000000;"}
-{"id": "nlsql_002", "predicted_sql": "select name from departments where location='Seoul'"}
-{"id": "nlsql_003", "predicted_sql": "SELECT COUNT(id) FROM departments;"}
-{"id": "nlsql_005", "predicted_sql": "SELECT name, email FROM customers WHERE country = 'USA';"}
-{"id": "nlsql_010", "predicted_sql": "SELECT name FROM employees WHERE name LIKE '김%"}
+{"id": "seed_001", "predicted_sql": "SELECT COUNT(*) FROM person"}
+{"id": "seed_002", "predicted_sql": "SELECT gender_concept_id, COUNT(*) FROM person GROUP BY gender_concept_id ORDER BY COUNT(*) DESC"}
+{"id": "seed_003", "predicted_sql": "SELECT DISTINCT person_id FROM condition_occurrence WHERE condition_concept_id = 201826;"}
+{"id": "seed_005", "predicted_sql": "SELECT DISTINCT person_id FROM drug_exposure WHERE drug_concept_id = 1503297 AND"}
+{"id": "seed_009", "predicted_sql": "SELECT AVG(visit_end_date - visit_start_date) AS avg_length_of_stay FROM visit_occurrence WHERE visit_concept_id = 9201 AND visit_end_date IS NOT NULL"}

@@ -1,0 +1,5 @@
+torch
+transformers>=4.46
+peft>=0.13
+accelerate
+safetensors

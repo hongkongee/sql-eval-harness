@@ -8,7 +8,7 @@
       [--report report.json]
 
 predictions.jsonl 스키마 (평가 대상 시스템이 생성):
-  {"id": "nlsql_001", "predicted_sql": "SELECT ..."}
+  {"id": "seed_001", "predicted_sql": "SELECT ..."}
 """
 import argparse
 import json

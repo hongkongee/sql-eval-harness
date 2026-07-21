@@ -1,0 +1,43 @@
+{
+  "n": 5,
+  "validity_rate": 0.8,
+  "em_rate": 0.4,
+  "ex_rate": 0.8,
+  "results": [
+    {
+      "id": "seed_001",
+      "difficulty": "easy",
+      "valid": true,
+      "em": false,
+      "ex": true
+    },
+    {
+      "id": "seed_002",
+      "difficulty": "easy",
+      "valid": true,
+      "em": false,
+      "ex": true
+    },
+    {
+      "id": "seed_003",
+      "difficulty": "medium",
+      "valid": true,
+      "em": true,
+      "ex": true
+    },
+    {
+      "id": "seed_005",
+      "difficulty": "easy",
+      "valid": false,
+      "em": false,
+      "ex": false
+    },
+    {
+      "id": "seed_009",
+      "difficulty": "medium",
+      "valid": true,
+      "em": true,
+      "ex": true
+    }
+  ]
+}

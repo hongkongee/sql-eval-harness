@@ -15,7 +15,7 @@ import psycopg
 # 등록된 db_id 목록. 값은 쓰지 않고 존재 여부만 확인한다 —
 # 실제 스키마/데이터는 DATABASE_URL이 가리키는 샌드박스 DB에 이미 있다.
 DB_REGISTRY = {
-    "company_db": None,
+    "omop_cdm_v53": None,
 }
 
 

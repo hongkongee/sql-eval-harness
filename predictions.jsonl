@@ -1,0 +1,5 @@
+{"id": "seed_001", "predicted_sql": "SELECT SUM(total) FROM patients;"}
+{"id": "seed_002", "predicted_sql": "SELECT gender, COUNT(*) FROM patients GROUP BY gender;"}
+{"id": "seed_003", "predicted_sql": "SELECT * FROM patients WHERE type = 'DiabetesType2';"}
+{"id": "seed_004", "predicted_sql": "SELECT DISTINCT YEAR('2021') AS year, COUNT(*) FROM visitors GROUP BY YEAR('2021'); SELECT DISTINCT YEAR('2022') AS year, COUNT(*) FROM visitors GROUP BY YEAR('2022'); SELECT DISTINCT YEAR('2023') AS year, COUNT(*) FROM visitors GROUP BY YEAR('2023');"}
+{"id": "seed_005", "predicted_sql": "SELECT name FROM patients WHERE medication_type = 'Menthol';"}
