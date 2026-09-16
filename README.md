@@ -88,6 +88,31 @@ python -m eval_harness.score \
 
 여러 체크포인트/스터디를 비교하고 싶으면 `--adapter`와 `--output`만 바꿔가며 여러 번 돌린 뒤, 각 `report.json`의 `validity_rate`/`em_rate`/`ex_rate`를 비교하면 됩니다 (`--report` 경로를 매번 다르게 지정하세요, 안 그러면 덮어씌워집니다).
 
+## 서빙 중인 모델을 API로 직접 평가 (Syntactic Validity / Format 이탈율 / 스키마 환각 / 응답 속도)
+
+vLLM 등으로 OpenAI 호환 `/v1/chat/completions` API로 서빙 중인 파인튜닝 모델을, EM/EX 없이 **SQL 생성 품질만** 빠르게 점검하고 싶을 때 쓴다. `eval_harness/`와 달리 샌드박스 PostgreSQL DB 접속이 필요 없고, `sqlglot` 정적 분석만으로 4개 지표를 CSV로 뽑는다:
+
+- **Syntactic Validity**: `sqlglot`으로 파싱 가능한 SQL인가
+- **Format 이탈율**: SQL이 아닌 자연어로 응답한 비율
+- **참조 테이블/컬럼 정확도**: `data/fixtures/omop_cdm_v53_ddl.sql` 기준 존재하지 않는 테이블/컬럼 참조(환각) 여부
+- **응답 속도**: API 호출 1건당 걸린 시간
+
+모델이 IN절 concept_id 자리에 의도적으로 남기는 `{{개념명}}` 자연어 플레이스홀더는 검사 전 더미값 `0`으로 치환해 문법/스키마 오류로 오탐되지 않게 한다.
+
+테스트 케이스는 `data/260914/auto_confirmed_val_260914.jsonl`의 증강 paraphrase(1012건)는 건너뛰고 시나리오별 고유 질의(`is_original=true`, 68건)만 쓰며, 데이터셋에 없는 신규 질의 10개(`data/custom_eval_queries.jsonl`, 도메인 이탈·모호한 질의 등 포함)를 더해 총 78건을 평가한다.
+
+```bash
+pip install -r scripts/requirements-eval-api.txt
+
+# 스모크 테스트 (앞 5건만)
+python scripts/eval_api_model.py --limit 5 --output eval_smoke.csv
+
+# 전체 평가 (78건) — HARD 난이도 등 응답이 길어서 SQL문법 fail이 많이 뜨면 --max-tokens를 올릴 것
+python scripts/eval_api_model.py --max-tokens 512 --output eval_results.csv
+```
+
+`--api-url`/`--model`로 다른 엔드포인트·모델명을 지정할 수 있고, `--skip-dataset`/`--skip-custom`으로 한쪽만 돌릴 수도 있다. 결과 CSV 컬럼: 자연어 질의, 모델 답변 쿼리문, 정답 쿼리문(신규 질의는 빈칸), SQL문법 결과/에러 사유, omop-cdm 스키마 오류 여부/에러 사유, 응답 속도, 비고(출처 시나리오·항목·경고).
+
 ## 구조
 
 ```
@@ -95,6 +120,8 @@ python -m eval_harness.score \
 ├── data/
 │   ├── testset.jsonl              # 10개 NL→SQL 문항 (id, text, query, db_id, tables, difficulty, domain 등). db_id="omop_cdm_v53"
 │   ├── omop_seed_dataset_10.jsonl # testset.jsonl의 원본 소스 (scenario_name/query_type 등 원본 메타데이터 그대로 보존, 참고용)
+│   ├── 260914/auto_confirmed_val_260914.jsonl  # automl-llm 파인튜닝 시 validation으로 쓴 데이터셋 (시나리오별 원본 68건 + 증강 paraphrase, 총 1012건)
+│   ├── custom_eval_queries.jsonl  # eval_api_model.py용 신규 작성 질의 10건 (데이터셋에 없는 도메인/모호한 질의 등)
 │   └── fixtures/
 │       └── omop_cdm_v53_ddl.sql   # OMOP CDM v5.3 스키마 정의 (테이블만, 데이터는 없음 — @cdmDatabaseSchema. 플레이스홀더를 public.으로 치환해둔 상태)
 ├── eval_harness/
@@ -105,7 +132,9 @@ python -m eval_harness.score \
 │   └── score.py                # CLI 진입점
 ├── scripts/
 │   ├── infer_lora.py          # LoRA adapter로 predictions.jsonl 생성 (--limit으로 스모크 테스트, 생략하면 전체 평가)
-│   └── requirements-infer.txt # infer_lora.py 전용 의존성 (torch/transformers/peft — 채점 로직과 분리)
+│   ├── requirements-infer.txt # infer_lora.py 전용 의존성 (torch/transformers/peft — 채점 로직과 분리)
+│   ├── eval_api_model.py      # 서빙 중인 모델을 API로 호출해 Syntactic Validity/Format 이탈율/스키마 환각/응답 속도를 CSV로 평가
+│   └── requirements-eval-api.txt  # eval_api_model.py 전용 의존성 (requests/sqlglot)
 └── examples/
     └── predictions.example.jsonl  # 스모크 테스트용 샘플 예측 (일부러 EM만 실패/문법 오류 케이스 포함)
 ```
