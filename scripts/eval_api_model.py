@@ -1,22 +1,38 @@
-"""HTTP 추론 API로 서빙 중인 파인튜닝 모델의 4개 지표를 자동 측정한다:
+"""HTTP 추론 API로 서빙 중인 파인튜닝 모델의 성능을 자동 측정한다.
 
+정적 분석 (DB 접속 없이 sqlglot만으로, 항상 실행):
   1. Syntactic Validity — 모델 응답이 문법적으로 유효한 SQL인가 (sqlglot 파싱 기준)
   2. Format 이탈율      — SQL이 아닌 자연어로 응답한 비율
   3. 참조 테이블/컬럼 정확도 — OMOP CDM v5.3 표준 스키마에 없는 테이블/컬럼을 참조하는지 (환각 여부)
   4. 응답 속도          — API 호출 1건당 걸린 시간
 
-이 harness(``eval_harness/``)의 Validity/EX는 샌드박스 PostgreSQL DB에 실제로
-접속해 ``EXPLAIN``/실행까지 해보는 방식이지만, 이 스크립트는 파인튜닝 모델
-자체의 SQL 생성 품질(문법·스키마 환각·응답 속도)만 빠르게 점검하는 용도라
-DB 접속 없이 ``sqlglot`` 정적 분석만으로 검사한다. 실행 결과까지 확인하려면
-predictions.jsonl로 변환해 ``eval_harness.score``를 함께 돌릴 것.
+샌드박스 DB 실행 검증 (V5 — SANDBOX_DB_HOST 등 환경변수가 설정된 경우에만 실행,
+미설정 시 자동으로 건너뜀):
+  5. 샌드박스 DB 실행검증 — 실제 PostgreSQL에 ``EXPLAIN``을 날려 sqlglot 정적
+     분석이 못 잡는 postgres 고유 문법/타입 오류까지 확인
+  6. EM (Exact Match)   — 정답 SQL이 있는 문항에 한해 문자열 정규화 비교
+  7. EX (Execution Match) — 정답 SQL이 있는 문항에 한해 실제 실행 결과 비교
 
 모델은 IN절에 들어갈 concept_id 리스트 자리에 ``{{암로디핀}}`` 같은 자연어
 플레이스홀더를 그대로 남기도록 의도적으로 학습되었다 (RAG가 나중에 실제
 concept_id로 치환). 이 플레이스홀더는 그 자체로는 유효한 SQL 토큰이 아니므로,
-문법/스키마 검사 전에 더미 리터럴 ``0``으로 치환한 뒤 검사한다.
+모든 검사(sqlglot 정적 분석 + 샌드박스 DB 실행) 전에 더미 리터럴 ``0``으로
+치환한다. 이 때문에 EX는 예측/정답 쿼리의 약물·진단 필터링 로직 자체의 동치를
+검증하지 못하고(둘 다 {{}} 자리가 0으로 동일하게 치환되므로), 나머지 구조
+(조인·서브쿼리·날짜 계산 등)의 동치만 검증한다. 또한 샌드박스 DB에 임상 데이터
+(person/condition_occurrence/drug_exposure 등)가 비어있는 경우 EX는 "둘 다
+빈 결과"로 사실상 항상 일치하므로, 그런 경우 EX 통과는 로직 정확성의 증거가
+아니라 구조적으로 실행이 되었다는 정도의 의미로만 해석할 것.
 
 사용법:
+  # 샌드박스 DB로 V5(실행검증/EM/EX)까지 돌리려면 먼저 접속정보를 export
+  export SANDBOX_DB_HOST=10.10.30.32
+  export SANDBOX_DB_PORT=5434
+  export SANDBOX_DB_NAME=postgres
+  export SANDBOX_DB_USER=postgres
+  export SANDBOX_DB_PASSWORD=postgres
+  export SANDBOX_DB_TIMEOUT=30000
+
   python scripts/eval_api_model.py \\
       --dataset data/260914/auto_confirmed_val_260914.jsonl \\
       --custom-queries data/custom_eval_queries.jsonl \\
@@ -30,10 +46,12 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import re
 import time
 from pathlib import Path
 
+import psycopg
 import requests
 import sqlglot
 from sqlglot import exp
@@ -61,6 +79,11 @@ CSV_FIELDNAMES = [
     "SQL문법 에러 사유",
     "omop-cdm 스키마 오류 여부",
     "omop-cdm 스키마 에러 사유",
+    "샌드박스 DB 실행검증 결과",
+    "샌드박스 DB 실행검증 에러 사유",
+    "EM 결과",
+    "EX 결과",
+    "EX 참고사항",
     "응답 속도",
     "비고",
 ]
@@ -120,11 +143,13 @@ def load_custom_cases(path: str) -> list[dict]:
     return cases
 
 
-def call_model(text: str, api_url: str, model: str, timeout: float, max_tokens: int) -> tuple[str | None, float, str | None]:
+def call_model(
+    text: str, api_url: str, model: str, timeout: float, max_tokens: int, system_prompt: str = SYSTEM_PROMPT
+) -> tuple[str | None, float, str | None]:
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": text},
         ],
         "temperature": 0,
@@ -210,7 +235,87 @@ def check_schema(sql: str, schema: dict[str, set[str]]) -> tuple[bool, str]:
     return len(errors) == 0, "; ".join(errors)
 
 
-def evaluate_case(case: dict, schema: dict[str, set[str]], api_url: str, model: str, timeout: float, max_tokens: int) -> dict:
+def get_sandbox_connection() -> psycopg.Connection | None:
+    """SANDBOX_DB_* 환경변수가 설정된 경우에만 연결한다 (미설정 시 None -> V5 건너뜀)."""
+    host = os.environ.get("SANDBOX_DB_HOST")
+    if not host:
+        return None
+    port = os.environ.get("SANDBOX_DB_PORT", "5432")
+    dbname = os.environ.get("SANDBOX_DB_NAME", "postgres")
+    user = os.environ.get("SANDBOX_DB_USER", "postgres")
+    password = os.environ.get("SANDBOX_DB_PASSWORD", "")
+    timeout_ms = int(os.environ.get("SANDBOX_DB_TIMEOUT", "30000"))
+    dsn = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
+    conn = psycopg.connect(dsn, connect_timeout=max(1, timeout_ms // 1000))
+    # 문항 하나가 실패해도 트랜잭션이 aborted 상태로 남아 이후 호출이 연쇄
+    # 실패하지 않도록, eval_harness/db.py와 동일하게 autocommit으로 문항마다
+    # 독립된 트랜잭션을 쓴다.
+    conn.autocommit = True
+    return conn
+
+
+def check_sandbox_validity(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
+    """EXPLAIN으로 postgres가 실제로 컴파일 가능한 SQL인지 확인 (sqlglot 정적
+    분석이 못 잡는 postgres 고유 문법/타입/함수 오류까지 잡는다)."""
+    if conn is None:
+        return "skip", ""
+    substituted = PLACEHOLDER_RE.sub("0", sql).strip().rstrip(";").strip()
+    if not substituted:
+        return "fail", "빈 SQL"
+    try:
+        conn.execute(f"EXPLAIN {substituted}")
+        return "pass", ""
+    except psycopg.Error as exc:
+        return "fail", str(exc).strip()
+
+
+def normalize_sql_for_em(sql: str) -> str:
+    sql = sql.strip().rstrip(";").strip()
+    sql = re.sub(r"\s+", " ", sql)
+    return sql.lower()
+
+
+def check_em(pred_sql: str, gold_sql: str) -> str:
+    if not gold_sql:
+        return "N/A"
+    return "pass" if normalize_sql_for_em(pred_sql) == normalize_sql_for_em(gold_sql) else "fail"
+
+
+def _run_rows(conn: psycopg.Connection, sql: str) -> list[tuple]:
+    substituted = PLACEHOLDER_RE.sub("0", sql).strip().rstrip(";").strip()
+    return conn.execute(substituted).fetchall()
+
+
+def check_ex(conn: psycopg.Connection | None, pred_sql: str, gold_sql: str) -> tuple[str, str]:
+    if conn is None:
+        return "skip", ""
+    if not gold_sql:
+        return "N/A", ""
+    try:
+        gold_rows = _run_rows(conn, gold_sql)
+    except psycopg.Error as exc:
+        return "ERROR", f"정답 쿼리 실행 실패 (테스트셋/샌드박스 DB 확인 필요): {exc}".strip()
+    try:
+        pred_rows = _run_rows(conn, pred_sql)
+    except psycopg.Error as exc:
+        return "fail", f"예측 쿼리 실행 실패: {exc}".strip()
+
+    if "order by" in gold_sql.lower():
+        match = pred_rows == gold_rows
+    else:
+        match = sorted(pred_rows, key=repr) == sorted(gold_rows, key=repr)
+    return ("pass" if match else "fail"), ""
+
+
+def evaluate_case(
+    case: dict,
+    schema: dict[str, set[str]],
+    api_url: str,
+    model: str,
+    timeout: float,
+    max_tokens: int,
+    sandbox_conn: psycopg.Connection | None,
+) -> dict:
     raw_response, elapsed, api_error = call_model(case["text"], api_url, model, timeout, max_tokens)
 
     if api_error is not None:
@@ -222,6 +327,11 @@ def evaluate_case(case: dict, schema: dict[str, set[str]], api_url: str, model: 
             "SQL문법 에러 사유": "",
             "omop-cdm 스키마 오류 여부": "fail",
             "omop-cdm 스키마 에러 사유": "",
+            "샌드박스 DB 실행검증 결과": "skip",
+            "샌드박스 DB 실행검증 에러 사유": "",
+            "EM 결과": "N/A",
+            "EX 결과": "skip",
+            "EX 참고사항": "",
             "응답 속도": f"{elapsed:.2f}",
             "비고": f"{case['note']} | API 호출 실패: {api_error}",
         }
@@ -237,6 +347,11 @@ def evaluate_case(case: dict, schema: dict[str, set[str]], api_url: str, model: 
             "SQL문법 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
             "omop-cdm 스키마 오류 여부": "fail",
             "omop-cdm 스키마 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
+            "샌드박스 DB 실행검증 결과": "fail" if sandbox_conn is not None else "skip",
+            "샌드박스 DB 실행검증 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)" if sandbox_conn is not None else "",
+            "EM 결과": check_em("", case["gold_query"]),
+            "EX 결과": "fail" if (sandbox_conn is not None and case["gold_query"]) else ("N/A" if not case["gold_query"] else "skip"),
+            "EX 참고사항": "SQL이 아닌 자연어로 응답 (Format 이탈)" if (sandbox_conn is not None and case["gold_query"]) else "",
             "응답 속도": f"{elapsed:.2f}",
             "비고": case["note"],
         }
@@ -246,6 +361,10 @@ def evaluate_case(case: dict, schema: dict[str, set[str]], api_url: str, model: 
         schema_ok, schema_reason = check_schema(sql, schema)
     else:
         schema_ok, schema_reason = False, "구문 오류로 스키마 검증 불가"
+
+    sandbox_result, sandbox_reason = check_sandbox_validity(sandbox_conn, sql)
+    em_result = check_em(sql, case["gold_query"])
+    ex_result, ex_note = check_ex(sandbox_conn, sql, case["gold_query"])
 
     note = case["note"]
     if PLACEHOLDER_RE.search(sql):
@@ -259,6 +378,11 @@ def evaluate_case(case: dict, schema: dict[str, set[str]], api_url: str, model: 
         "SQL문법 에러 사유": "" if syntax_ok else syntax_reason,
         "omop-cdm 스키마 오류 여부": "pass" if schema_ok else "fail",
         "omop-cdm 스키마 에러 사유": "" if schema_ok else schema_reason,
+        "샌드박스 DB 실행검증 결과": sandbox_result,
+        "샌드박스 DB 실행검증 에러 사유": sandbox_reason,
+        "EM 결과": em_result,
+        "EX 결과": ex_result,
+        "EX 참고사항": ex_note,
         "응답 속도": f"{elapsed:.2f}",
         "비고": note,
     }
@@ -280,6 +404,27 @@ def print_summary(rows: list[dict]) -> None:
     print(f"  Format 이탈율       : {format_fail}/{n} ({format_fail / n:.1%})")
     print(f"  스키마 참조 정확도  : {schema_pass}/{n} ({schema_pass / n:.1%})")
     print(f"  응답 속도(평균/최대) : {sum(speeds) / n:.2f}s / {max(speeds):.2f}s")
+
+    sandbox_checked = [r for r in rows if r["샌드박스 DB 실행검증 결과"] in ("pass", "fail")]
+    if sandbox_checked:
+        sb_pass = sum(1 for r in sandbox_checked if r["샌드박스 DB 실행검증 결과"] == "pass")
+        m = len(sandbox_checked)
+        print(f"  샌드박스 DB 실행검증 : {sb_pass}/{m} ({sb_pass / m:.1%})")
+    else:
+        print("  샌드박스 DB 실행검증 : SANDBOX_DB_HOST 미설정으로 건너뜀")
+
+    em_checked = [r for r in rows if r["EM 결과"] in ("pass", "fail")]
+    if em_checked:
+        em_pass = sum(1 for r in em_checked if r["EM 결과"] == "pass")
+        m = len(em_checked)
+        print(f"  EM (정답 있는 {m}건)  : {em_pass}/{m} ({em_pass / m:.1%})")
+
+    ex_checked = [r for r in rows if r["EX 결과"] in ("pass", "fail")]
+    if ex_checked:
+        ex_pass = sum(1 for r in ex_checked if r["EX 결과"] == "pass")
+        m = len(ex_checked)
+        print(f"  EX (정답 있는 {m}건)  : {ex_pass}/{m} ({ex_pass / m:.1%})")
+        print("    주의: 샌드박스 DB에 임상 데이터가 비어있으면 EX는 '둘 다 빈 결과'로 사실상 항상 pass가 되므로 로직 정확성의 증거로 해석하지 말 것")
 
 
 def main() -> None:
@@ -303,6 +448,12 @@ def main() -> None:
     schema = load_schema(args.ddl)
     print(f"OMOP CDM 스키마 로드: 테이블 {len(schema)}개 ({args.ddl})")
 
+    sandbox_conn = get_sandbox_connection()
+    if sandbox_conn is not None:
+        print("샌드박스 DB 연결 성공 — V5(실행검증/EM/EX)도 함께 실행합니다.")
+    else:
+        print("SANDBOX_DB_HOST 미설정 — V5(실행검증/EM/EX)는 건너뜁니다 (정적 분석만 실행).")
+
     cases: list[dict] = []
     if not args.skip_dataset:
         cases += select_scenario_cases(args.dataset)
@@ -314,10 +465,17 @@ def main() -> None:
     print(f"평가 케이스 {len(cases)}건 (데이터셋 시나리오 원본 + 신규 작성 질의)\n")
 
     rows = []
-    for i, case in enumerate(cases, 1):
-        row = evaluate_case(case, schema, args.api_url, args.model, args.timeout, args.max_tokens)
-        rows.append(row)
-        print(f"[{i}/{len(cases)}] {case['id']}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} ({row['응답 속도']}s)")
+    try:
+        for i, case in enumerate(cases, 1):
+            row = evaluate_case(case, schema, args.api_url, args.model, args.timeout, args.max_tokens, sandbox_conn)
+            rows.append(row)
+            print(
+                f"[{i}/{len(cases)}] {case['id']}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} "
+                f"샌드박스={row['샌드박스 DB 실행검증 결과']} EM={row['EM 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
+            )
+    finally:
+        if sandbox_conn is not None:
+            sandbox_conn.close()
 
     with open(args.output, "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)

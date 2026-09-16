@@ -8,3 +8,13 @@
 {"id": "custom_08", "text": "방금 조회한 결과를 표로 정리해서 설명해줘.", "query": "", "note": "SQL 생성이 아닌 설명을 요구 — Format 이탈율 측정용"}
 {"id": "custom_09", "text": "SQL 짜줘", "query": "", "note": "정보가 거의 없는 최소 입력 — 강건성 테스트"}
 {"id": "custom_10", "text": "말기신장병 환자 중 동정맥루 조성술을 받은 이력이 있고, 조성술 이후 6개월 이내 재중재 시술 이력이 있는 환자의 조성술부터 재중재까지 걸린 일수를 계산해줘.", "query": "", "note": "훈련 시나리오(SAVE-Fistula)와 유사하지만 세부조건이 다른 변형 — STATISTICAL_AGGREGATION, HARD"}
+{"id": "custom_11", "text": "심방세동을 진단받고 이후 90일 이내 NOAC(비타민K 비의존성 경구항응고제) 처방을 시작한 환자를 노출군으로 정의하고, 첫 처방일을 기준일로 해줘.", "query": "", "note": "신규 시나리오(심방세동/NOAC) — COHORT_EXTRACTION, index date 정의, MEDIUM"}
+{"id": "custom_12", "text": "만성폐쇄성폐질환 진단 이력이 있고 흡입용 코르티코스테로이드를 처방받은 환자 중, 처방 시작 후 1년 이내 급성악화로 인한 입원 이력이 있는 환자 수를 계산해줘.", "query": "", "note": "신규 시나리오(COPD/흡입스테로이드) — STATISTICAL_AGGREGATION, MEDIUM"}
+{"id": "custom_13", "text": "만성 신장질환 3단계 진단 이후 추적관찰 중 혈청 크레아티닌 수치가 처음으로 진단 시점 대비 2배 이상 상승한 날짜와 수치를 환자별로 조회해줘.", "query": "", "note": "신규 시나리오(CKD 진행) — VALUE_RETRIEVAL, 최초 발생 시점 로직, HARD"}
+{"id": "custom_14", "text": "골다공증 진단을 받고 비스포스포네이트 계열 약물을 처방받은 폐경 후 여성 환자 중, 약물 투여 시작 후 2년 이내 고관절 골절 진단을 받은 환자를 찾아줘.", "query": "", "note": "신규 시나리오(골다공증/비스포스포네이트) — COHORT_EXTRACTION, MEDIUM"}
+{"id": "custom_15", "text": "항뇌전증제 단일요법을 시작한 환자 중 6개월 이내 다른 항뇌전증제로 교체되거나 병용요법으로 전환된 환자의 비율을 계산해줘.", "query": "", "note": "신규 시나리오(뇌전증/약물 전환) — STATISTICAL_AGGREGATION, HARD"}
+{"id": "custom_16", "text": "주요우울장애 진단 후 SSRI 계열 약물을 처방받은 환자의 첫 처방일부터 마지막 처방 종료일까지의 총 복용 기간을 환자별로 계산해줘.", "query": "", "note": "신규 시나리오(우울장애/SSRI 복약기간) — VALUE_RETRIEVAL, MEDIUM"}
+{"id": "custom_17", "text": "천식으로 진단된 18세 미만 소아 환자 중 최근 1년간 응급실 방문 횟수가 2회 이상인 환자를 찾아줘.", "query": "", "note": "신규 시나리오(소아 천식) — COHORT_EXTRACTION, EASY~MEDIUM"}
+{"id": "custom_18", "text": "류마티스 관절염 진단 이력이 있고 첫 생물학적제제 처방 후 1년 이내 다른 생물학적제제로 전환한 환자의 전환까지 걸린 평균 일수를 계산해줘.", "query": "", "note": "신규 시나리오(류마티스 관절염/생물학적제제 전환) — STATISTICAL_AGGREGATION, HARD"}
+{"id": "custom_19", "text": "패혈증 진단으로 중환자실에 입실한 환자 중 입실일로부터 28일 이내 사망한 환자의 비율을 계산해줘.", "query": "", "note": "신규 시나리오(패혈증/중환자실 사망률) — STATISTICAL_AGGREGATION, death 테이블 참조, MEDIUM~HARD"}
+{"id": "custom_20", "text": "슬관절 전치환술을 받은 환자 중 수술 후 90일 이내 수술 부위 감염으로 재입원한 이력이 있는 환자를 찾아줘.", "query": "", "note": "신규 시나리오(슬관절 전치환술 후 감염) — COHORT_EXTRACTION, MEDIUM"}

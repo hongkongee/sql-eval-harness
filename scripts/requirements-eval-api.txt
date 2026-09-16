@@ -1,2 +1,3 @@
 requests>=2.32
 sqlglot>=30
+psycopg[binary]>=3.1
