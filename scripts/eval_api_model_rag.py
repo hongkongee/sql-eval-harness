@@ -61,6 +61,8 @@ SYSTEM_PROMPT_RAG = os.environ.get(
 
 RESULT_FIELDNAMES = [
     "자연어 질의",
+    "RAG 제공 개념",
+    "RAG 제공 테이블",
     "모델 답변 쿼리문",
     "SQL문법 결과",
     "SQL문법 에러 사유",
@@ -93,6 +95,23 @@ def call_rag(text: str, rag_api_url: str, timeout: float) -> tuple[dict | None, 
         return data, None
     except Exception as exc:  # noqa: BLE001
         return None, str(exc)
+
+
+def summarize_rag_materials(rag_item: dict) -> tuple[str, str]:
+    """RAG가 이번 질의에 실제로 뭘 줬는지 (concept_id 개수, 테이블 목록)를
+    CSV에 남기기 위한 요약. concept_id는 아토르바스타틴처럼 1000개가 넘는
+    경우도 있어 전체 나열 대신 개수만 적는다 (컬럼 자체는 SQL 실행/샌드박스
+    검증에서 안 맞으면 어차피 에러로 잡히므로 별도로 안 본다)."""
+    concepts = rag_item.get("concepts") or []
+    if concepts:
+        concepts_summary = ", ".join(f"{c['surface']}→{len(c['concept_ids'])}개" for c in concepts)
+    else:
+        concepts_summary = "없음"
+
+    tables = rag_item.get("tables") or []
+    tables_summary = ", ".join(t["table_name"] for t in tables) if tables else "없음"
+
+    return concepts_summary, tables_summary
 
 
 def check_actual_execution(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
@@ -128,6 +147,8 @@ def evaluate_case(
     if rag_error is not None:
         return {
             "자연어 질의": text,
+            "RAG 제공 개념": "N/A",
+            "RAG 제공 테이블": "N/A",
             "모델 답변 쿼리문": "",
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "",
@@ -140,6 +161,8 @@ def evaluate_case(
             "비고": f"RAG API 호출 실패: {rag_error}",
         }
 
+    concepts_summary, tables_summary = summarize_rag_materials(rag_item)
+
     rag_prompt = rag_item["prompt"]
     raw_response, llm_elapsed, api_error = base.call_model(
         rag_prompt, llm_api_url, model, timeout, max_tokens, system_prompt=system_prompt
@@ -149,6 +172,8 @@ def evaluate_case(
     if api_error is not None:
         return {
             "자연어 질의": text,
+            "RAG 제공 개념": concepts_summary,
+            "RAG 제공 테이블": tables_summary,
             "모델 답변 쿼리문": "",
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "",
@@ -166,6 +191,8 @@ def evaluate_case(
     if not is_sql_format:
         return {
             "자연어 질의": text,
+            "RAG 제공 개념": concepts_summary,
+            "RAG 제공 테이블": tables_summary,
             "모델 답변 쿼리문": raw_response.strip(),
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
@@ -190,9 +217,6 @@ def evaluate_case(
     note_parts = []
     if base.PLACEHOLDER_RE.search(sql):
         note_parts.append("⚠ {{}} 플레이스홀더 잔존 (RAG concept_id를 무시하고 예전처럼 답함)")
-    if rag_item.get("concepts"):
-        concept_names = ", ".join(c["surface"] for c in rag_item["concepts"])
-        note_parts.append(f"RAG 인식 개념: {concept_names}")
     if ex_result == "fail" and ex_note:
         note_parts.append(f"EX 실패 사유: {ex_note}")
     elif ex_result == "pass" and ex_note:
@@ -200,6 +224,8 @@ def evaluate_case(
 
     return {
         "자연어 질의": text,
+        "RAG 제공 개념": concepts_summary,
+        "RAG 제공 테이블": tables_summary,
         "모델 답변 쿼리문": sql,
         "SQL문법 결과": "pass" if syntax_ok else "fail",
         "SQL문법 에러 사유": "" if syntax_ok else syntax_reason,
