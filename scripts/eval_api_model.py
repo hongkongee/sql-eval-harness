@@ -56,11 +56,34 @@ import requests
 import sqlglot
 from sqlglot import exp
 
-API_URL = "http://10.1.1.69:8003/v1/chat/completions"
-MODEL_NAME = "xiyan-sql-14b-sft-260914"
-SYSTEM_PROMPT = (
+
+def _load_dotenv(path: Path) -> None:
+    """아주 단순한 .env 로더. KEY=VALUE, '#' 주석, 값의 앞뒤 따옴표, 값 안의
+    리터럴 ``\\n``(실제 줄바꿈으로 변환)만 지원한다. 이미 셸에 export된 환경변수가
+    있으면 그걸 우선한다(setdefault)."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        value = value.replace("\\n", "\n")
+        os.environ.setdefault(key, value)
+
+
+_load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
+API_URL = os.environ.get("LLM_API_URL", "http://10.1.1.69:8003/v1/chat/completions")
+MODEL_NAME = os.environ.get("LLM_MODEL_NAME", "xiyan-sql-14b-sft-260914")
+SYSTEM_PROMPT = os.environ.get(
+    "LLM_SYSTEM_PROMPT",
     "You are a Text-to-SQL expert. Convert the following natural language "
-    "query into a SQL statement based on the schema."
+    "query into a SQL statement based on the schema.",
 )
 DDL_PATH = "data/fixtures/omop_cdm_v53_ddl.sql"
 DATASET_PATH = "data/260914/auto_confirmed_val_260914.jsonl"
@@ -159,7 +182,12 @@ def call_model(
     try:
         resp = requests.post(api_url, json=payload, timeout=timeout)
         elapsed = time.perf_counter() - start
-        resp.raise_for_status()
+        if not resp.ok:
+            # requests의 기본 HTTPError 메시지는 응답 바디(에러 사유)를 담지
+            # 않는다. vLLM 등은 4xx 사유를 바디에 담아 보내는 경우가 많아서
+            # (예: "max context length 8192 tokens인데 프롬프트가 더 김") 바디를
+            # 같이 넣어야 원인을 알 수 있다.
+            return None, elapsed, f"{resp.status_code} {resp.reason}: {resp.text[:500]}"
         content = resp.json()["choices"][0]["message"]["content"]
         return content, elapsed, None
     except Exception as exc:  # noqa: BLE001 - API 오류는 결과 행에 그대로 기록
@@ -251,6 +279,9 @@ def get_sandbox_connection() -> psycopg.Connection | None:
     # 실패하지 않도록, eval_harness/db.py와 동일하게 autocommit으로 문항마다
     # 독립된 트랜잭션을 쓴다.
     conn.autocommit = True
+    # concept 테이블만 700만 행이라, 모델이 조건 없이 큰 조인을 내면 쿼리가
+    # 무한정 오래 걸릴 수 있다 — 연결 전체에 statement_timeout을 걸어둔다.
+    conn.execute(f"SET statement_timeout = {timeout_ms}")
     return conn
 
 
