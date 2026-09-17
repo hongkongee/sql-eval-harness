@@ -66,11 +66,19 @@ RAG_API_URL = os.environ.get("RAG_API_URL", "http://10.1.1.106:8080/materials")
 SYSTEM_PROMPT_RAG = os.environ.get(
     "RAG_LLM_SYSTEM_PROMPT",
     "당신은 OMOP CDM 기반 Text-to-SQL 전문가입니다. [질의]는 사용자의 자연어 질문이고, "
-    "[재료]에는 질의에 필요한 개념(concept) ID 매핑, 사용 가능한 테이블/컬럼 스키마, "
-    "테이블 간 조인 관계가 이미 정리되어 있습니다.\n\n"
+    "[재료]에는 질의에 필요한 개념(concept)의 대표(앵커) concept_id, 사용 가능한 "
+    "테이블/컬럼 스키마, 테이블 간 조인 관계가 이미 정리되어 있습니다.\n\n"
+    "[재료]의 concept_id는 그 개념 전체를 대표하는 상위(앵커) 코드만 주어지며, "
+    "하위(descendant) 코드는 생략되어 있습니다. 앵커 코드를 IN절에 직접 나열하면 "
+    "하위 개념이 다 빠지므로 절대 그렇게 쓰면 안 되고, 반드시 concept_ancestor "
+    "테이블로 하위 개념까지 확장해서 조회하세요.\n\n"
     "다음을 반드시 지키세요:\n"
-    "1. [재료]에 주어진 개념 값 조건의 concept_id 목록을 SQL의 IN (...) 절에 그대로 사용하세요 "
-    "(개념명을 텍스트나 {{}} 플레이스홀더로 남기지 마세요).\n"
+    "1. 개념 값 조건은 앵커가 몇 개든 항상 아래 형태의 서브쿼리로 쓰세요 "
+    "(리터럴 IN절 절대 금지):\n"
+    "   <컬럼> IN (\n"
+    "     SELECT descendant_concept_id FROM concept_ancestor\n"
+    "     WHERE ancestor_concept_id IN (<[재료]에 주어진 앵커 concept_id 전부>)\n"
+    "   )\n"
     "2. [재료]에 나열된 테이블/컬럼만 사용하세요. 나열되지 않은 테이블/컬럼을 추측해서 만들지 마세요.\n"
     "3. [재료]의 조인 관계를 그대로 사용하세요.\n"
     "4. 다른 설명 없이 SQL 쿼리 하나만 답하세요.",
@@ -88,6 +96,8 @@ RESULT_FIELDNAMES = [
     "omop-cdm 스키마 에러 사유",
     "concept_id 반영 결과",
     "concept_id 반영 상세",
+    "앵커 서브쿼리 형식 준수",
+    "앵커 서브쿼리 형식 준수 상세",
     "샌드박스 DB 실행검증 결과",
     "샌드박스 DB 실행검증 에러 사유",
     "EX 결과",
@@ -118,13 +128,22 @@ def call_rag(text: str, rag_api_url: str, timeout: float) -> tuple[dict | None, 
 
 
 def summarize_rag_materials(rag_item: dict) -> tuple[str, str]:
-    """RAG가 이번 질의에 실제로 뭘 줬는지 (concept_id 개수, 테이블 목록)를
-    CSV에 남기기 위한 요약. concept_id는 아토르바스타틴처럼 1000개가 넘는
-    경우도 있어 전체 나열 대신 개수만 적는다 (컬럼 자체는 SQL 실행/샌드박스
-    검증에서 안 맞으면 어차피 에러로 잡히므로 별도로 안 본다)."""
+    """RAG가 이번 질의에 실제로 뭘 줬는지(개념명, target_column, concept_id
+    전체 목록, 테이블 목록)를 CSV에 그대로 남긴다.
+
+    RAG API가 같은 자연어 질의에도 매번 다른 concept_id/target_column을 주는
+    비결정성이 있는 것으로 확인됐다 (예: "만성신장질환"이 어떤 호출에서는
+    procedure_occurrence.procedure_concept_id로, 다른 호출에서는
+    condition_occurrence.condition_concept_id로 감). 그래서 "몇 개"라는 개수만
+    적으면 나중에 RAG를 다시 호출해 값을 맞춰볼 수 없다 — 이번 실행에서 실제로
+    쓰인 값을 원문 그대로 남겨야 재현/검증이 가능하다."""
     concepts = rag_item.get("concepts") or []
     if concepts:
-        concepts_summary = ", ".join(f"{c['surface']}→{len(c['concept_ids'])}개" for c in concepts)
+        concepts_summary = "; ".join(
+            f"{c['surface']} ({c['target_column']}, {len(c['concept_ids'])}개): "
+            f"IN ({', '.join(str(i) for i in c['concept_ids'])})"
+            for c in concepts
+        )
     else:
         concepts_summary = "없음"
 
@@ -166,12 +185,83 @@ def count_prompt_tokens(
         return None, None, str(exc)
 
 
-def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int]]]:
-    """SQL에서 'table.column IN (정수, 정수, ...)' 형태를 전부 뽑는다.
-    concept_id 검증용이라 리터럴이 전부 정수인 IN절만 대상으로 한다.
-    같은 컬럼에 서로 다른 개념의 IN절이 여러 번 나올 수 있어(예: 노출군/비교군
-    약물이 둘 다 drug_exposure.drug_concept_id를 씀) 딕셔너리가 아니라
-    (컬럼, id집합) 후보 리스트로 반환하고, 매칭은 호출부에서 겹치는 정도로 한다."""
+def _resolve_column(col: exp.Expression, alias_to_table: dict[str, str]) -> str | None:
+    if not isinstance(col, exp.Column):
+        return None
+    qualifier = col.table.lower() if col.table else None
+    table_name = alias_to_table.get(qualifier) if qualifier else None
+    if table_name is None:
+        return None
+    return f"{table_name}.{col.name.lower()}"
+
+
+def _extract_anchor_subquery_ids(
+    parsed: exp.Expression, alias_to_table: dict[str, str]
+) -> list[tuple[str, set[int], str]]:
+    """파인튜닝 모델이 이제 학습된 규칙: concept_id가 앵커(대표) 코드만 주어지면
+    'table.column IN (SELECT descendant_concept_id FROM concept_ancestor WHERE
+    ancestor_concept_id IN (앵커...))' 형태의 서브쿼리로 하위 개념까지 확장해서
+    조회해야 한다. 이 패턴을 찾아 (바깥쪽 컬럼, 앵커 id집합, "subquery")로 반환한다.
+    concept_ancestor 서브쿼리 안의 ancestor_concept_id는 그 서브쿼리 안에 테이블이
+    concept_ancestor 하나뿐이라 별칭이 없어도(비한정 컬럼) 확실히 귀속시킬 수 있다."""
+    candidates: list[tuple[str, set[int], str]] = []
+    for in_expr in parsed.find_all(exp.In):
+        query = in_expr.args.get("query")
+        if query is None:
+            continue  # 리터럴 IN - 위 일반 로직에서 처리
+
+        outer_col = _resolve_column(in_expr.this, alias_to_table)
+        if outer_col is None:
+            continue
+
+        select = query.this if isinstance(query, exp.Subquery) else query
+        if not isinstance(select, exp.Select):
+            continue
+        from_tables = {t.name.lower() for t in select.find_all(exp.Table)}
+        if "concept_ancestor" not in from_tables:
+            continue  # concept_ancestor 서브쿼리가 아님 - 다른 목적의 서브쿼리
+
+        anchor_ids: set[int] = set()
+        for inner_in in select.find_all(exp.In):
+            col = inner_in.this
+            if not (isinstance(col, exp.Column) and col.name.lower() == "ancestor_concept_id"):
+                continue
+            for lit in inner_in.expressions:
+                if isinstance(lit, exp.Literal) and lit.is_number:
+                    try:
+                        anchor_ids.add(int(lit.this))
+                    except ValueError:
+                        pass
+        for eq_expr in select.find_all(exp.EQ):
+            left, right = eq_expr.this, eq_expr.expression
+            if isinstance(left, exp.Column) and left.name.lower() == "ancestor_concept_id" and isinstance(right, exp.Literal) and right.is_number:
+                lit = right
+            elif isinstance(right, exp.Column) and right.name.lower() == "ancestor_concept_id" and isinstance(left, exp.Literal) and left.is_number:
+                lit = left
+            else:
+                continue
+            try:
+                anchor_ids.add(int(lit.this))
+            except ValueError:
+                pass
+
+        if anchor_ids:
+            candidates.append((outer_col, anchor_ids, "subquery"))
+    return candidates
+
+
+def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int], str]]:
+    """SQL에서 concept_id 필터로 쓰였을 법한 세 가지 형태를 전부 뽑는다:
+    'table.column IN (정수, 정수, ...)', 'table.column = 정수'(concept_id가
+    1개뿐이면 모델이 IN 대신 등호로 쓰기도 함), 그리고 앵커 기반 서브쿼리
+    'table.column IN (SELECT descendant_concept_id FROM concept_ancestor
+    WHERE ancestor_concept_id IN (앵커...))'. concept_id 검증용이라 리터럴이
+    정수인 경우만 대상으로 한다. 같은 컬럼에 서로 다른 개념의 조건이 여러 번
+    나올 수 있어(예: 노출군/비교군 약물이 둘 다 drug_exposure.drug_concept_id를
+    씀) 딕셔너리가 아니라 (컬럼, id집합, 발견방식) 후보 리스트로 반환하고, 값
+    비교는 호출부에서 컬럼별로 합쳐서 한다. 발견방식은 "subquery"(요구되는
+    앵커 서브쿼리 형태) 아니면 "literal"(리터럴 IN/등호 - 값은 맞아도 새
+    시스템 프롬프트가 요구하는 형식은 아님)이다."""
     substituted = base.PLACEHOLDER_RE.sub("0", sql)
     try:
         parsed = sqlglot.parse_one(substituted, read="postgres")
@@ -182,14 +272,12 @@ def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int]]]:
     for t in parsed.find_all(exp.Table):
         alias_to_table[t.alias_or_name.lower()] = t.name.lower()
 
-    candidates: list[tuple[str, set[int]]] = []
+    candidates: list[tuple[str, set[int], str]] = []
+    candidates += _extract_anchor_subquery_ids(parsed, alias_to_table)
+
     for in_expr in parsed.find_all(exp.In):
-        col = in_expr.this
-        if not isinstance(col, exp.Column):
-            continue
-        qualifier = col.table.lower() if col.table else None
-        table_name = alias_to_table.get(qualifier) if qualifier else None
-        if table_name is None:
+        resolved = _resolve_column(in_expr.this, alias_to_table)
+        if resolved is None:
             continue
 
         ids: set[int] = set()
@@ -205,7 +293,24 @@ def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int]]]:
                 all_int = False
                 break
         if all_int and ids:
-            candidates.append((f"{table_name}.{col.name.lower()}", ids))
+            candidates.append((resolved, ids, "literal"))
+
+    for eq_expr in parsed.find_all(exp.EQ):
+        left, right = eq_expr.this, eq_expr.expression
+        if isinstance(right, exp.Literal) and right.is_number:
+            col, lit = left, right
+        elif isinstance(left, exp.Literal) and left.is_number:
+            col, lit = right, left
+        else:
+            continue
+        resolved = _resolve_column(col, alias_to_table)
+        if resolved is None:
+            continue
+        try:
+            candidates.append((resolved, {int(lit.this)}, "literal"))
+        except ValueError:
+            continue
+
     return candidates
 
 
@@ -226,7 +331,7 @@ def check_concept_id_fidelity(sql: str, concepts: list[dict]) -> tuple[str, str]
 
     candidates = extract_in_clause_ids(sql)
     used_by_column: dict[str, set[int]] = {}
-    for col, ids in candidates:
+    for col, ids, _method in candidates:
         used_by_column.setdefault(col, set()).update(ids)
 
     expected_union_by_column: dict[str, set[int]] = {}
@@ -260,6 +365,37 @@ def check_concept_id_fidelity(sql: str, concepts: list[dict]) -> tuple[str, str]
         if extra:
             all_ok = False
             details.append(f"{col}: RAG가 안 준 값 {len(extra)}개 포함 ({sorted(extra)[:5]}{'...' if len(extra) > 5 else ''})")
+
+    return ("pass" if all_ok else "fail"), "; ".join(details)
+
+
+def check_anchor_subquery_usage(sql: str, concepts: list[dict]) -> tuple[str, str]:
+    """새 시스템 프롬프트가 강제하는 형식 준수 여부만 본다: 값이 맞는지와 별개로,
+    실제로 'IN (SELECT descendant_concept_id FROM concept_ancestor WHERE
+    ancestor_concept_id IN (앵커...))' 서브쿼리 형태를 썼는지. 값은 정확해도
+    이 형식을 안 쓰고 리터럴 IN/등호로 썼으면 여기서는 fail이다 —
+    check_concept_id_fidelity(값 반영 여부)와는 독립적인 검사다."""
+    if not concepts:
+        return "N/A", ""
+
+    candidates = extract_in_clause_ids(sql)
+    subquery_union_by_column: dict[str, set[int]] = {}
+    for col, ids, method in candidates:
+        if method == "subquery":
+            subquery_union_by_column.setdefault(col, set()).update(ids)
+
+    details = []
+    all_ok = True
+    for c in concepts:
+        target_col = c["target_column"].lower()
+        expected = set(c["concept_ids"])
+        found_via_subquery = subquery_union_by_column.get(target_col, set())
+
+        if expected and expected.issubset(found_via_subquery):
+            details.append(f"{c['surface']}: 앵커 서브쿼리 사용")
+        else:
+            all_ok = False
+            details.append(f"{c['surface']}: 앵커 서브쿼리 미사용 (리터럴/등호로 쓰였거나 값 자체가 없음)")
 
     return ("pass" if all_ok else "fail"), "; ".join(details)
 
@@ -307,6 +443,8 @@ def evaluate_case(
             "omop-cdm 스키마 에러 사유": "",
             "concept_id 반영 결과": "N/A",
             "concept_id 반영 상세": "",
+            "앵커 서브쿼리 형식 준수": "N/A",
+            "앵커 서브쿼리 형식 준수 상세": "",
             "샌드박스 DB 실행검증 결과": "skip",
             "샌드박스 DB 실행검증 에러 사유": "",
             "EX 결과": "skip",
@@ -345,6 +483,8 @@ def evaluate_case(
             "omop-cdm 스키마 에러 사유": "",
             "concept_id 반영 결과": "skip",
             "concept_id 반영 상세": "",
+            "앵커 서브쿼리 형식 준수": "skip",
+            "앵커 서브쿼리 형식 준수 상세": "",
             "샌드박스 DB 실행검증 결과": "skip",
             "샌드박스 DB 실행검증 에러 사유": "",
             "EX 결과": "skip",
@@ -367,6 +507,8 @@ def evaluate_case(
             "omop-cdm 스키마 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
             "concept_id 반영 결과": "skip",
             "concept_id 반영 상세": "",
+            "앵커 서브쿼리 형식 준수": "skip",
+            "앵커 서브쿼리 형식 준수 상세": "",
             "샌드박스 DB 실행검증 결과": "fail" if sandbox_conn is not None else "skip",
             "샌드박스 DB 실행검증 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)" if sandbox_conn is not None else "",
             "EX 결과": "fail" if sandbox_conn is not None else "skip",
@@ -378,9 +520,11 @@ def evaluate_case(
     if syntax_ok:
         schema_ok, schema_reason = base.check_schema(sql, schema)
         concept_id_result, concept_id_detail = check_concept_id_fidelity(sql, rag_item.get("concepts") or [])
+        anchor_result, anchor_detail = check_anchor_subquery_usage(sql, rag_item.get("concepts") or [])
     else:
         schema_ok, schema_reason = False, "구문 오류로 스키마 검증 불가"
         concept_id_result, concept_id_detail = "skip", "구문 오류로 확인 불가"
+        anchor_result, anchor_detail = "skip", "구문 오류로 확인 불가"
 
     sandbox_result, sandbox_reason = base.check_sandbox_validity(sandbox_conn, sql)
     ex_result, ex_note = check_actual_execution(sandbox_conn, sql)
@@ -405,6 +549,8 @@ def evaluate_case(
         "omop-cdm 스키마 에러 사유": "" if schema_ok else schema_reason,
         "concept_id 반영 결과": concept_id_result,
         "concept_id 반영 상세": concept_id_detail,
+        "앵커 서브쿼리 형식 준수": anchor_result,
+        "앵커 서브쿼리 형식 준수 상세": anchor_detail,
         "샌드박스 DB 실행검증 결과": sandbox_result,
         "샌드박스 DB 실행검증 에러 사유": sandbox_reason,
         "EX 결과": ex_result,
@@ -435,6 +581,12 @@ def print_summary(rows: list[dict]) -> None:
         concept_pass = sum(1 for r in concept_checked if r["concept_id 반영 결과"] == "pass")
         m = len(concept_checked)
         print(f"  concept_id 반영 정확도 : {concept_pass}/{m} ({concept_pass / m:.1%}) — RAG가 준 concept_id가 빠짐/변형 없이 반영됐는지")
+
+    anchor_checked = [r for r in rows if r["앵커 서브쿼리 형식 준수"] in ("pass", "fail")]
+    if anchor_checked:
+        anchor_pass = sum(1 for r in anchor_checked if r["앵커 서브쿼리 형식 준수"] == "pass")
+        m = len(anchor_checked)
+        print(f"  앵커 서브쿼리 형식 준수 : {anchor_pass}/{m} ({anchor_pass / m:.1%}) — 값이 아니라 concept_ancestor 서브쿼리 형태를 실제로 썼는지")
 
     sandbox_checked = [r for r in rows if r["샌드박스 DB 실행검증 결과"] in ("pass", "fail")]
     if sandbox_checked:
