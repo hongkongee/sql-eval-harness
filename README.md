@@ -103,13 +103,20 @@ vLLM 등으로 OpenAI 호환 `/v1/chat/completions` API로 서빙 중인 파인�
 
 ```bash
 pip install -r scripts/requirements-eval-api.txt
+cp .env.example .env   # LLM/RAG 엔드포인트, 샌드박스 DB 등 설정 (필요시 값 수정)
 
 # 스모크 테스트 (앞 5건만)
-python scripts/eval_api_model.py --limit 5 --output eval_smoke.csv
+python scripts/eval_api_model.py --limit 5 --output results/eval_smoke.csv
 
-# 전체 평가 (78건) — HARD 난이도 등 응답이 길어서 SQL문법 fail이 많이 뜨면 --max-tokens를 올릴 것
-python scripts/eval_api_model.py --max-tokens 512 --output eval_results.csv
+# 전체 평가 — HARD 난이도 등 응답이 길어서 SQL문법 fail이 많이 뜨면 --max-tokens를 올릴 것.
+# --output 생략 시 results/eval_results.csv에 저장됨 (디렉터리는 자동 생성).
+python scripts/eval_api_model.py --max-tokens 512
+
+# 문항이 많아 오래 걸리면 --concurrency로 동시 요청 (LLM API가 감당 가능한 선에서 5~10 권장)
+python scripts/eval_api_model.py --max-tokens 512 --concurrency 5
 ```
+
+같은 방식으로 `scripts/eval_api_model_rag.py`(자연어 질의를 RAG API에 먼저 보내 프롬프트를 조립한 뒤 LLM에 넣는 파이프라인)도 `--concurrency`를 지원하며, 결과는 기본적으로 `results/eval_results_rag.csv`에 저장된다. `results/`는 실행할 때마다 쌓이는 산출물이라 `.gitignore` 처리되어 있다.
 
 `--api-url`/`--model`로 다른 엔드포인트·모델명을 지정할 수 있고, `--skip-dataset`/`--skip-custom`으로 한쪽만 돌릴 수도 있다. 결과 CSV 컬럼: 자연어 질의, 모델 답변 쿼리문, 정답 쿼리문(신규 질의는 빈칸), SQL문법 결과/에러 사유, omop-cdm 스키마 오류 여부/에러 사유, 응답 속도, 비고(출처 시나리오·항목·경고).
 

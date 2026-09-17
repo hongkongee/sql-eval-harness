@@ -44,10 +44,12 @@ concept_id로 치환). 이 플레이스홀더는 그 자체로는 유효한 SQL 
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import os
 import re
+import threading
 import time
 from pathlib import Path
 
@@ -88,7 +90,7 @@ SYSTEM_PROMPT = os.environ.get(
 DDL_PATH = "data/fixtures/omop_cdm_v53_ddl.sql"
 DATASET_PATH = "data/260914/auto_confirmed_val_260914.jsonl"
 CUSTOM_QUERIES_PATH = "data/custom_eval_queries.jsonl"
-OUTPUT_PATH = "eval_results.csv"
+OUTPUT_PATH = "results/eval_results.csv"
 
 CODE_FENCE_RE = re.compile(r"```(?:sql)?\s*(.*?)```", re.IGNORECASE | re.DOTALL)
 PLACEHOLDER_RE = re.compile(r"\{\{[^}]*\}\}")
@@ -285,6 +287,34 @@ def get_sandbox_connection() -> psycopg.Connection | None:
     return conn
 
 
+class SandboxConnectionPool:
+    """--concurrency로 동시에 여러 문항을 처리할 때 쓴다. psycopg 커넥션은
+    스레드 세이프하지 않으므로 스레드마다 자기 커넥션을 하나씩 열어 재사용한다
+    (ThreadPoolExecutor는 스레드를 재사용하므로 워커 수만큼만 커넥션이 열린다)."""
+
+    def __init__(self) -> None:
+        self._local = threading.local()
+        self._all_conns: list[psycopg.Connection] = []
+        self._lock = threading.Lock()
+
+    def get(self) -> psycopg.Connection | None:
+        conn = getattr(self._local, "conn", "unset")
+        if conn != "unset":
+            return conn
+        conn = get_sandbox_connection()
+        self._local.conn = conn
+        if conn is not None:
+            with self._lock:
+                self._all_conns.append(conn)
+        return conn
+
+    def close_all(self) -> None:
+        with self._lock:
+            for conn in self._all_conns:
+                conn.close()
+            self._all_conns.clear()
+
+
 def check_sandbox_validity(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
     """EXPLAIN으로 postgres가 실제로 컴파일 가능한 SQL인지 확인 (sqlglot 정적
     분석이 못 잡는 postgres 고유 문법/타입/함수 오류까지 잡는다)."""
@@ -474,13 +504,17 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None, help="앞 N건만 실행 (스모크 테스트용)")
     parser.add_argument("--skip-dataset", action="store_true", help="데이터셋 시나리오 없이 --custom-queries만 실행")
     parser.add_argument("--skip-custom", action="store_true", help="신규 작성 질의 없이 데이터셋만 실행")
+    parser.add_argument(
+        "--concurrency", type=int, default=1,
+        help="동시에 처리할 문항 수 (LLM API가 continuous batching을 지원하면 5~10 정도로 올려 속도를 낼 수 있음)",
+    )
     args = parser.parse_args()
 
     schema = load_schema(args.ddl)
     print(f"OMOP CDM 스키마 로드: 테이블 {len(schema)}개 ({args.ddl})")
 
-    sandbox_conn = get_sandbox_connection()
-    if sandbox_conn is not None:
+    pool = SandboxConnectionPool()
+    if pool.get() is not None:
         print("샌드박스 DB 연결 성공 — V5(실행검증/EM/EX)도 함께 실행합니다.")
     else:
         print("SANDBOX_DB_HOST 미설정 — V5(실행검증/EM/EX)는 건너뜁니다 (정적 분석만 실행).")
@@ -493,25 +527,34 @@ def main() -> None:
     if args.limit:
         cases = cases[: args.limit]
 
-    print(f"평가 케이스 {len(cases)}건 (데이터셋 시나리오 원본 + 신규 작성 질의)\n")
+    print(f"평가 케이스 {len(cases)}건 (데이터셋 시나리오 원본 + 신규 작성 질의, 동시 요청 {args.concurrency}개)\n")
 
+    def run_one(case: dict) -> dict:
+        return evaluate_case(case, schema, args.api_url, args.model, args.timeout, args.max_tokens, pool.get())
+
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     rows = []
+    out_f = open(args.output, "w", newline="", encoding="utf-8-sig")
+    writer = csv.DictWriter(out_f, fieldnames=CSV_FIELDNAMES)
+    writer.writeheader()
     try:
-        for i, case in enumerate(cases, 1):
-            row = evaluate_case(case, schema, args.api_url, args.model, args.timeout, args.max_tokens, sandbox_conn)
-            rows.append(row)
-            print(
-                f"[{i}/{len(cases)}] {case['id']}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} "
-                f"샌드박스={row['샌드박스 DB 실행검증 결과']} EM={row['EM 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
-            )
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+            # 제출은 한 번에 다 해서 동시에 돌아가게 하되, 진행 로그/CSV 기록은
+            # 원래 문항 순서대로 남긴다 (동시성이 출력 순서에 영향 안 주도록).
+            futures = [executor.submit(run_one, case) for case in cases]
+            for i, (case, future) in enumerate(zip(cases, futures), 1):
+                row = future.result()
+                rows.append(row)
+                writer.writerow(row)
+                out_f.flush()
+                print(
+                    f"[{i}/{len(cases)}] {case['id']}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} "
+                    f"샌드박스={row['샌드박스 DB 실행검증 결과']} EM={row['EM 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
+                )
     finally:
-        if sandbox_conn is not None:
-            sandbox_conn.close()
+        out_f.close()
+        pool.close_all()
 
-    with open(args.output, "w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)
-        writer.writeheader()
-        writer.writerows(rows)
     print(f"\n결과 저장: {args.output}")
 
     print_summary(rows)

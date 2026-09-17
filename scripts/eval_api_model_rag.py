@@ -46,6 +46,7 @@ RAG가 만든 프롬프트가 곧 LLM에 들어가는 입력이므로, vLLM이 �
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import os
 import sys
@@ -209,54 +210,58 @@ def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int]]]:
 
 
 def check_concept_id_fidelity(sql: str, concepts: list[dict]) -> tuple[str, str]:
-    """RAG가 준 concept_id 리스트가 모델 SQL의 IN절에 컬럼까지 정확히,
-    빠짐없이 반영됐는지 확인한다. 완벽한 의미 분석은 아니고 'column IN (...)'
-    형태를 찾는 휴리스틱이라, 서브쿼리/OR/CASE 등으로 복잡하게 쪼개면 놓칠
-    수 있다."""
+    """RAG가 준 concept_id 리스트가 모델 SQL에 빠짐없이, 엉뚱한 값 없이
+    반영됐는지 확인한다. 완벽한 의미 분석은 아니고 'column IN (...)' 형태를
+    찾는 휴리스틱이다.
+
+    개념 하나당 IN절 하나에 1:1로 매칭하지 않는다 — 예를 들어
+    "condition_concept_id IN (A의 id, B의 id) AND (... OR condition_concept_id
+    IN (B의 id))"처럼, 여러 개념의 id를 합친 IN절로 먼저 걸러내고 OR로 특정
+    개념만 다시 좁히는 것도 흔한 유효한 SQL 패턴이다. 그래서 같은 컬럼에 쓰인
+    모든 IN절의 숫자를 합쳐놓고(컬럼별 합집합), 그 안에 각 개념의 concept_id가
+    다 들어있는지(누락)만 개념 단위로 보고, 그 컬럼에 어떤 개념에도 없는 숫자가
+    섞였는지(할루시네이션)는 컬럼 단위로 따로 본다."""
     if not concepts:
         return "N/A", ""
 
     candidates = extract_in_clause_ids(sql)
-    if not candidates:
-        details = [f"{c['surface']}({c['target_column']}): 전부 누락 (IN절을 찾을 수 없음)" for c in concepts]
-        return "fail", "; ".join(details)
+    used_by_column: dict[str, set[int]] = {}
+    for col, ids in candidates:
+        used_by_column.setdefault(col, set()).update(ids)
 
-    used = [False] * len(candidates)
-    details = []
-    all_exact = True
+    expected_union_by_column: dict[str, set[int]] = {}
     for c in concepts:
-        expected = set(c["concept_ids"])
+        expected_union_by_column.setdefault(c["target_column"].lower(), set()).update(c["concept_ids"])
+
+    details = []
+    all_ok = True
+    for c in concepts:
         target_col = c["target_column"].lower()
+        expected = set(c["concept_ids"])
+        found_union = used_by_column.get(target_col)
 
-        best_idx, best_overlap = None, -1
-        for idx, (col, ids) in enumerate(candidates):
-            if used[idx] or col != target_col:
-                continue
-            overlap = len(expected & ids)
-            if overlap > best_overlap:
-                best_idx, best_overlap = idx, overlap
-
-        if best_idx is None:
-            all_exact = False
+        if not found_union:
+            all_ok = False
             details.append(f"{c['surface']}({c['target_column']}): 해당 컬럼의 IN절 없음 (컬럼 불일치 또는 미반영)")
             continue
 
-        used[best_idx] = True
-        found = candidates[best_idx][1]
-        missing = expected - found
-        extra = found - expected
-        if not missing and not extra:
-            details.append(f"{c['surface']}: 정확히 일치 ({len(expected)}개)")
+        missing = expected - found_union
+        if missing:
+            all_ok = False
+            details.append(f"{c['surface']}: {len(missing)}개 누락 (기대 {len(expected)}개)")
         else:
-            all_exact = False
-            parts = []
-            if missing:
-                parts.append(f"{len(missing)}개 누락")
-            if extra:
-                parts.append(f"{len(extra)}개 추가/변형")
-            details.append(f"{c['surface']}: {', '.join(parts)} (기대 {len(expected)}개)")
+            details.append(f"{c['surface']}: 반영됨 ({len(expected)}개)")
 
-    return ("pass" if all_exact else "fail"), "; ".join(details)
+    for col, used in used_by_column.items():
+        expected_union = expected_union_by_column.get(col)
+        if expected_union is None:
+            continue  # RAG가 이 컬럼에 대해 준 개념이 없음 - 검증 대상 아님
+        extra = used - expected_union
+        if extra:
+            all_ok = False
+            details.append(f"{col}: RAG가 안 준 값 {len(extra)}개 포함 ({sorted(extra)[:5]}{'...' if len(extra) > 5 else ''})")
+
+    return ("pass" if all_ok else "fail"), "; ".join(details)
 
 
 def check_actual_execution(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
@@ -455,19 +460,23 @@ def main() -> None:
     parser.add_argument("--dataset", default=base.DATASET_PATH)
     parser.add_argument("--custom-queries", default=base.CUSTOM_QUERIES_PATH)
     parser.add_argument("--ddl", default=base.DDL_PATH)
-    parser.add_argument("--output", default="eval_results_rag.csv")
+    parser.add_argument("--output", default="results/eval_results_rag.csv")
     parser.add_argument("--timeout", type=float, default=60.0)
     parser.add_argument("--max-tokens", type=int, default=512)
     parser.add_argument("--limit", type=int, default=None, help="앞 N건만 실행 (스모크 테스트용)")
     parser.add_argument("--skip-dataset", action="store_true")
     parser.add_argument("--skip-custom", action="store_true")
+    parser.add_argument(
+        "--concurrency", type=int, default=1,
+        help="동시에 처리할 문항 수 (RAG API + LLM API가 감당 가능한 선에서 5~10 정도로 올려 속도를 낼 수 있음)",
+    )
     args = parser.parse_args()
 
     schema = base.load_schema(args.ddl)
     print(f"OMOP CDM 스키마 로드: 테이블 {len(schema)}개 ({args.ddl})")
 
-    sandbox_conn = base.get_sandbox_connection()
-    if sandbox_conn is not None:
+    pool = base.SandboxConnectionPool()
+    if pool.get() is not None:
         print("샌드박스 DB 연결 성공 — 실행검증/EX도 함께 실행합니다.")
     else:
         print("SANDBOX_DB_HOST 미설정 — 실행검증/EX는 건너뜁니다 (정적 분석만 실행).")
@@ -477,33 +486,40 @@ def main() -> None:
         texts = texts[: args.limit]
 
     print(f"RAG API: {args.rag_api_url}")
-    print(f"평가 케이스 {len(texts)}건 (자연어 질의 -> RAG 프롬프트 조립 -> LLM 호출)\n")
+    print(f"평가 케이스 {len(texts)}건 (자연어 질의 -> RAG 프롬프트 조립 -> LLM 호출, 동시 요청 {args.concurrency}개)\n")
+
+    def run_one(text: str) -> dict:
+        return evaluate_case(
+            text, args.rag_api_url, args.llm_api_url, args.model, args.system_prompt,
+            args.timeout, args.max_tokens, schema, pool.get(),
+        )
 
     # 문항 수가 많고(RAG+LLM 호출 합산이라 문항당 수 초~십수 초) 이 프로세스와
     # 무관한 이유(시스템 메모리 부족 등)로 중간에 죽는 경우에도 그때까지의
     # 결과는 남도록, 끝에 한 번에 쓰지 않고 문항마다 바로 파일에 쓰고 flush한다.
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     rows = []
     out_f = open(args.output, "w", newline="", encoding="utf-8-sig")
     writer = csv.DictWriter(out_f, fieldnames=RESULT_FIELDNAMES)
     writer.writeheader()
     try:
-        for i, text in enumerate(texts, 1):
-            row = evaluate_case(
-                text, args.rag_api_url, args.llm_api_url, args.model, args.system_prompt,
-                args.timeout, args.max_tokens, schema, sandbox_conn,
-            )
-            rows.append(row)
-            writer.writerow(row)
-            out_f.flush()
-            preview = text[:30]
-            print(
-                f"[{i}/{len(texts)}] {preview}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} "
-                f"샌드박스={row['샌드박스 DB 실행검증 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
-            )
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+            # 제출은 한 번에 다 해서 동시에 돌아가게 하되, 진행 로그/CSV 기록은
+            # 원래 문항 순서대로 남긴다 (동시성이 출력 순서에 영향 안 주도록).
+            futures = [executor.submit(run_one, text) for text in texts]
+            for i, (text, future) in enumerate(zip(texts, futures), 1):
+                row = future.result()
+                rows.append(row)
+                writer.writerow(row)
+                out_f.flush()
+                preview = text[:30]
+                print(
+                    f"[{i}/{len(texts)}] {preview}: 문법={row['SQL문법 결과']} 스키마={row['omop-cdm 스키마 오류 여부']} "
+                    f"샌드박스={row['샌드박스 DB 실행검증 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
+                )
     finally:
         out_f.close()
-        if sandbox_conn is not None:
-            sandbox_conn.close()
+        pool.close_all()
 
     print(f"\n결과 저장: {args.output}")
 
