@@ -18,6 +18,13 @@ RAG API 계약: ``POST {RAG_API_URL}`` body ``{"text": "<자연어 질의>"}`` -
 대신 실제로 실행해서 오류 없이 결과가 나오는지(EX 컬럼 = 실행 성공 여부, 정답과의
 일치가 아니라 "실행 가능한가")만 본다.
 
+RAG가 만든 프롬프트가 곧 LLM에 들어가는 입력이므로, vLLM이 제공하는 ``/tokenize``
+엔드포인트(``{LLM_API_URL의 호스트}/tokenize`` — OpenAI 표준은 아니고 vLLM 확장)로
+실제 채팅 템플릿까지 적용한 정확한 입력 토큰 수를 재서 "LLM 프롬프트 토큰 수"
+컬럼에 남긴다. concept_id가 많은 개념 때문에 프롬프트가 모델의 max_model_len을
+넘겨 요청이 거부되는 경우를 사전에 진단하기 위함 (다른 서버라 /tokenize가 없으면
+그 사유를 컬럼에 그대로 적고 LLM 호출 자체는 계속 진행한다).
+
 설정은 모두 ``.env``에서 읽는다 (``.env.example`` 참고, 없으면 ``cp .env.example .env``):
   LLM_API_URL, LLM_MODEL_NAME       — 파인튜닝 모델 추론 API
   RAG_API_URL                       — RAG 프롬프트 조립 API
@@ -38,6 +45,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 import psycopg
 import requests
@@ -63,6 +71,7 @@ RESULT_FIELDNAMES = [
     "자연어 질의",
     "RAG 제공 개념",
     "RAG 제공 테이블",
+    "LLM 프롬프트 토큰 수",
     "모델 답변 쿼리문",
     "SQL문법 결과",
     "SQL문법 에러 사유",
@@ -114,6 +123,38 @@ def summarize_rag_materials(rag_item: dict) -> tuple[str, str]:
     return concepts_summary, tables_summary
 
 
+def get_tokenize_url(llm_api_url: str) -> str:
+    """vLLM은 /v1/chat/completions와 같은 호스트의 /tokenize에서 실제 모델
+    토크나이저 기준 정확한 토큰 수를 알려준다 (OpenAI 표준 API는 아니지만
+    vLLM 확장으로 제공됨 — 8080/materials 같은 다른 서버는 없을 수 있음)."""
+    parts = urlsplit(llm_api_url)
+    return urlunsplit((parts.scheme, parts.netloc, "/tokenize", "", ""))
+
+
+def count_prompt_tokens(
+    tokenize_url: str, model: str, system_prompt: str, user_prompt: str, timeout: float
+) -> tuple[int | None, int | None, str | None]:
+    """실제 채팅 템플릿(시스템+유저 메시지, 특수 토큰 포함)까지 적용한 뒤의
+    정확한 입력 토큰 수와 서버의 max_model_len을 함께 반환한다."""
+    try:
+        resp = requests.post(
+            tokenize_url,
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+            },
+            timeout=timeout,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("count"), data.get("max_model_len"), None
+    except Exception as exc:  # noqa: BLE001
+        return None, None, str(exc)
+
+
 def check_actual_execution(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
     """EXPLAIN(계획만)이 아니라 실제로 SQL을 실행해서 오류 없이 끝나는지 확인.
     정답이 없으니 결과 일치가 아니라 '실행 가능한가'만 본다."""
@@ -149,6 +190,7 @@ def evaluate_case(
             "자연어 질의": text,
             "RAG 제공 개념": "N/A",
             "RAG 제공 테이블": "N/A",
+            "LLM 프롬프트 토큰 수": "N/A",
             "모델 답변 쿼리문": "",
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "",
@@ -164,6 +206,16 @@ def evaluate_case(
     concepts_summary, tables_summary = summarize_rag_materials(rag_item)
 
     rag_prompt = rag_item["prompt"]
+
+    tokenize_url = get_tokenize_url(llm_api_url)
+    token_count, max_model_len, tokenize_error = count_prompt_tokens(
+        tokenize_url, model, system_prompt, rag_prompt, timeout
+    )
+    if token_count is not None:
+        token_count_str = str(token_count) if not max_model_len else f"{token_count} (max {max_model_len})"
+    else:
+        token_count_str = f"측정 실패: {tokenize_error}"
+
     raw_response, llm_elapsed, api_error = base.call_model(
         rag_prompt, llm_api_url, model, timeout, max_tokens, system_prompt=system_prompt
     )
@@ -174,6 +226,7 @@ def evaluate_case(
             "자연어 질의": text,
             "RAG 제공 개념": concepts_summary,
             "RAG 제공 테이블": tables_summary,
+            "LLM 프롬프트 토큰 수": token_count_str,
             "모델 답변 쿼리문": "",
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "",
@@ -193,6 +246,7 @@ def evaluate_case(
             "자연어 질의": text,
             "RAG 제공 개념": concepts_summary,
             "RAG 제공 테이블": tables_summary,
+            "LLM 프롬프트 토큰 수": token_count_str,
             "모델 답변 쿼리문": raw_response.strip(),
             "SQL문법 결과": "fail",
             "SQL문법 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
@@ -226,6 +280,7 @@ def evaluate_case(
         "자연어 질의": text,
         "RAG 제공 개념": concepts_summary,
         "RAG 제공 테이블": tables_summary,
+        "LLM 프롬프트 토큰 수": token_count_str,
         "모델 답변 쿼리문": sql,
         "SQL문법 결과": "pass" if syntax_ok else "fail",
         "SQL문법 에러 사유": "" if syntax_ok else syntax_reason,
