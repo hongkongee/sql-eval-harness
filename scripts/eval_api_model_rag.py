@@ -14,6 +14,13 @@ RAG API 계약: ``POST {RAG_API_URL}`` body ``{"text": "<자연어 질의>"}`` -
 ``{"text", "concepts", "tables", "joins", "prompt"}`` JSON. "prompt" 필드를
 그대로 LLM의 user 메시지로 쓴다 (직접 호출해 구조 확인 완료).
 
+주의: concept_id/target_column 채점에는 "concepts" JSON 필드를 쓰지 않고
+"prompt" 텍스트에서 직접 파싱한다(``parse_concepts_from_prompt``). 실제로
+"concepts" 필드가 "prompt" 텍스트와 어긋나는 경우가 확인됐다 — "concepts"에는
+옛 방식대로 concept_id가 21개 다 나열돼 있는데, 정작 LLM에게 그대로 들어가는
+"prompt"에는 이미 새 방식(대표 앵커 1개)만 적혀 있었다. LLM은 "prompt"만 보고
+답하므로 그게 유일하게 신뢰할 수 있는 정답이다.
+
 정답 SQL을 알 수 없는 전제의 테스트이므로 EM/EX(정답과의 비교)는 하지 않는다.
 대신 실제로 실행해서 오류 없이 결과가 나오는지(EX 컬럼 = 실행 성공 여부, 정답과의
 일치가 아니라 "실행 가능한가")만 본다.
@@ -49,6 +56,7 @@ import argparse
 import concurrent.futures
 import csv
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -81,7 +89,9 @@ SYSTEM_PROMPT_RAG = os.environ.get(
     "   )\n"
     "2. [재료]에 나열된 테이블/컬럼만 사용하세요. 나열되지 않은 테이블/컬럼을 추측해서 만들지 마세요.\n"
     "3. [재료]의 조인 관계를 그대로 사용하세요.\n"
-    "4. 다른 설명 없이 SQL 쿼리 하나만 답하세요.",
+    "4. NOT IN절은 어떤 경우에도 사용하지 마세요. 제외 조건이 필요하면 "
+    "NOT EXISTS (서브쿼리) 형태로 쓰세요.\n"
+    "5. 다른 설명 없이 SQL 쿼리 하나만 답하세요.",
 )
 
 RESULT_FIELDNAMES = [
@@ -127,9 +137,38 @@ def call_rag(text: str, rag_api_url: str, timeout: float) -> tuple[dict | None, 
         return None, str(exc)
 
 
+CONCEPT_LINE_RE = re.compile(
+    r'-\s*"(?P<surface>[^"]+)"\s*→\s*(?P<column>[\w.]+)\s*'
+    r'(?:IN\s*\((?P<ids_in>[\d,\s]+)\)|=\s*(?P<id_eq>\d+))'
+)
+
+
+def parse_concepts_from_prompt(prompt: str) -> list[dict]:
+    """RAG 응답의 "concepts" 필드가 아니라 "prompt" 필드 원문에서 개념 값
+    조건을 직접 파싱한다.
+
+    실제로 확인해보니 RAG의 "concepts"/"target_column" JSON 필드가 "prompt"
+    텍스트와 어긋나는 경우가 있었다 — 예를 들어 "concepts"에는 옛날 방식대로
+    concept_id 21개가 전부 나열돼 있는데, 정작 LLM에게 그대로 들어가는
+    "prompt" 텍스트에는 이미 새 방식(대표 앵커 1개, "혈당" → ... = 4120120)만
+    적혀 있었다. LLM은 "prompt"만 보고 답하므로, 그 텍스트에 실제로 적힌
+    값이 유일하게 신뢰할 수 있는 정답이다 — "concepts" 필드는 쓰지 않는다.
+
+    "[재료]\\n개념 값 조건:\\n  - "이름" → table.column IN (1, 2, 3)" 또는
+    "table.column = 1" 형태의 줄을 찾는다."""
+    concepts = []
+    for m in CONCEPT_LINE_RE.finditer(prompt):
+        if m.group("ids_in"):
+            ids = [int(x) for x in re.findall(r"\d+", m.group("ids_in"))]
+        else:
+            ids = [int(m.group("id_eq"))]
+        concepts.append({"surface": m.group("surface"), "target_column": m.group("column"), "concept_ids": ids})
+    return concepts
+
+
 def summarize_rag_materials(rag_item: dict) -> tuple[str, str]:
-    """RAG가 이번 질의에 실제로 뭘 줬는지(개념명, target_column, concept_id
-    전체 목록, 테이블 목록)를 CSV에 그대로 남긴다.
+    """RAG의 "prompt" 필드에 실제로 뭐가 적혀 있는지(개념명, target_column,
+    concept_id 전체 목록, 테이블 목록)를 CSV에 그대로 남긴다.
 
     RAG API가 같은 자연어 질의에도 매번 다른 concept_id/target_column을 주는
     비결정성이 있는 것으로 확인됐다 (예: "만성신장질환"이 어떤 호출에서는
@@ -137,7 +176,7 @@ def summarize_rag_materials(rag_item: dict) -> tuple[str, str]:
     condition_occurrence.condition_concept_id로 감). 그래서 "몇 개"라는 개수만
     적으면 나중에 RAG를 다시 호출해 값을 맞춰볼 수 없다 — 이번 실행에서 실제로
     쓰인 값을 원문 그대로 남겨야 재현/검증이 가능하다."""
-    concepts = rag_item.get("concepts") or []
+    concepts = parse_concepts_from_prompt(rag_item["prompt"])
     if concepts:
         concepts_summary = "; ".join(
             f"{c['surface']} ({c['target_column']}, {len(c['concept_ids'])}개): "
@@ -516,11 +555,13 @@ def evaluate_case(
             "비고": "SQL이 아닌 자연어로 응답 (Format 이탈)",
         }
 
+    prompt_concepts = parse_concepts_from_prompt(rag_prompt)
+
     syntax_ok, syntax_reason = base.check_syntax(sql)
     if syntax_ok:
         schema_ok, schema_reason = base.check_schema(sql, schema)
-        concept_id_result, concept_id_detail = check_concept_id_fidelity(sql, rag_item.get("concepts") or [])
-        anchor_result, anchor_detail = check_anchor_subquery_usage(sql, rag_item.get("concepts") or [])
+        concept_id_result, concept_id_detail = check_concept_id_fidelity(sql, prompt_concepts)
+        anchor_result, anchor_detail = check_anchor_subquery_usage(sql, prompt_concepts)
     else:
         schema_ok, schema_reason = False, "구문 오류로 스키마 검증 불가"
         concept_id_result, concept_id_detail = "skip", "구문 오류로 확인 불가"
