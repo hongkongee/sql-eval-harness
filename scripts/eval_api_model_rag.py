@@ -18,6 +18,12 @@ RAG API 계약: ``POST {RAG_API_URL}`` body ``{"text": "<자연어 질의>"}`` -
 대신 실제로 실행해서 오류 없이 결과가 나오는지(EX 컬럼 = 실행 성공 여부, 정답과의
 일치가 아니라 "실행 가능한가")만 본다.
 
+{{}} 플레이스홀더가 안 남았다고 해서 RAG가 준 concept_id가 다 반영됐다는 뜻은
+아니다(일부만 베꼈거나, 엉뚱한 값으로 바꿨거나, 엉뚱한 컬럼에 넣었을 수 있음) —
+"concept_id 반영 결과/상세" 컬럼이 이를 별도로 검증한다. SQL의 'column IN (...)'
+꼴을 찾아 RAG가 준 concept_ids/target_column과 값 단위로 비교하는 휴리스틱이라,
+서브쿼리/OR/CASE 등으로 복잡하게 쪼개면 놓칠 수 있다.
+
 RAG가 만든 프롬프트가 곧 LLM에 들어가는 입력이므로, vLLM이 제공하는 ``/tokenize``
 엔드포인트(``{LLM_API_URL의 호스트}/tokenize`` — OpenAI 표준은 아니고 vLLM 확장)로
 실제 채팅 템플릿까지 적용한 정확한 입력 토큰 수를 재서 "LLM 프롬프트 토큰 수"
@@ -49,6 +55,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 import psycopg
 import requests
+import sqlglot
+from sqlglot import exp
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import eval_api_model as base  # noqa: E402 - .env 로딩 + 기존 체크 로직/유틸 재사용
@@ -77,6 +85,8 @@ RESULT_FIELDNAMES = [
     "SQL문법 에러 사유",
     "omop-cdm 스키마 오류 여부",
     "omop-cdm 스키마 에러 사유",
+    "concept_id 반영 결과",
+    "concept_id 반영 상세",
     "샌드박스 DB 실행검증 결과",
     "샌드박스 DB 실행검증 에러 사유",
     "EX 결과",
@@ -155,6 +165,100 @@ def count_prompt_tokens(
         return None, None, str(exc)
 
 
+def extract_in_clause_ids(sql: str) -> list[tuple[str, set[int]]]:
+    """SQL에서 'table.column IN (정수, 정수, ...)' 형태를 전부 뽑는다.
+    concept_id 검증용이라 리터럴이 전부 정수인 IN절만 대상으로 한다.
+    같은 컬럼에 서로 다른 개념의 IN절이 여러 번 나올 수 있어(예: 노출군/비교군
+    약물이 둘 다 drug_exposure.drug_concept_id를 씀) 딕셔너리가 아니라
+    (컬럼, id집합) 후보 리스트로 반환하고, 매칭은 호출부에서 겹치는 정도로 한다."""
+    substituted = base.PLACEHOLDER_RE.sub("0", sql)
+    try:
+        parsed = sqlglot.parse_one(substituted, read="postgres")
+    except Exception:
+        return []
+
+    alias_to_table: dict[str, str] = {}
+    for t in parsed.find_all(exp.Table):
+        alias_to_table[t.alias_or_name.lower()] = t.name.lower()
+
+    candidates: list[tuple[str, set[int]]] = []
+    for in_expr in parsed.find_all(exp.In):
+        col = in_expr.this
+        if not isinstance(col, exp.Column):
+            continue
+        qualifier = col.table.lower() if col.table else None
+        table_name = alias_to_table.get(qualifier) if qualifier else None
+        if table_name is None:
+            continue
+
+        ids: set[int] = set()
+        all_int = True
+        for lit in in_expr.expressions:
+            if isinstance(lit, exp.Literal) and lit.is_number:
+                try:
+                    ids.add(int(lit.this))
+                except ValueError:
+                    all_int = False
+                    break
+            else:
+                all_int = False
+                break
+        if all_int and ids:
+            candidates.append((f"{table_name}.{col.name.lower()}", ids))
+    return candidates
+
+
+def check_concept_id_fidelity(sql: str, concepts: list[dict]) -> tuple[str, str]:
+    """RAG가 준 concept_id 리스트가 모델 SQL의 IN절에 컬럼까지 정확히,
+    빠짐없이 반영됐는지 확인한다. 완벽한 의미 분석은 아니고 'column IN (...)'
+    형태를 찾는 휴리스틱이라, 서브쿼리/OR/CASE 등으로 복잡하게 쪼개면 놓칠
+    수 있다."""
+    if not concepts:
+        return "N/A", ""
+
+    candidates = extract_in_clause_ids(sql)
+    if not candidates:
+        details = [f"{c['surface']}({c['target_column']}): 전부 누락 (IN절을 찾을 수 없음)" for c in concepts]
+        return "fail", "; ".join(details)
+
+    used = [False] * len(candidates)
+    details = []
+    all_exact = True
+    for c in concepts:
+        expected = set(c["concept_ids"])
+        target_col = c["target_column"].lower()
+
+        best_idx, best_overlap = None, -1
+        for idx, (col, ids) in enumerate(candidates):
+            if used[idx] or col != target_col:
+                continue
+            overlap = len(expected & ids)
+            if overlap > best_overlap:
+                best_idx, best_overlap = idx, overlap
+
+        if best_idx is None:
+            all_exact = False
+            details.append(f"{c['surface']}({c['target_column']}): 해당 컬럼의 IN절 없음 (컬럼 불일치 또는 미반영)")
+            continue
+
+        used[best_idx] = True
+        found = candidates[best_idx][1]
+        missing = expected - found
+        extra = found - expected
+        if not missing and not extra:
+            details.append(f"{c['surface']}: 정확히 일치 ({len(expected)}개)")
+        else:
+            all_exact = False
+            parts = []
+            if missing:
+                parts.append(f"{len(missing)}개 누락")
+            if extra:
+                parts.append(f"{len(extra)}개 추가/변형")
+            details.append(f"{c['surface']}: {', '.join(parts)} (기대 {len(expected)}개)")
+
+    return ("pass" if all_exact else "fail"), "; ".join(details)
+
+
 def check_actual_execution(conn: psycopg.Connection | None, sql: str) -> tuple[str, str]:
     """EXPLAIN(계획만)이 아니라 실제로 SQL을 실행해서 오류 없이 끝나는지 확인.
     정답이 없으니 결과 일치가 아니라 '실행 가능한가'만 본다."""
@@ -196,6 +300,8 @@ def evaluate_case(
             "SQL문법 에러 사유": "",
             "omop-cdm 스키마 오류 여부": "fail",
             "omop-cdm 스키마 에러 사유": "",
+            "concept_id 반영 결과": "N/A",
+            "concept_id 반영 상세": "",
             "샌드박스 DB 실행검증 결과": "skip",
             "샌드박스 DB 실행검증 에러 사유": "",
             "EX 결과": "skip",
@@ -232,6 +338,8 @@ def evaluate_case(
             "SQL문법 에러 사유": "",
             "omop-cdm 스키마 오류 여부": "fail",
             "omop-cdm 스키마 에러 사유": "",
+            "concept_id 반영 결과": "skip",
+            "concept_id 반영 상세": "",
             "샌드박스 DB 실행검증 결과": "skip",
             "샌드박스 DB 실행검증 에러 사유": "",
             "EX 결과": "skip",
@@ -252,6 +360,8 @@ def evaluate_case(
             "SQL문법 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
             "omop-cdm 스키마 오류 여부": "fail",
             "omop-cdm 스키마 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)",
+            "concept_id 반영 결과": "skip",
+            "concept_id 반영 상세": "",
             "샌드박스 DB 실행검증 결과": "fail" if sandbox_conn is not None else "skip",
             "샌드박스 DB 실행검증 에러 사유": "SQL이 아닌 자연어로 응답 (Format 이탈)" if sandbox_conn is not None else "",
             "EX 결과": "fail" if sandbox_conn is not None else "skip",
@@ -262,8 +372,10 @@ def evaluate_case(
     syntax_ok, syntax_reason = base.check_syntax(sql)
     if syntax_ok:
         schema_ok, schema_reason = base.check_schema(sql, schema)
+        concept_id_result, concept_id_detail = check_concept_id_fidelity(sql, rag_item.get("concepts") or [])
     else:
         schema_ok, schema_reason = False, "구문 오류로 스키마 검증 불가"
+        concept_id_result, concept_id_detail = "skip", "구문 오류로 확인 불가"
 
     sandbox_result, sandbox_reason = base.check_sandbox_validity(sandbox_conn, sql)
     ex_result, ex_note = check_actual_execution(sandbox_conn, sql)
@@ -286,6 +398,8 @@ def evaluate_case(
         "SQL문법 에러 사유": "" if syntax_ok else syntax_reason,
         "omop-cdm 스키마 오류 여부": "pass" if schema_ok else "fail",
         "omop-cdm 스키마 에러 사유": "" if schema_ok else schema_reason,
+        "concept_id 반영 결과": concept_id_result,
+        "concept_id 반영 상세": concept_id_detail,
         "샌드박스 DB 실행검증 결과": sandbox_result,
         "샌드박스 DB 실행검증 에러 사유": sandbox_reason,
         "EX 결과": ex_result,
@@ -310,6 +424,12 @@ def print_summary(rows: list[dict]) -> None:
     print(f"  스키마 참조 정확도     : {schema_pass}/{n} ({schema_pass / n:.1%})")
     print(f"  {{}} 플레이스홀더 잔존   : {placeholder_left}/{n} ({placeholder_left / n:.1%})")
     print(f"  응답 속도(평균/최대)   : {sum(speeds) / n:.2f}s / {max(speeds):.2f}s  (RAG 호출 + LLM 호출 합산)")
+
+    concept_checked = [r for r in rows if r["concept_id 반영 결과"] in ("pass", "fail")]
+    if concept_checked:
+        concept_pass = sum(1 for r in concept_checked if r["concept_id 반영 결과"] == "pass")
+        m = len(concept_checked)
+        print(f"  concept_id 반영 정확도 : {concept_pass}/{m} ({concept_pass / m:.1%}) — RAG가 준 concept_id가 빠짐/변형 없이 반영됐는지")
 
     sandbox_checked = [r for r in rows if r["샌드박스 DB 실행검증 결과"] in ("pass", "fail")]
     if sandbox_checked:
