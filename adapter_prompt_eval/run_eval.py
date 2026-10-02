@@ -247,6 +247,19 @@ def evaluate_one(
     return row
 
 
+def load_existing_rows(out_path: Path) -> list[dict]:
+    """--resume용: 기존 결과 CSV를 읽어온다. 컬럼 구성이 지금 버전과 다르면
+    (예: 옛 버전 스크립트로 만든 파일) 이어쓰다 망가뜨리지 않도록 바로 에러를 낸다."""
+    with open(out_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames != CSV_FIELDNAMES:
+            raise SystemExit(
+                f"[오류] {out_path}의 컬럼 구성이 지금 스크립트와 달라 --resume으로 이어쓸 수 "
+                "없습니다. 파일을 지우거나 다른 이름으로 옮긴 뒤 다시 실행하세요."
+            )
+        return list(reader)
+
+
 def _rate(values: list, predicate=lambda v: v) -> tuple[float | None, int]:
     known = [v for v in values if v is not None and v not in ("N/A", "skip")]
     if not known:
@@ -365,6 +378,14 @@ def main() -> None:
         help="체크포인트 1개당 동시에 처리할 문항 수 (vLLM이 continuous batching을 지원하면 5~10 권장)",
     )
     parser.add_argument("--limit", type=int, default=None, help="각 테스트셋 앞 N건만 실행 (스모크 테스트용)")
+    parser.add_argument(
+        "--resume", action="store_true",
+        help=(
+            "체크포인트×테스트셋 조합마다 기존 결과 CSV가 있으면 거기 담긴 id는 다시 "
+            "호출하지 않고 이어서 나머지만 돌린다 (API 에러/중단 등으로 일부만 끝난 뒤 "
+            "재실행할 때 사용). 기본값은 매번 새로 덮어쓰기."
+        ),
+    )
     parser.add_argument("--output-dir", default=str(Path(__file__).resolve().parent.parent / "results"))
     args = parser.parse_args()
 
@@ -413,32 +434,48 @@ def main() -> None:
 
             for checkpoint_label, model_name in adapters:
                 out_path = output_dir / f"adapter_eval_{checkpoint_label}_{testset_label}.csv"
-                rows = []
 
-                def run_one(case: dict) -> dict:
-                    return evaluate_one(
-                        case, checkpoint_label, model_name, testset_label,
-                        args.api_url, args.system_prompt, args.max_tokens, args.timeout, pool.get(),
+                rows: list[dict] = []
+                pending_cases = cases
+                append_mode = False
+                if args.resume and out_path.exists() and out_path.stat().st_size > 0:
+                    rows = load_existing_rows(out_path)
+                    done_ids = {r["id"] for r in rows}
+                    pending_cases = [c for c in cases if str(c["id"]) not in done_ids]
+                    append_mode = True
+                    print(
+                        f"[이어하기] '{checkpoint_label}/{testset_label}': 기존 {len(rows)}건 "
+                        f"중 {len(cases) - len(pending_cases)}건 재사용, 남은 {len(pending_cases)}건 실행"
                     )
 
-                with open(out_path, "w", newline="", encoding="utf-8-sig") as f:
-                    writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)
-                    writer.writeheader()
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as executor:
-                        # 제출은 한 번에 다 해서 동시에 돌아가게 하되, 진행 로그/CSV 기록은
-                        # 원래 문항 순서대로 남긴다 (동시성이 출력 순서에 영향 안 주도록).
-                        futures = [executor.submit(run_one, case) for case in cases]
-                        for i, (case, future) in enumerate(zip(cases, futures), 1):
-                            row = future.result()
-                            rows.append(row)
-                            writer.writerow(row)
-                            f.flush()
-                            print(
-                                f"  [{checkpoint_label}][{i}/{len(cases)}] {case['id']}: "
-                                f"문법={row['SQL문법 결과']} 전개={row['쿼리문 하위 전개 반영도']} "
-                                f"concept_correctness={row['concept_id Correctness']} "
-                                f"EM={row['EM 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
-                            )
+                if not pending_cases:
+                    print(f"[이어하기] '{checkpoint_label}/{testset_label}': 이미 전부 완료되어 건너뜁니다.")
+                else:
+                    def run_one(case: dict) -> dict:
+                        return evaluate_one(
+                            case, checkpoint_label, model_name, testset_label,
+                            args.api_url, args.system_prompt, args.max_tokens, args.timeout, pool.get(),
+                        )
+
+                    with open(out_path, "a" if append_mode else "w", newline="", encoding="utf-8-sig") as f:
+                        writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)
+                        if not append_mode:
+                            writer.writeheader()
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as executor:
+                            # 제출은 한 번에 다 해서 동시에 돌아가게 하되, 진행 로그/CSV 기록은
+                            # 원래 문항 순서대로 남긴다 (동시성이 출력 순서에 영향 안 주도록).
+                            futures = [executor.submit(run_one, case) for case in pending_cases]
+                            for i, (case, future) in enumerate(zip(pending_cases, futures), 1):
+                                row = future.result()
+                                rows.append(row)
+                                writer.writerow(row)
+                                f.flush()
+                                print(
+                                    f"  [{checkpoint_label}][{i}/{len(pending_cases)}] {case['id']}: "
+                                    f"문법={row['SQL문법 결과']} 전개={row['쿼리문 하위 전개 반영도']} "
+                                    f"concept_correctness={row['concept_id Correctness']} "
+                                    f"EM={row['EM 결과']} EX={row['EX 결과']} ({row['응답 속도']}s)"
+                                )
 
                 summary = summarize(rows)
                 all_summaries[f"{testset_label}/{checkpoint_label}"] = summary

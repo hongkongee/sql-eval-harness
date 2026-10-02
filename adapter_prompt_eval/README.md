@@ -230,7 +230,21 @@ python run_eval.py \
   썼다면 `--system-prompt`로 지정할 것.
 - `--concurrency`로 체크포인트 1개당 동시 요청 수를 올릴 수 있다 (vLLM이
   continuous batching을 지원하면 5~10 권장 — `eval_api_model.py`/
-  `eval_api_model_rag.py`와 동일한 옵션).
+  `eval_api_model_rag.py`와 동일한 옵션). 단, `serve_vllm.sh`는 `--max-loras`를
+  지정하지 않아 vLLM 기본값(1)을 쓴다 — **같은 체크포인트로 가는 동시 요청은**
+  vLLM이 continuous batching으로 잘 묶어 처리하지만, **서로 다른 체크포인트로
+  가는 요청을 동시에 섞으면** 배치에 LoRA가 1개만 들어갈 수 있어 내부적으로
+  어댑터를 번갈아 교체하느라 비효율적일 수 있다. 이 스크립트는 체크포인트를
+  한 번에 하나씩만 순회하며 그 안에서만 동시 요청을 보내므로(코드 구조상
+  체크포인트 간에는 겹치지 않음) 이 제약과 자연스럽게 맞게 돼 있다 — 여러
+  체크포인트를 동시에 섞어 보내고 싶다면 `serve_vllm.sh`의 vLLM 실행 인자에
+  `--max-loras`를 체크포인트 수만큼 올려야 한다.
+- `--resume`을 주면 체크포인트×테스트셋 조합별 결과 CSV가 이미 있을 때 그
+  안에 담긴 `id`는 다시 호출하지 않고 나머지만 이어서 돌린다(새 행은 파일
+  끝에 append) — API 중간 에러나 프로세스 중단 후 재실행할 때 전체를 처음부터
+  다시 돌리지 않아도 된다. 기본값(=`--resume` 없음)은 항상 새로 덮어쓰기이다.
+  기존 CSV의 컬럼 구성이 지금 버전과 다르면(옛 버전으로 만든 파일 등) 덮어쓰기
+  전에 바로 에러를 내고 멈춘다.
 - 결과는 `../results/adapter_eval_<체크포인트>_<테스트셋>.csv`(문항별 상세)와
   `../results/adapter_eval_summary_<시각>.json`(체크포인트×테스트셋 전체 집계)에
   저장된다. `../results/`는 이미 `.gitignore` 처리돼 있다.
