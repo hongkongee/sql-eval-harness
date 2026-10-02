@@ -120,6 +120,18 @@ python scripts/eval_api_model.py --max-tokens 512 --concurrency 5
 
 `--api-url`/`--model`로 다른 엔드포인트·모델명을 지정할 수 있고, `--skip-dataset`/`--skip-custom`으로 한쪽만 돌릴 수도 있다. 결과 CSV 컬럼: 자연어 질의, 모델 답변 쿼리문, 정답 쿼리문(신규 질의는 빈칸), SQL문법 결과/에러 사유, omop-cdm 스키마 오류 여부/에러 사유, 응답 속도, 비고(출처 시나리오·항목·경고).
 
+## 어댑터 단독(RAG 미연동) + [질의]/[재료] 프롬프트 모델 평가 — 체크포인트 비교 / Prompt Adherence
+
+"프롬프트 반영 + concept 랜덤화" 방식으로 학습한 모델을, RAG 없이 체크포인트
+여러 개(eval_loss 최저 / concept-id score 최고 / final step 등) × 테스트셋
+여러 개(학습셋 재현 / 독립 테스트셋 / LLM 생성 테스트셋)에 대해 한 번에 비교
+평가하려면 `adapter_prompt_eval/`을 쓴다. 모델은 로컬에서 로드하지 않고,
+`automl-llm/scripts/serve_vllm.sh`로 이미 띄워둔 원격 vLLM 서버에
+`/v1/chat/completions`로 체크포인트별 `model` 이름만 바꿔가며 요청한다.
+SQL Validity/EM/EX 외에, concept-id/스키마 각각의 Presence·Correctness·Usage
+"Prompt Adherence"와 concept_ancestor 하위 개념 전개 반영도까지 측정한다.
+자세한 내용과 테스트셋 파일 스키마는 `adapter_prompt_eval/README.md` 참고.
+
 ## 구조
 
 ```
@@ -142,6 +154,12 @@ python scripts/eval_api_model.py --max-tokens 512 --concurrency 5
 │   ├── requirements-infer.txt # infer_lora.py 전용 의존성 (torch/transformers/peft — 채점 로직과 분리)
 │   ├── eval_api_model.py      # 서빙 중인 모델을 API로 호출해 Syntactic Validity/Format 이탈율/스키마 환각/응답 속도를 CSV로 평가
 │   └── requirements-eval-api.txt  # eval_api_model.py 전용 의존성 (requests/sqlglot)
+├── adapter_prompt_eval/
+│   ├── README.md              # 테스트셋 파일 스키마, Presence/Correctness/Usage 지표 정의, 사용법
+│   ├── run_eval.py             # CLI 진입점 (--adapter/--testset 여러 개 지정해 체크포인트×테스트셋 전체 비교)
+│   ├── inference.py            # 원격 vLLM 서버에 /v1/chat/completions 호출 (로컬 모델 로드 없음)
+│   ├── adherence.py            # [재료] 텍스트 파싱 + concept-id/스키마 Prompt Adherence, 하위 전개 반영도 채점
+│   └── requirements.txt        # 전용 의존성 (requests/sqlglot/psycopg — 로컬 추론 없어 torch 불필요)
 └── examples/
     └── predictions.example.jsonl  # 스모크 테스트용 샘플 예측 (일부러 EM만 실패/문법 오류 케이스 포함)
 ```

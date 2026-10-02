@@ -1,0 +1,5 @@
+# 원격 vLLM 서버에 HTTP로 요청만 보내므로 torch/transformers/peft는 필요 없다
+# (로컬에서 모델을 로드하지 않음 — inference.py 참고).
+requests>=2.32
+sqlglot>=30
+psycopg[binary]>=3.1
