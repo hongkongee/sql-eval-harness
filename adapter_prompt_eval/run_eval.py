@@ -19,6 +19,10 @@
 모델 + 체크포인트들을 원격 vLLM 서버에 `--enable-lora`로 이미 동시에 띄워둔
 전제로, OpenAI 호환 `/v1/chat/completions`에 `model` 필드만 체크포인트별
 서빙 이름(예: `by-loss`/`final-step`/`by-adherence`)으로 바꿔가며 요청한다.
+`--adapter`를 하나도 안 주면 `.env`의 `CHECKPOINT_EVAL_LOSS`/`CHECKPOINT_CONCEPT_ID`/
+`CHECKPOINT_FINAL_STEP`(설정된 것만) 기본값을 쓰고, `--no-base`를 안 주면
+베이스 모델(`.env`의 `BASE_MODEL_NAME`, 파인튜닝 전)도 자동으로 같이 비교한다
+— "체크포인트 3개 vs 베이스 모델"까지 한 번에 보고 싶을 때를 위함.
 
 RAG는 붙이지 않는다 — 테스트셋 파일은 automl-llm의 학습 데이터셋과 동일한
 물리 필드("text"=자연어 질의, "input"=재료, "query"=정답 SQL)로 주면 되고,
@@ -31,18 +35,24 @@ RAG는 붙이지 않는다 — 테스트셋 파일은 automl-llm의 학습 데�
   {"id": "...", "text": "자연어 질의", "input": "[재료]\\n...", "query": "<정답 SQL, 모르면 \"\">"}
   {"id": "...", "prompt": "[질의]\\n...\\n\\n[재료]\\n...", "query": "<정답 SQL, 모르면 \"\">"}  # 이미 조립된 경우
 
-사용법:
+사용법 (.env에 VLLM_HOST/VLLM_PORT/CHECKPOINT_*/BASE_MODEL_NAME을 채워뒀다면
+--adapter/--api-url 없이 테스트셋만 줘도 체크포인트 전부 + 베이스 모델까지
+자동으로 비교한다):
+  python run_eval.py \\
+      --testset train_repro=/path/to/train_subset.jsonl \\
+      --testset independent=/path/to/mpx_testset.jsonl \\
+      --testset llm_generated=/path/to/llm_generated_testset.jsonl
+
+  # 명시적으로 지정하고 싶으면 (.env 설정을 덮어씀)
   python run_eval.py \\
       --api-url http://<vLLM 서버>:<포트>/v1/chat/completions \\
       --adapter eval_loss=by-loss \\
       --adapter concept_id=by-adherence \\
       --adapter final_step=final-step \\
-      --testset train_repro=/path/to/train_subset.jsonl \\
-      --testset independent=/path/to/mpx_testset.jsonl \\
-      --testset llm_generated=/path/to/llm_generated_testset.jsonl
+      --testset independent=/path/to/mpx_testset.jsonl
 
-  # 스모크 테스트 (각 테스트셋 앞 5건만, 체크포인트 1개만)
-  python run_eval.py --adapter final_step=final-step --testset smoke=/path/... --limit 5
+  # 스모크 테스트 (한 테스트셋 앞 5건만, 체크포인트 1개만, 베이스 모델 비교는 끔)
+  python run_eval.py --adapter final_step=final-step --no-base --testset smoke=/path/... --limit 5
 """
 from __future__ import annotations
 
@@ -50,6 +60,7 @@ import argparse
 import concurrent.futures
 import csv
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -58,7 +69,28 @@ import adherence as ad
 from inference import call_model
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import eval_api_model as base  # noqa: E402 - .env 로딩(LLM_API_URL/SANDBOX_DB_*) + syntax/sandbox/EM/EX 유틸 재사용
+import eval_api_model as base  # noqa: E402 - 공용 .env 로딩 + syntax/sandbox/EM/EX 유틸 재사용
+
+# adapter_prompt_eval 전용 설정은 공용 .env(scripts/eval_api_model.py가 쓰는
+# LLM_API_URL 등)와 분리된 별도 .env에 둔다 — 이 도구가 말 거는 원격 서버는
+# serve_vllm.sh로 체크포인트 여러 개를 동시에 올려둔 평가용 vLLM이라, 운영
+# 서빙 엔드포인트(LLM_API_URL)와는 보통 다른 서버이기 때문.
+base._load_dotenv(Path(__file__).resolve().parent / ".env")
+
+_VLLM_HOST = os.environ.get("VLLM_HOST", "").strip()
+_VLLM_PORT = os.environ.get("VLLM_PORT", "").strip()
+DEFAULT_API_URL = f"http://{_VLLM_HOST}:{_VLLM_PORT}/v1/chat/completions" if _VLLM_HOST and _VLLM_PORT else None
+
+DEFAULT_CHECKPOINTS = [
+    (label, value)
+    for label, value in (
+        ("eval_loss", os.environ.get("CHECKPOINT_EVAL_LOSS", "").strip()),
+        ("concept_id", os.environ.get("CHECKPOINT_CONCEPT_ID", "").strip()),
+        ("final_step", os.environ.get("CHECKPOINT_FINAL_STEP", "").strip()),
+    )
+    if value
+]
+DEFAULT_BASE_MODEL_NAME = os.environ.get("BASE_MODEL_NAME", "").strip() or None
 
 CSV_FIELDNAMES = [
     "id",
@@ -300,14 +332,27 @@ def print_summary(label: str, summary: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="어댑터 단독(RAG 미연동) [질의]/[재료] nl2sql 모델 평가 — 원격 vLLM API 호출")
     parser.add_argument(
-        "--adapter", action="append", required=True, metavar="LABEL=MODEL_NAME",
+        "--adapter", action="append", default=None, metavar="LABEL=MODEL_NAME",
         help=(
             "원격 vLLM 서버에 등록된 체크포인트 모델 이름 (예: eval_loss=by-loss, "
             "concept_id=by-adherence, final_step=final-step — automl-llm/scripts/serve_vllm.sh가 "
-            "등록하는 이름). 여러 번 지정 가능 (최소 1개)."
+            "등록하는 이름). 여러 번 지정 가능. 생략하면 .env의 CHECKPOINT_EVAL_LOSS/"
+            "CHECKPOINT_CONCEPT_ID/CHECKPOINT_FINAL_STEP 중 설정된 것만 기본값으로 쓴다."
         ),
     )
-    parser.add_argument("--api-url", default=base.API_URL, help=".env의 LLM_API_URL이 기본값")
+    parser.add_argument(
+        "--base-model-name", default=DEFAULT_BASE_MODEL_NAME, metavar="MODEL_NAME",
+        help=(
+            "베이스 모델(파인튜닝 전) 자체도 같이 비교하려면 그 served model 이름 "
+            "(serve_vllm.sh가 --served-model-name으로 등록한 {STUDY_NAME}). "
+            "미지정 시 .env의 BASE_MODEL_NAME이 기본값."
+        ),
+    )
+    parser.add_argument(
+        "--no-base", action="store_true",
+        help="베이스 모델 이름이 있어도(--base-model-name/.env BASE_MODEL_NAME) 베이스 모델 비교를 끈다.",
+    )
+    parser.add_argument("--api-url", default=DEFAULT_API_URL, help=".env의 VLLM_HOST/VLLM_PORT로 조립한 URL이 기본값")
     parser.add_argument(
         "--testset", action="append", required=True, metavar="LABEL=PATH",
         help="평가할 테스트셋 JSONL 파일 (예: independent=/path/to/mpx.jsonl). 여러 번 지정 가능.",
@@ -323,8 +368,27 @@ def main() -> None:
     parser.add_argument("--output-dir", default=str(Path(__file__).resolve().parent.parent / "results"))
     args = parser.parse_args()
 
-    adapters = [parse_labeled_value(a) for a in args.adapter]
+    adapters = [parse_labeled_value(a) for a in args.adapter] if args.adapter else list(DEFAULT_CHECKPOINTS)
+    if not args.no_base:
+        if args.base_model_name:
+            adapters.append(("base", args.base_model_name))
+        else:
+            print("[안내] 베이스 모델 이름이 없어(--base-model-name 또는 .env BASE_MODEL_NAME) 베이스 모델 비교는 건너뜁니다.")
+    if not adapters:
+        raise SystemExit(
+            "[오류] 테스트할 체크포인트가 하나도 없습니다. --adapter를 지정하거나 "
+            ".env의 CHECKPOINT_EVAL_LOSS/CHECKPOINT_CONCEPT_ID/CHECKPOINT_FINAL_STEP 중 "
+            "하나 이상을 설정하세요 (베이스 모델만 보려면 --base-model-name만 줘도 됨)."
+        )
+    if not args.api_url:
+        raise SystemExit(
+            "[오류] --api-url이 없고 .env의 VLLM_HOST/VLLM_PORT도 설정되지 않았습니다. "
+            "adapter_prompt_eval/.env.example을 참고해 .env를 채우거나 --api-url을 직접 지정하세요."
+        )
     testsets = [parse_labeled_path(t) for t in args.testset]
+
+    print(f"API: {args.api_url}")
+    print("체크포인트: " + ", ".join(f"{label}={model_name}" for label, model_name in adapters))
 
     pool = base.SandboxConnectionPool()
     if pool.get() is not None:

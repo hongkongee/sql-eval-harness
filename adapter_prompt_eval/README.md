@@ -33,7 +33,36 @@ curl -s http://<vLLM 서버 IP>:<포트>/v1/chat/completions \
 ```
 
 이 도구는 테스트 케이스마다 위 curl과 똑같은 요청을, `--adapter`로 지정한
-체크포인트 수만큼 `model` 필드만 바꿔서 자동으로 반복한다.
+체크포인트 수만큼(+ 기본적으로 베이스 모델까지 한 번 더) `model` 필드만 바꿔서
+자동으로 반복한다 — `python run_eval.py --adapter a=X --adapter b=Y --testset t=f.jsonl`
+한 번이면 체크포인트 2개 × 테스트셋 1개 = 2개의 결과 CSV가 나오고, 테스트셋을
+여러 개 주면(`--testset t1=... --testset t2=...`) 체크포인트 수 × 테스트셋 수
+만큼 CSV가 나온다. 여기에 베이스 모델 비교까지 켜져 있으면(기본값) 체크포인트
+수에 +1이 된다.
+
+## .env 설정
+
+이 폴더 전용 설정은 `../.env`(공용 — `eval_api_model.py` 계열이 쓰는
+`LLM_API_URL`, `SANDBOX_DB_*`)와 분리된 `adapter_prompt_eval/.env`에 둔다 —
+이 도구가 말 거는 vLLM 서버(체크포인트 여러 개를 동시에 올려둔 평가용 서버)는
+보통 운영 서빙 엔드포인트(`LLM_API_URL`)와 다른 서버이기 때문이다. 샌드박스
+DB 설정(`SANDBOX_DB_*`)은 여러 도구가 공유하는 설정이라 그대로 `../.env`에
+남아있고, 이 도구도 그걸 그대로 읽는다 — `../.env`도 같이 채워둘 것.
+
+```bash
+cd adapter_prompt_eval
+cp .env.example .env   # VLLM_HOST/VLLM_PORT/CHECKPOINT_*/BASE_MODEL_NAME 값 채우기
+```
+
+| 변수 | 의미 |
+|---|---|
+| `VLLM_HOST` / `VLLM_PORT` | 체크포인트들을 서빙 중인 vLLM 서버 주소. `http://{HOST}:{PORT}/v1/chat/completions`로 조립해 기본 `--api-url`로 쓴다 |
+| `CHECKPOINT_EVAL_LOSS` / `CHECKPOINT_CONCEPT_ID` / `CHECKPOINT_FINAL_STEP` | `serve_vllm.sh`가 등록한 체크포인트별 served model 이름. `--adapter`를 하나도 안 주면 이 중 값이 채워진 것만 자동으로 쓴다 |
+| `BASE_MODEL_NAME` | 베이스 모델(파인튜닝 전) 자체의 served model 이름(`serve_vllm.sh`의 `{STUDY_NAME}`). 값이 있으면 `--no-base`를 안 주는 한 체크포인트들과 나란히 자동으로 비교 평가된다 |
+
+세 `CHECKPOINT_*` 전부와 `BASE_MODEL_NAME`을 채워두면, `--adapter`/`--api-url`
+없이 `--testset`만 주고 돌려도 체크포인트 3개 + 베이스 모델까지 자동으로
+비교된다 (아래 "사용법"의 첫 예시).
 
 ## 이 도구가 하는 일
 
@@ -146,34 +175,47 @@ concept-id Adherence는 케이스 하나에 앵커가 여러 개면 그 평균 "
 ```bash
 cd adapter_prompt_eval
 pip install -r requirements.txt
-cp ../.env.example ../.env   # 아직 없다면 (LLM_API_URL/SANDBOX_DB_* 등 — ../.env를 그대로 재사용)
+cp .env.example .env         # VLLM_HOST/VLLM_PORT/CHECKPOINT_*/BASE_MODEL_NAME 채우기
+cp ../.env.example ../.env   # 아직 없다면 (SANDBOX_DB_* 등 공용 설정)
 
+# .env를 다 채웠다면 테스트셋만 지정해도 체크포인트 3개 + 베이스 모델이 전부 돌아간다
+python run_eval.py \
+    --testset train_repro=/path/to/train_subset.jsonl \
+    --testset independent=/path/to/mpx_testset.jsonl \
+    --testset llm_generated=/path/to/llm_generated_testset.jsonl
+
+# .env를 안 쓰거나 일부만 덮어쓰고 싶으면 명시적으로 지정
 python run_eval.py \
     --api-url http://<vLLM 서버 IP>:<포트>/v1/chat/completions \
     --adapter eval_loss=by-loss \
     --adapter concept_id=by-adherence \
     --adapter final_step=final-step \
-    --testset train_repro=/path/to/train_subset.jsonl \
-    --testset independent=/path/to/mpx_testset.jsonl \
-    --testset llm_generated=/path/to/llm_generated_testset.jsonl
+    --base-model-name llm-finetune-study \
+    --testset independent=/path/to/mpx_testset.jsonl
 
-# 스모크 테스트 (한 테스트셋 앞 5건만, 체크포인트 1개만)
+# 스모크 테스트 (한 테스트셋 앞 5건만, 체크포인트 1개만, 베이스 모델 비교는 끔)
 python run_eval.py \
-    --api-url http://<vLLM 서버 IP>:<포트>/v1/chat/completions \
     --adapter final_step=final-step \
+    --no-base \
     --testset smoke=/path/to/testset.jsonl \
     --limit 5
 ```
 
 - `--adapter`는 `LABEL=MODEL_NAME` 형태로 여러 번 지정한다. `MODEL_NAME`은
   로컬 경로가 아니라 **원격 vLLM 서버에 등록된 served model 이름**이다
-  (`serve_vllm.sh`가 등록하는 `by-loss`/`final-step`/`by-adherence`, 또는
-  베이스 모델 자체를 baseline으로 보고 싶으면 `{STUDY_NAME}`). `LABEL`은
+  (`serve_vllm.sh`가 등록하는 `by-loss`/`final-step`/`by-adherence`). `LABEL`은
   결과 파일 이름/CSV의 "체크포인트" 컬럼에 쓰이는 식별자일 뿐이라 자유롭게
-  붙이면 된다 (`=`가 없으면 `MODEL_NAME` 자체를 라벨로도 쓴다).
+  붙이면 된다 (`=`가 없으면 `MODEL_NAME` 자체를 라벨로도 쓴다). 생략하면
+  `.env`의 `CHECKPOINT_EVAL_LOSS`/`CHECKPOINT_CONCEPT_ID`/`CHECKPOINT_FINAL_STEP`
+  중 값이 채워진 것만 기본값으로 쓴다.
+- **베이스 모델(파인튜닝 전) 자체도 기본적으로 같이 비교 평가된다** —
+  `--base-model-name`(또는 `.env`의 `BASE_MODEL_NAME`)에 served model 이름을
+  주면(`serve_vllm.sh`의 `{STUDY_NAME}`) 체크포인트들 뒤에 `체크포인트=base`로
+  자동 추가된다. 끄려면 `--no-base`.
 - `--testset`은 `LABEL=PATH` 형태로 여러 번 지정한다 (`=`가 없으면 파일명이
-  LABEL이 된다).
-- `--api-url`을 생략하면 `.env`의 `LLM_API_URL`을 쓴다.
+  LABEL이 된다). **체크포인트 수 × 테스트셋 수**만큼 결과 CSV가 생성된다 —
+  예를 들어 체크포인트 3개(+베이스 모델 1개) × 테스트셋 3개면 CSV 12개.
+- `--api-url`을 생략하면 `.env`의 `VLLM_HOST`/`VLLM_PORT`로 조립한 URL을 쓴다.
 - `--system-prompt`를 생략하면 system 메시지 없이 조립된 프롬프트 전체를
   user 메시지로 그대로 보낸다 — `automl-llm/scripts/compute_adherence.py`가
   학습 데이터의 instruction+input을 system 메시지 없이 단일 user 메시지로
@@ -188,10 +230,13 @@ python run_eval.py \
 
 ## 기존 코드 재사용
 
-- SQL 문법 검사(sqlglot), 샌드박스 DB 실행검증(EXPLAIN), EM, EX, `.env`
-  로딩(`LLM_API_URL`/`SANDBOX_DB_*`)은 `../scripts/eval_api_model.py`를
-  그대로 import해서 쓴다 (`eval_api_model_rag.py`가 이미 쓰는 것과 같은
-  패턴: `sys.path.insert(...); import eval_api_model as base`).
+- SQL 문법 검사(sqlglot), 샌드박스 DB 실행검증(EXPLAIN), EM, EX, 그리고 `.env`
+  로더 자체(`_load_dotenv`)는 `../scripts/eval_api_model.py`를 그대로
+  import해서 쓴다 (`eval_api_model_rag.py`가 이미 쓰는 것과 같은 패턴:
+  `sys.path.insert(...); import eval_api_model as base`). import 시점에
+  `../.env`(공용 — `SANDBOX_DB_*` 등)가 먼저 로드되고, 그 뒤 같은 로더로
+  `adapter_prompt_eval/.env`(이 폴더 전용 — `VLLM_HOST`/`CHECKPOINT_*`/
+  `BASE_MODEL_NAME`)를 추가로 로드한다.
 - `/v1/chat/completions` 호출 자체(`inference.py`)도 `eval_api_model.py`의
   `call_model()`과 같은 요청 형태를 쓴다 — 차이는 system 메시지 기본값(이
   도구는 기본적으로 안 보냄, 아래 "사용법" 참고)뿐이다.
