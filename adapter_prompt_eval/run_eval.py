@@ -343,6 +343,12 @@ def print_summary(label: str, summary: dict) -> None:
 
 
 def main() -> None:
+    # stdout을 파일/파이프로 리다이렉트하면(nohup ... > out.log &) 파이썬이 터미널일 때와
+    # 달리 완전 버퍼링으로 바뀌어 진행 로그가 버퍼에 쌓이기만 하고 한참 안 보일 수 있다.
+    # 이 스크립트는 애초에 한 문항 처리에 수 초씩 걸리는 장시간 작업이라 줄 단위로 바로
+    # flush되는 쪽이 이득이 훨씬 크다(디스크 I/O 오버헤드는 무시할 만함).
+    sys.stdout.reconfigure(line_buffering=True)
+
     parser = argparse.ArgumentParser(description="어댑터 단독(RAG 미연동) [질의]/[재료] nl2sql 모델 평가 — 원격 vLLM API 호출")
     parser.add_argument(
         "--adapter", action="append", default=None, metavar="LABEL=MODEL_NAME",

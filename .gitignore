@@ -7,3 +7,4 @@ venv/
 .vscode/
 .env
 results/
+nohup.out
