@@ -184,14 +184,16 @@ python run_eval.py \
     --testset independent=/path/to/mpx_testset.jsonl \
     --testset llm_generated=/path/to/llm_generated_testset.jsonl
 
-# .env를 안 쓰거나 일부만 덮어쓰고 싶으면 명시적으로 지정
+# api-url/adapter/testset만 명시하고 나머지(베이스 모델 비교 여부 등)는 .env 기본값 그대로.
+# --base-model-name을 안 줬어도 .env에 BASE_MODEL_NAME이 있으면 베이스 모델이 자동으로 붙는다.
 python run_eval.py \
     --api-url http://<vLLM 서버 IP>:<포트>/v1/chat/completions \
     --adapter eval_loss=by-loss \
     --adapter concept_id=by-adherence \
     --adapter final_step=final-step \
-    --base-model-name llm-finetune-study \
-    --testset independent=/path/to/mpx_testset.jsonl
+    --testset train_repro=/path/to/train_subset.jsonl \
+    --testset independent=/path/to/mpx_testset.jsonl \
+    --testset llm_generated=/path/to/llm_generated_testset.jsonl
 
 # 스모크 테스트 (한 테스트셋 앞 5건만, 체크포인트 1개만, 베이스 모델 비교는 끔)
 python run_eval.py \
@@ -211,7 +213,12 @@ python run_eval.py \
 - **베이스 모델(파인튜닝 전) 자체도 기본적으로 같이 비교 평가된다** —
   `--base-model-name`(또는 `.env`의 `BASE_MODEL_NAME`)에 served model 이름을
   주면(`serve_vllm.sh`의 `{STUDY_NAME}`) 체크포인트들 뒤에 `체크포인트=base`로
-  자동 추가된다. 끄려면 `--no-base`.
+  자동 추가된다. 끄려면 `--no-base`. **이건 `--api-url`/`--adapter`를 CLI로
+  명시했는지와 무관하게 독립적으로 적용된다** — 위 두 번째 예시처럼
+  `--api-url`/`--adapter`만 CLI로 주고 `--base-model-name`을 안 줘도,
+  `.env`에 `BASE_MODEL_NAME`이 설정돼 있으면 베이스 모델이 자동으로
+  섞여 들어간다. 베이스 모델을 빼고 싶으면 CLI 인자를 얼마나 명시했든
+  관계없이 `--no-base`를 따로 줘야 한다.
 - `--testset`은 `LABEL=PATH` 형태로 여러 번 지정한다 (`=`가 없으면 파일명이
   LABEL이 된다). **체크포인트 수 × 테스트셋 수**만큼 결과 CSV가 생성된다 —
   예를 들어 체크포인트 3개(+베이스 모델 1개) × 테스트셋 3개면 CSV 12개.
