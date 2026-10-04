@@ -30,6 +30,7 @@ from typing import Any
 
 import sqlglot
 from sqlglot import exp
+from sqlglot.optimizer.scope import Scope, traverse_scope
 
 _ANCHOR_LINE = re.compile(
     r'"[^"]*"\s*→\s*(?P<table>\w+)\.(?P<column>\w+)\s*'
@@ -226,19 +227,105 @@ def score_concept_adherence(sql: str, anchors: list[dict[str, Any]]) -> dict[str
     }
 
 
-def _resolve_join_tables(sql_join: exp.Join, alias_to_table: dict[str, str]) -> set[frozenset[str]]:
+def _lookup_source(scope: Scope, name: str) -> Any:
+    """별칭 name이 가리키는 원본(실제 테이블 또는 CTE/서브쿼리 scope)을 바깥 scope까지 거슬러 찾는다
+    (EXISTS 상관 서브쿼리 안에서 바깥 테이블 별칭을 참조하는 경우)."""
+    s: Scope | None = scope
+    while s is not None:
+        if name in s.sources:
+            return s.sources[name]
+        s = s.parent
+    return None
+
+
+def _resolve_column(col: exp.Column, scope: Scope, depth: int = 0) -> str | None:
+    """컬럼을 실제 "table.column"으로 되짚는다. CTE/서브쿼리 별칭이면 그 투영을
+    따라 원본 테이블까지 내려간다 (UNION이면 첫 SELECT 기준). 별칭 없는 컬럼은
+    그 SELECT의 원본이 하나뿐일 때만 귀속시킨다."""
+    if depth > 10:
+        return None
+    if col.table:
+        src = _lookup_source(scope, col.table)
+    else:
+        src = next(iter(scope.sources.values())) if len(scope.sources) == 1 else None
+    if isinstance(src, exp.Table):
+        return f"{src.name.lower()}.{col.name.lower()}"
+    if isinstance(src, Scope):
+        select = src.expression
+        while isinstance(select, exp.SetOperation):
+            select = select.left
+        if not isinstance(select, exp.Select):
+            return None
+        inner_scope = src if src.expression is select else next(
+            (s for s in src.union_scopes if s.expression is select), src
+        )
+        for proj in select.selects:
+            if proj.alias_or_name.lower() == col.name.lower():
+                inner = proj.this if isinstance(proj, exp.Alias) else proj
+                if isinstance(inner, exp.Column):
+                    return _resolve_column(inner, inner_scope, depth + 1)
+        return None
+    return None
+
+
+def _add_join_pair(pairs: set[frozenset[str]], left: str | None, right: str | None) -> None:
+    if not left or not right:
+        return
+    lt, rt = left.split(".")[0], right.split(".")[0]
+    if lt == rt or lt in _ALWAYS_ALLOWED_TABLES or rt in _ALWAYS_ALLOWED_TABLES:
+        return  # 같은 테이블끼리(자기 참조) 또는 하위 개념 확장용 테이블 연결은 조인 평가 대상 아님
+    if not (left.endswith("_id") and right.endswith("_id")):
+        return  # 날짜 등 값이 같은 기록을 찾는 조건(예: measurement_date = observation_date)은 표 연결 키가 아님
+    pairs.add(frozenset({left, right}))
+
+
+def _collect_join_pairs(parsed: exp.Expression) -> set[frozenset[str]]:
+    """SQL이 서로 다른 테이블을 잇는 데 쓴 (table.column, table.column) 쌍을 모은다.
+    표를 잇는 조건은 세 위치에 올 수 있어 모두 본다:
+      - JOIN ... ON a.x = b.x
+      - WHERE/EXISTS 안의 a.x = b.x (상관 서브쿼리)
+      - a.x IN (SELECT x FROM b ...)"""
     pairs: set[frozenset[str]] = set()
-    on = sql_join.args.get("on")
-    if on is None:
-        return pairs
-    for eq in on.find_all(exp.EQ):
-        left, right = eq.this, eq.expression
-        if isinstance(left, exp.Column) and isinstance(right, exp.Column):
-            lt = alias_to_table.get((left.table or "").lower())
-            rt = alias_to_table.get((right.table or "").lower())
-            if lt and rt:
-                pairs.add(frozenset({f"{lt}.{left.name.lower()}", f"{rt}.{right.name.lower()}"}))
+    for scope in traverse_scope(parsed):
+        own_columns = {id(c) for c in scope.columns}
+        for eq in scope.expression.find_all(exp.EQ):
+            left, right = eq.this, eq.expression
+            if (
+                isinstance(left, exp.Column) and isinstance(right, exp.Column)
+                and id(left) in own_columns and id(right) in own_columns
+            ):
+                _add_join_pair(pairs, _resolve_column(left, scope), _resolve_column(right, scope))
+        for in_expr in scope.expression.find_all(exp.In):
+            sub = in_expr.args.get("query")
+            left = in_expr.this
+            if sub is None or not isinstance(left, exp.Column) or id(left) not in own_columns:
+                continue
+            sub_select = sub.this if isinstance(sub, exp.Subquery) else sub
+            sub_scope = next((s for s in scope.subquery_scopes if s.expression is sub_select), None)
+            if sub_scope is None or not isinstance(sub_select, exp.Select) or len(sub_select.selects) != 1:
+                continue
+            proj = sub_select.selects[0]
+            inner = proj.this if isinstance(proj, exp.Alias) else proj
+            if isinstance(inner, exp.Column):
+                _add_join_pair(pairs, _resolve_column(left, scope), _resolve_column(inner, sub_scope))
     return pairs
+
+
+def _join_groups(joins: list[tuple[str, str]]) -> dict[str, str]:
+    """재료 조인 목록으로 "같은 기준 항목" 묶음을 만든다 (예: drug_exposure.person_id,
+    condition_occurrence.person_id가 둘 다 person.person_id와 이어지면 셋은 한 묶음).
+    반환값은 table.column -> 묶음 대표."""
+    parent: dict[str, str] = {}
+
+    def find(x: str) -> str:
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            x = parent[x]
+        return x
+
+    for a, b in joins:
+        parent[find(a)] = find(b)
+    return {c: find(c) for c in parent}
 
 
 def score_schema_adherence(
@@ -250,9 +337,13 @@ def score_schema_adherence(
                    엉뚱한 테이블만 쓴 경우를 잡는다)
     - correctness: 참조한 모든 테이블/컬럼이 재료 범위 안에 있는가 (재료 밖
                    테이블/컬럼 참조 = 설령 DB에 실재해도 이 질의에는 "환각")
-    - usage      : 재료가 준 테이블을 2개 이상 join했다면, 그 join이 재료의
-                   조인 목록과 일치하는가 (테이블이 1개뿐이거나 재료에 조인
-                   정보가 없으면 평가 대상이 아니라 None)
+    - usage      : 재료가 준 테이블을 2개 이상 썼다면, 표를 잇는 데 쓴 기준
+                   항목이 모두 재료의 조인 목록과 맞는가. JOIN ON뿐 아니라
+                   EXISTS/WHERE 안의 동등 조건, IN 서브쿼리도 연결로 본다. 재료의
+                   조인으로 이어지는 항목끼리는 직접 나열되지 않아도 맞는 연결로
+                   본다 (예: 둘 다 person.person_id와 이어지는 두 테이블의 person_id).
+                   테이블이 1개뿐이거나, 재료에 조인 정보가 없거나, 연결 조건 없이
+                   UNION 등으로만 합친 경우는 평가 대상이 아니라 None
     """
     if not schema:
         return {
@@ -304,7 +395,7 @@ def score_schema_adherence(
 
     correctness = not unknown_tables and not unknown_columns
 
-    used_tables = set(real_tables) & set(schema)
+    used_tables = (set(real_tables) & set(schema)) - _ALWAYS_ALLOWED_TABLES
     if len(used_tables) < 2:
         usage = None
         usage_detail = "테이블 1개 이하 참조 - 조인 평가 대상 아님"
@@ -312,14 +403,18 @@ def score_schema_adherence(
         usage = None
         usage_detail = "재료에 조인 정보 없음"
     else:
-        used_pairs: set[frozenset[str]] = set()
-        for j in parsed.find_all(exp.Join):
-            used_pairs |= _resolve_join_tables(j, alias_to_table)
-        expected_pairs = {frozenset({a, b}) for a, b in joins}
-        matched = used_pairs & expected_pairs
-        usage = bool(matched) if used_pairs else False
-        extra = used_pairs - expected_pairs
-        usage_detail = f"일치 조인 {len(matched)}개" + (f", 재료에 없는 조인 {len(extra)}개" if extra else "")
+        used_pairs = _collect_join_pairs(parsed)
+        if not used_pairs:
+            usage = None
+            usage_detail = "테이블 간 연결 조건 없음(UNION 등) - 조인 평가 대상 아님"
+        else:
+            groups = _join_groups(joins)
+            wrong = sorted(
+                " = ".join(sorted(p)) for p in used_pairs
+                if any(c not in groups for c in p) or len({groups[c] for c in p}) != 1
+            )
+            usage = not wrong
+            usage_detail = f"연결 {len(used_pairs)}개" + (f", 재료와 다른 연결: {'; '.join(wrong)}" if wrong else " 모두 재료와 일치")
 
     detail_parts = []
     if unknown_tables:
