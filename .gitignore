@@ -9,3 +9,5 @@ venv/
 results/*
 !results/reports/
 nohup.out
+*.log
+test_set/
