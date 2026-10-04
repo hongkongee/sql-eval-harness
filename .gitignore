@@ -6,5 +6,6 @@ venv/
 .idea/
 .vscode/
 .env
-results/
+results/*
+!results/reports/
 nohup.out

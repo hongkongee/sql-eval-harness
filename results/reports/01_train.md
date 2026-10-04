@@ -1,0 +1,355 @@
+# NL2SQL 어댑터 평가 — 학습셋 (`proposed_input_train`)
+
+> 종합 보고서와 지표 설명: [00_overview.md](00_overview.md)
+
+- 원본: `results/adapter_eval_{eval_loss,concept_id,final_step,base}_proposed_input_train.csv`, `results/adapter_eval_summary_261002_155905.json`(체크포인트 3개), `results/adapter_eval_summary_261002_171505.json`(베이스 모델 재실행), `results/adapter_eval_base_sysprompt_v2_proposed_input_train.csv` + `results/adapter_eval_summary_261002_210806.json`(베이스 모델 + 시스템 프롬프트, 프롬프트 원문은 `results/adapter_eval_base_sysprompt_v2_system_prompt.txt`)
+  - 참고: 이전 버전 시스템 프롬프트(v1) 결과 `results/adapter_eval_base_sysprompt_proposed_input_train.csv` / `adapter_eval_summary_261002_181028.json` / `adapter_eval_base_sysprompt_system_prompt.txt`도 남아 있어요. 이 보고서에는 성능이 더 좋은 v2 결과만 반영했어요.
+- 테스트셋: `test_set/proposed_input_train.jsonl` (학습셋 재현, 612건 / 시나리오 64개)
+  - query_type: COHORT_EXTRACTION 332 · STATISTICAL_AGGREGATION 144 · VALUE_RETRIEVAL 92 · EXPLORATORY_SEARCH 44
+  - difficulty: EASY 188 · MEDIUM 330 · HARD 94
+  - 개념 값 조건(앵커)이 있는 케이스 532건 (concept_id 지표·하위 전개 반영도의 분모)
+- 서빙 모델: 파인튜닝 = `by-loss`(eval_loss 기준 체크포인트, 3절), base = `xiyansql-qwencoder-14b-proposed-input`(`XGenerationLab/XiYanSQL-QwenCoder-14B-2504`)
+  - 최초 실행 때 base는 잘못된 모델 이름(`llm-finetune-study`)으로 612건 모두 404가 나서, 올바른 이름으로 base만 같은 설정(max_tokens 512, 동시 요청 1)으로 다시 돌렸어요.
+  - **base+시스템 프롬프트:** 같은 베이스 모델에 직접 설계한 시스템 프롬프트를 붙인 추가 테스트예요. 하위 전개 규칙(등호·리터럴 IN 모두 금지), PostgreSQL 문법 규칙, 데이터셋 스타일 규칙, 그리고 검증셋(`proposed_input_val`)에서 뽑은 few-shot 예시 5개로 구성돼 있어요(→ 2.2절). 체크포인트와 base는 시스템 프롬프트 없이 테스트했어요.
+
+---
+
+## 1. 핵심 요약
+
+1. **파인튜닝 효과는 뚜렷해요. EX가 23.7%에서 68.0%로 올랐어요(약 2.9배).** 파인튜닝 모델만 맞힌 건 279건, base만 맞힌 건 8건이에요. 개선은 주로 세 가지에서 왔어요(→ 2.1절).
+   - **출력 형식 준수:** base는 47건(7.7%)을 SQL이 아닌 자연어 설명으로 답했어요. 파인튜닝 모델은 0건이에요.
+   - **하위 개념 확장:** base는 `concept_ancestor` 확장을 한 번도 하지 않았어요(0%). 파인튜닝 모델은 94.9%예요.
+   - **정답 SQL 스타일 학습:** base는 EM 0%, 파인튜닝 모델은 34.6%예요.
+   - 반면 **concept_id 값 자체를 정확히 넣는 능력은 base도 이미 비슷한 수준이에요**(Correctness 91.1% vs 90.8%). 파인튜닝으로 이 능력이 늘지는 않았어요.
+   - **하지만 시스템 프롬프트를 잘 설계하면 base도 파인튜닝 모델에 거의 근접해요.** 하위 전개 규칙과 few-shot 예시를 넣자 하위 전개 반영도가 0%에서 96.7%로, EX가 23.7%에서 66.2%로 올랐어요. 파인튜닝 모델은 68.0%예요. concept_id Correctness(94.9%)와 실행 통과율(96.6%)은 오히려 파인튜닝 모델보다 높아요. 반면 EM(10% vs 35%), 5.기간설정, VALUE_RETRIEVAL에서는 파인튜닝 모델이 앞서요(→ 2.2절). **이번 테스트셋이 학습셋이라는 점을 생각하면, 파인튜닝의 실질적인 우위는 독립 테스트셋으로 다시 확인해야 해요**(→ [02_val.md](02_val.md)).
+2. **체크포인트는 eval_loss 하나로 대표해요.** 한 번의 학습에서 체크포인트 3개(eval_loss / concept_id / final_step 기준)를 뽑아 비교했지만, 612건 중 567건(92.6%)에서 글자 하나 다르지 않은 똑같은 SQL을 만들어서 사실상 같은 모델이었어요(→ 3절).
+3. **concept_id 반영도는 높아요(Correctness 90.8%).** 다만 정답 SQL을 똑같은 채점기로 채점해도 1.00이 나오지 않아요(Presence/Correctness 0.934, Usage 0.972). 재료에 **정답 SQL이 쓰지 않는 앵커(교란 앵커)가 섞여 있기 때문**이라서, "1.00 = 만점" 해석은 맞지 않아요.
+4. **스키마 Usage는 채점 방식을 고친 뒤 모든 모델이 거의 100%예요.** 처음에는 표를 잇는 작성 방식 중 `JOIN ... ON`만 인식해서, `EXISTS` 방식을 쓰는 정답 SQL조차 4/439건만 통과했어요. 지금은 모든 연결 방식을 인식하도록 고쳤고, 정답 SQL은 평가 대상 406건이 모두 통과해요. 수정 후에는 모든 모델이 재료에 적힌 연결 기준대로 표를 잇고 있어요(→ 5절).
+5. **주요 오류 패턴은 네 가지예요:** ① 중첩 `concept_ancestor` 서브쿼리 반복 루프가 생기고 `max_tokens=512`에 걸려 SQL이 잘림(SQL 문법 실패 대부분), ② PostgreSQL이 지원하지 않는 `INTERVAL 'N' WEEK` 사용(16건), ③ 조인하지 않은 별칭 참조(`missing FROM-clause`, 17건), ④ `LEAST` 대신 `MIN(a, b)` 사용(5건).
+
+---
+
+## 2. 지표 요약 (n=612)
+
+각 지표의 의미와 계산 방법은 [00_overview.md의 지표 설명](00_overview.md#지표-설명)에 정리돼 있어요.
+
+| 분류 | 지표 | FT1 (input·1ep) | base | base+시스템 프롬프트 | 정답 SQL 채점값(참고) |
+|---|---|---:|---:|---:|---:|
+| SQL Validity | 문법(sqlglot) | 98.37% | 92.32% | **99.84%** | – |
+| | 샌드박스 실행검증(EXPLAIN) | 91.83% | 87.09% | **96.57%** | – |
+| 하위 전개 | 하위 전개 반영도 (n=532) | 94.87% | 0.00% | **96.70%** | – |
+| concept_id | Presence (n=532) | 93.99% | 91.55% | **94.99%** | 93.45% |
+| | Correctness | 90.81% | 91.05% | **94.85%** | 93.45% |
+| | Usage | 94.87% | 92.77% | **96.89%** | 97.21% |
+| 스키마 | Presence | 98.37% | 92.32% | **99.84%** | 100% |
+| | Correctness | **97.88%** | 91.18% | 97.06% | 100% |
+| | Usage | 100% (426/426) | 100% (464/464) | 99.78% (460/461) | 100% (406/406) |
+| 정답 비교 | EM | **34.64%** | 0.00% | 10.13% | – |
+| | EX | **67.97%** | 23.69% | 66.18% | – |
+| 속도 | 평균 / 최대 응답(초) | 6.42 / 23.70 | **3.46** / 20.16 | 5.49 / 17.88 | – |
+
+- **FT1 (input·1ep)** = `proposed_input`으로 1 epoch 학습한 첫 파인튜닝 모델의 eval_loss 기준 체크포인트(`by-loss`)예요(→ 3절, [실험 목록](00_overview.md#파인튜닝-실험-목록)).
+- **정답 SQL 채점값(참고):** 테스트셋의 정답 SQL을 모델 답변과 같은 방식으로 채점한 값이에요. 재료에 정답에 필요 없는 코드가 섞여 있어서 concept_id 지표는 100%가 나오지 않아요. 이 값보다 높은 모델은 정답보다 나은 게 아니라, 정답이 쓰지 않은 불필요한 코드까지 SQL에 넣었다는 뜻이에요.
+- **EX는 샌드박스 DB를 고친 뒤 다시 판정한 값이에요.** 처음 실행 때는 DB 공유 메모리 부족으로 정답 쿼리조차 실행되지 못한 문항이 있어서 EX가 실제보다 낮게 나왔어요. DB 설정을 고친 뒤 해당 문항만 저장된 SQL로 다시 판정했어요(`adapter_prompt_eval/rescore_ex.py`). 이제 정답 쿼리 실행 실패는 0건이에요. 모델 SQL이 30초 제한을 넘긴 타임아웃(base 2건, base+시스템 프롬프트 6건)은 너무 느린 SQL로 보고 실패로 셌어요.
+- **base 수치는 분모를 612건(앵커 지표는 532건)으로 맞춰 다시 계산했어요.** base가 자연어로 답한 47건은 채점기가 "Format 이탈"로 처리하고 이후 지표에서 빼버려서, summary JSON에는 분모가 565건(앵커 지표는 505건)으로 기록돼 있어요. JSON 값을 그대로 쓰면 base가 과대평가돼요. 이 표에서는 형식 이탈 47건을 실패(0)로 넣었어요.
+- concept_id Usage와 하위 전개 반영도가 파인튜닝 모델에서 정확히 같은 값이에요. 바인딩 슬롯을 만들 때는 **항상** `concept_ancestor` 서브쿼리로 확장한다는 뜻이고, 리터럴 `IN (...)`만 쓴 경우는 없었어요.
+- 문법 통과율과 스키마 Presence가 같은 이유는 파싱에 실패하면 스키마 Presence/Correctness가 자동으로 fail 처리되기 때문이에요.
+- 응답 시간은 생성된 SQL 길이와 거의 완벽하게 비례해요(상관계수 0.99).
+
+### 2.1 베이스 모델 대비 파인튜닝 효과
+
+| 항목 | base | FT1 (input·1ep) | 해석 |
+|---|---:|---:|---|
+| 자연어로 답함 (Format 이탈) | 47건 (7.7%) | 0건 | VALUE_RETRIEVAL 26 · COHORT 20 · STAT 1건, 섹션별로는 5.기간설정이 24건으로 최다. 예: "암로디핀 최초 처방일을 기준 시점으로 정의하려면, drug_exposure 테이블에서…"처럼 설명문으로 답함. 이 47건 중 30건은 파인튜닝 모델이 EX까지 맞혔어요 |
+| 하위 개념 확장 (`concept_ancestor`) | 0 / 612건 | 94.9% | base는 재료의 값을 리터럴 `IN (1308842)` / `= 1308842`로만 써요. 정답 SQL은 모두 하위 전개를 하므로 **결과 집합이 달라져서 EX가 대량으로 fail**이 돼요. EX 격차의 가장 큰 원인으로 보여요 |
+| 테이블 연결 방식 | JOIN 477건 · EXISTS 95건 | 정답 스타일(EXISTS 중심) | 정답 SQL 스타일(EXISTS 상관 서브쿼리)을 학습한 결과예요. 연결 방식은 달라도 연결 기준은 양쪽 모두 재료대로예요(스키마 Usage 둘 다 100%, 5절) |
+| concept_id Correctness | 91.05% | 90.81% | **차이 없음.** base도 재료의 개념 값을 그대로 옮겨 쓰는 능력은 이미 갖고 있어요 |
+| 정답이 쓰는 앵커 731개 바인딩 | 682 (93.3%)* | 664 (90.8%) | base가 오히려 약간 높아요. 리터럴 `IN (값)`이라 슬롯 판정이 단순한 영향도 있어요 |
+| 정답이 쓰지 않는 앵커 92개 바인딩 | 71 (77.2%)* | 51 (55.4%) | base는 재료에 있는 개념을 거의 다 넣어요. 파인튜닝 후에는 필요 없는 앵커를 일부 덜 쓰게 됐어요 |
+| 샌드박스 실행 실패 | 32건 | 50건 | base 주요 원인: `column reference "person_id" is ambiguous` 11건, `table name "p" specified more than once` 4건. 파인튜닝 모델은 SQL이 길고 복잡해진 만큼(평균 길이 base 291자) 실행 실패 건수 자체는 오히려 많아요(6.2절) |
+| EM | 0% | 34.6% | base는 정답 스타일과 문자열이 일치할 수 없어요 |
+| 평균 응답 | 3.46초 | 6.42초 | 출력이 짧아서 빠름(응답 시간은 출력 길이에 비례) |
+
+\* base의 앵커 단위 집계는 형식 이탈 47건의 자연어 응답 텍스트까지 그대로 채점한 값이에요. 설명문 안에 `drug_concept_id = 1332418` 같은 구문이 있으면 슬롯으로 잡히기 때문에 약간 후하게 나와요.
+
+**그룹별 EX**
+
+| query_type | n | base | FT1 (input·1ep) | | section | n | base | FT1 (input·1ep) |
+|---|---:|---:|---:|---|---|---:|---:|---:|
+| COHORT_EXTRACTION | 332 | 30.4% | 76.2% | | 1.연구대상자 | 108 | 37.0% | 85.2% |
+| VALUE_RETRIEVAL | 92 | 19.6% | 73.9% | | 2.노출군 | 119 | 29.4% | 85.7% |
+| STATISTICAL_AGGREGATION | 144 | 10.4% | 56.9% | | 3.비교군 | 105 | 24.8% | 56.2% |
+| EXPLORATORY_SEARCH | 44 | 25.0% | 29.5% | | 4.결과 | 83 | 22.9% | 51.8% |
+| | | | | | 5.기간설정 | 197 | 12.7% | 60.9% |
+
+- 개념 조건이 핵심인 COHORT/VALUE 계열에서 개선폭이 가장 커요(+46~54%p). 하위 전개 학습의 효과로 보여요.
+- **EXPLORATORY_SEARCH는 파인튜닝 후에도 거의 개선되지 않았어요(25.0% → 29.5%).** 6.3절의 반환 컬럼 불일치 문제는 파인튜닝으로 해결되지 않았어요.
+- 5.기간설정은 base에서 가장 약했고(형식 이탈 24건) 파인튜닝 후 크게 좋아졌어요. 다만 여전히 `INTERVAL 'N' WEEK` 오류가 몰려 있는 구간이에요.
+
+### 2.2 base + 시스템 프롬프트 (규칙 + few-shot을 알려준 경우)
+
+"base가 하위 전개를 0% 하는 건 그런 규칙이 있다는 맥락 자체를 몰라서가 아닐까?", "시스템 프롬프트를 잘 설계하면 베이스 모델로도 되지 않을까?"라는 가설을 확인하려고, 같은 베이스 모델에 직접 설계한 시스템 프롬프트를 붙여서 다시 테스트했어요. 프롬프트 구성은 다음과 같아요.
+
+- **하위 전개 규칙:** `*_concept_id`에 숫자를 직접 비교하는 건 `=`든 `IN (숫자)`든 모두 금지라고 금지 예시와 함께 명시했어요. 앵커가 1개이거나 성별·방문 유형 같은 단순 코드여도 예외 없이 서브쿼리를 쓰게 했어요.
+- **데이터셋 스타일 규칙:** 환자 조건은 `person` 기준 `EXISTS`로, 제외 조건은 `NOT EXISTS`로, 서로 다른 개념의 사건은 `UNION ALL`로 합치게 했어요.
+- **PostgreSQL 규칙:** 주 단위는 일수로 환산(`INTERVAL 'N' WEEK`·`DATE_ADD` 금지)하고, 가장 이른 날짜는 `CASE WHEN`으로 고르고(`MIN(a, b)` 금지), 별칭은 모두 선언하게 했어요.
+- **few-shot 5개:** 검증셋(`proposed_input_val`, id 290·535·721·447·299)에서 골랐어요. 단순 코호트, 기준일, UNION ALL로 결과 합치기, 관찰기간 겹침, 추적 종료일 예시예요. 학습셋과 SQL이 겹치는 예시는 없어요.
+
+<details>
+<summary>사용한 시스템 프롬프트 전문 (<code>results/adapter_eval_base_sysprompt_v2_system_prompt.txt</code>)</summary>
+
+```text
+당신은 OMOP CDM(PostgreSQL) 기반 Text-to-SQL 전문가입니다. [질의]는 사용자의 자연어 질문이고, [재료]에는 질의에 필요한 개념(concept)의 대표(앵커) concept_id, 사용 가능한 테이블/컬럼 스키마, 테이블 간 조인 관계가 이미 정리되어 있습니다.
+
+[재료]의 concept_id는 그 개념 전체를 대표하는 상위(앵커) 코드만 주어지며, 하위(descendant) 코드는 생략되어 있습니다. 앵커 코드를 그대로 비교하면 하위 개념이 전부 빠지므로, 모든 개념 조건은 concept_ancestor 테이블로 하위 개념까지 확장해서 조회해야 합니다.
+
+다음을 반드시 지키세요:
+1. *_concept_id 컬럼에 숫자를 직접 비교하는 것은 형태와 관계없이 모두 금지입니다.
+   - 금지: drug_concept_id = 1308842
+   - 금지: drug_concept_id IN (1308842)
+   - 금지: drug_concept_id IN (1308842, 1332418)
+   앵커가 1개뿐이어도, 성별(gender_concept_id)·방문 유형(visit_concept_id) 같은 단순 코드여도 예외 없이 항상 아래 형태만 쓰세요:
+   <컬럼> IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (<앵커 concept_id>))
+2. [재료]에 나열된 테이블/컬럼만 사용하세요. 나열되지 않은 테이블/컬럼을 추측해서 만들지 마세요.
+3. 환자 조건은 person 테이블을 기준으로 EXISTS (SELECT 1 FROM ... WHERE x.person_id = p.person_id AND ...) 형태로 거세요. 제외 조건은 NOT EXISTS를 쓰고, NOT IN은 쓰지 마세요.
+4. 서로 다른 개념의 사건을 함께 모을 때는 개념마다 별도 SELECT를 만들어 UNION ALL로 합치세요.
+5. PostgreSQL 문법만 쓰세요.
+   - 기간 더하기: INTERVAL 'N' DAY / INTERVAL 'N' MONTH / INTERVAL 'N' YEAR만 사용하세요. 주(week) 단위는 일수로 환산하세요(예: 12주 → INTERVAL '84' DAY). DATE_ADD, INTERVAL 'N' WEEK는 쓰지 마세요.
+   - 여러 날짜 중 가장 이른 날짜는 CASE WHEN으로 비교하세요. MIN(a, b)처럼 집계함수에 인자를 두 개 넣지 마세요.
+   - SELECT/WHERE에서 쓰는 테이블 별칭은 모두 FROM/JOIN에 선언돼 있어야 합니다. 여러 테이블에 있는 컬럼(person_id 등)은 항상 별칭을 붙이세요.
+6. 다른 설명 없이 SQL 쿼리 하나만 답하세요.
+
+아래는 올바른 답변 예시입니다([재료]는 개념 값 조건만 발췌).
+
+[예시 1]
+[질의] 현재 연도 기준 연령 65세 이상이고 여성 기록이고 골다공증 진단인 환자.
+[재료] 개념 값 조건:
+  - "골다공증" → condition_occurrence.condition_concept_id IN (80502)
+  - "여성" → person.gender_concept_id IN (8532)
+[SQL]
+SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM CURRENT_DATE) - p.year_of_birth) >= 65 AND p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)));
+
+[예시 2]
+[질의] 백내장 최초 진단일을 기준 시점으로 정의.
+[재료] 개념 값 조건:
+  - "백내장" → condition_occurrence.condition_concept_id IN (375545)
+[SQL]
+SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) GROUP BY co.person_id;
+
+[예시 3]
+[질의] 유방암 또는 전립선암의 최초 발생일을 조회.
+[재료] 개념 값 조건:
+  - "유방암" → condition_occurrence.condition_concept_id IN (4112853)
+  - "전립선암" → condition_occurrence.condition_concept_id IN (4163261)
+[SQL]
+WITH outcome_events AS ( SELECT co.person_id, co.condition_start_date AS event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) UNION ALL SELECT co.person_id, co.condition_start_date AS event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4163261)) ) SELECT oe.person_id, MIN(oe.event_date) AS first_event_date FROM outcome_events oe GROUP BY oe.person_id;
+
+[예시 4]
+[질의] 관찰기간이 2021-01-14부터 2022-12-31까지의 기간과 겹치는 환자.
+[재료] 개념 값 조건: 없음
+[SQL]
+SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2022-12-31' AND op.observation_period_end_date >= DATE '2021-01-14';
+
+[예시 5]
+[질의] 기준시점(로모소주맙 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 24개월)
+[재료] 개념 값 조건:
+  - "로모소주맙" → drug_exposure.drug_concept_id IN (1511251)
+[SQL]
+WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)) GROUP BY de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '24' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '24' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '24_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;
+```
+
+</details>
+
+> 이 프롬프트 이전에 RAG 평가용 프롬프트(`SYSTEM_PROMPT_RAG`, 하위 전개 규칙만 있고 few-shot 없음)로 먼저 테스트했어요. 그때는 하위 전개 32.7%, EX 36.0%에 그쳤어요. 그 프롬프트는 "리터럴 IN절"만 금지하고 등호를 언급하지 않아서, 하위 전개를 안 한 케이스의 약 3분의 2가 `= 1308842` 형태였어요. 현재 프롬프트는 그 결과보다 195건을 더 맞히고 10건을 잃었어요. 이전 결과 파일은 `results/`에 남아 있어요(`adapter_eval_base_sysprompt_*`).
+
+| 항목 | base | base+시스템 프롬프트 | FT1 (input·1ep) |
+|---|---:|---:|---:|
+| 자연어로 답함 (Format 이탈) | 47건 | **0건** | 0건 |
+| 하위 전개 반영도 (n=532) | 0.0% | **96.7%** | 94.9% |
+| └ 모든 앵커를 전개 / 일부만 / 전혀 안 함 | 0 / 0 / 532 | 498 / 32 / 2 | – |
+| concept_id Correctness | 91.1% | **94.9%** | 90.8% |
+| 정답이 쓰는 앵커 731개 바인딩 | 682 (93.3%) | **689 (94.3%)** | 664 (90.8%) |
+| 정답이 쓰지 않는 앵커 92개 바인딩 | 71 (77.2%) | 62 (67.4%) | 51 (55.4%) |
+| SQL 문법 / 샌드박스 실행검증 | 92.3% / 87.1% | **99.8% / 96.6%** | 98.4% / 91.8% |
+| EM | 0% | 10.1% | **34.6%** |
+| EX | 23.7% | 66.2% | **68.0%** |
+| 평균 SQL 길이 / 평균 응답 | 291자 / 3.46초 | 546자 / 5.49초 | – / 6.42초 |
+
+**그룹별 EX**
+
+| query_type | n | base+시스템 프롬프트 | FT1 (input·1ep) |
+|---|---:|---:|---:|
+| COHORT_EXTRACTION | 332 | **79.2%** | 76.2% |
+| VALUE_RETRIEVAL | 92 | 56.5% | **73.9%** |
+| STATISTICAL_AGGREGATION | 144 | 54.9% | **56.9%** |
+| EXPLORATORY_SEARCH | 44 | 25.0% | **29.5%** |
+
+| section | n | base+시스템 프롬프트 | FT1 (input·1ep) |
+|---|---:|---:|---:|
+| 1.연구대상자 | 108 | **94.4%** | 85.2% |
+| 2.노출군 | 119 | 73.9% | **85.7%** |
+| 3.비교군 | 105 | **69.5%** | 56.2% |
+| 4.결과 | 83 | **56.6%** | 51.8% |
+| 5.기간설정 | 197 | 48.2% | **60.9%** |
+
+**확인된 점**
+
+1. **가설이 맞아요. base는 규칙을 몰랐던 거예요.** 규칙과 예시를 주자 532건 중 498건에서 모든 앵커를 하위 전개했어요. 등호 리터럴은 0건이 됐고, 남은 리터럴은 일부 앵커만 `IN (숫자)`로 쓴 33건뿐이에요. 하위 전개 반영도(96.7%)는 파인튜닝 모델(94.9%)보다 높아요.
+2. **EX도 파인튜닝 모델에 거의 근접해요(66.2% vs 68.0%).** 두 모델이 서로 다른 케이스를 맞혀요(이 모델만 맞힘 61건, 파인튜닝 모델만 맞힘 72건, 둘 다 맞힘 344건). COHORT_EXTRACTION과 1.연구대상자·3.비교군·4.결과 섹션에서는 오히려 파인튜닝 모델보다 높아요.
+3. **실행 안정성과 concept_id 값 반영은 base+시스템 프롬프트가 더 좋아요.** 문법 99.8%, 실행검증 96.6%, Correctness 94.9%예요. 파인튜닝 모델에서 보였던 반복 루프로 잘리는 문제(약 8건)도 없어요.
+4. **파인튜닝 모델이 앞서는 부분**
+   - **EM(34.6% vs 10.1%):** 정답 SQL과 글자 단위로 같은 스타일은 파인튜닝이 훨씬 잘 재현해요. base+시스템 프롬프트는 `JOIN`을 여전히 많이 써요(JOIN 439건, EXISTS 106건).
+   - **5.기간설정(60.9% vs 48.2%):** "주 단위는 일수로 환산하라"고 명시했는데도 `INTERVAL '12' WEEK`를 **17건** 썼어요. 실행 실패 21건 중 17건이 이 원인이에요.
+   - **VALUE_RETRIEVAL(73.9% vs 56.5%):** "발사르탄 최초 처방일을 기준 시점으로 정의"에서 `person_id`와 `GROUP BY` 없이 전체 최솟값 하나만 반환하는 경우가 많아요. few-shot 예시 2(백내장 기준일)와 같은 유형인데도 따라오지 못한 케이스가 있어요.
+   - **EXPLORATORY_SEARCH(29.5% vs 25.0%):** 예시 4에서 반환 컬럼 3개를 보여줬는데도 `SELECT DISTINCT p.person_id FROM person p JOIN observation_period ...`처럼 person 기준으로 `person_id`만 반환했어요. 규칙 3("환자 조건은 person 기준")이 예시 4와 충돌한 것으로 보여요.
+5. **교란 앵커는 여전히 많이 써요.** 정답이 쓰지 않는 앵커 92개 중 62개(67.4%)를 넣어서, 파인튜닝 모델(55.4%)보다 높아요.
+
+**해석 시 주의**
+
+- **few-shot 예시 4·5는 학습셋의 같은 유형 케이스와 구조가 같고 약물명·기간만 달라요.** 정답이 그대로 들어간 건 아니지만, 두 유형에서는 base에 정답 템플릿을 사실상 알려준 셈이에요. 파인튜닝 모델도 학습으로 이 템플릿을 봤기 때문에 비교 조건은 비슷하지만, 독립 테스트셋에서도 같은 효과가 날지는 따로 확인해야 해요.
+- **이번 테스트셋은 파인튜닝 모델의 학습셋이에요.** 파인튜닝 모델에 가장 유리한 조건인데도 EX 차이가 1.8%p에 불과해요. 일반화 성능에서는 순위가 달라질 수 있어서, `proposed_input_val` 같은 독립 테스트셋 비교가 결론에 꼭 필요해요. val 결과는 [02_val.md](02_val.md)에 있어요(few-shot으로 쓴 5건은 빼고 집계).
+- 시스템 프롬프트가 길어져서(few-shot 포함) 입력 토큰과 응답 시간이 늘었어요(평균 3.46초 → 5.49초). 그래도 파인튜닝 모델(약 6.5초)보다는 빨라요.
+
+**시사점**
+
+- "규칙을 일관되게 지키는 능력"은 프롬프트 설계만으로도 상당 부분 확보돼요. 이번 결과만 보면 **파인튜닝의 추가 가치는 주로 데이터셋 고유 스타일(EM)과 일부 유형(기간 설정, 기준일 조회)에서 나와요.**
+- 프롬프트 개선 여지도 남아 있어요. ① 규칙 3에 "관찰기간 조회처럼 [질의]가 기간 정보를 요구하면 해당 테이블 기준으로 반환" 예외 추가, ② WEEK 금지를 금지 예시(`INTERVAL '12' WEEK` → `INTERVAL '84' DAY`)로 명시, ③ 기준일 조회는 반드시 `person_id`별 `GROUP BY` 규칙 추가.
+- 파인튜닝 모델에 이 시스템 프롬프트를 붙였을 때 두 장점이 합쳐지는지(EM 스타일 + 실행 안정성)도 확인해볼 만해요.
+
+---
+
+## 3. 체크포인트 선택
+
+한 번의 학습(1 epoch)에서 서로 다른 기준으로 체크포인트 3개를 뽑아 모두 평가했어요: 검증 손실이 가장 낮은 지점(`by-loss`), 학습 중 concept_id 반영도가 가장 높은 지점(`by-adherence`), 마지막 지점(`final-step`).
+
+결과는 사실상 같은 모델이었어요. 612건 중 567건(92.6%)에서 세 체크포인트가 글자 하나 다르지 않은 SQL을 만들었고, EX도 416 / 414 / 415건(68.0% / 67.6% / 67.8%)으로 1~2건 차이이고, 세 체크포인트의 결과가 갈린 문항은 6건뿐이에요(validation 셋에서는 맞힌 문항까지 완전히 같아요). 그래서 **이 보고서는 일반적인 선택 기준인 eval_loss 체크포인트로 대표해요.** 나머지 두 체크포인트의 문항별 결과는 `results/adapter_eval_{concept_id,final_step}_*.csv`에 남아 있어요.
+
+- 1 epoch 학습이라 체크포인트 사이의 학습량 차이가 작았던 것으로 보여요. epoch을 늘리면 뒤로 갈수록 학습 데이터에 과하게 맞춰지면서 체크포인트 간 차이가 생길 수 있어서, 그때 다시 비교해요.
+
+---
+
+## 4. concept_id 반영도 심층 분석
+
+### 4.1 정답 SQL과의 관계 (교란 앵커)
+
+재료의 "개념 값 조건" 중 일부는 정답 SQL이 실제로 쓰지 않아요. 예시:
+
+- id 7 "급사(돌연심장사) 또는 뇌졸중의 최초 발생일": 앵커 3개(급사·돌연심장사·뇌졸중)가 주어졌지만, 정답은 `death.cause_concept_id`(급사)와 뇌졸중만 쓰고 **돌연심장사(437461)는 쓰지 않아요.**
+- id 73/75: "관상동맥질환"과 "관상동맥경화증"이 함께 주어졌고, 정답은 그중 하나만 써요.
+
+정답 SQL을 기준으로 앵커를 둘로 나눠서 모델을 다시 채점했어요(앵커 단위, 823개):
+
+| | FT1 (input·1ep) |
+|---|---:|
+| **정답이 쓰는 앵커** 731개 중 모델이 올바르게 바인딩(Correctness) | 664 (90.8%) |
+| └ 같은 컬럼에 슬롯 존재(Usage) | 702 (96.0%) |
+| **정답이 쓰지 않는 앵커** 92개 중 모델이 바인딩 | 51 (55.4%) |
+
+- 실질적인 재현율(정답이 필요로 하는 개념을 제대로 넣었는가)은 **약 91%**예요.
+- 반대로 정답이 쓰지 않는 앵커의 **절반 이상을 모델이 그대로 SQL에 넣었어요.** id 7에서 모델은 `condition_concept_id IN (… 437461, 381316)`로 돌연심장사를 포함하고 death 테이블은 빠뜨렸어요. 현재 지표는 이렇게 교란 앵커를 쓴 경우에 **가점**을 주기 때문에, "재료에 있는 걸 다 쓰는 모델"이 유리해요. 교란 앵커가 의도된 설계(필요한 것만 고르는 능력 학습)라면 지표를 정답 기준으로 바꾸는 걸 고려해야 해요.
+  - 다만 일부 교란 앵커는 질의 문장상 포함하는 게 오히려 자연스러워요(예: "급사(돌연심장사)"). 정답 라벨 자체도 한 번 검토해볼 만해요.
+
+### 4.2 미반영 컬럼 분포 (`concept_id 상세` 기준)
+
+| 미반영 컬럼 | 케이스 수 |
+|---|---:|
+| condition_concept_id | 35 |
+| drug_concept_id | 13 |
+| procedure_concept_id | 12 |
+| visit_concept_id | 3 |
+| cause_concept_id / observation_concept_id | 각 1 |
+
+진단(condition) 쪽 누락이 가장 많아요. 앵커가 3개 이상인 복합 조건에서 진단 앵커 하나를 빠뜨리거나 다른 앵커와 합쳐버리는 패턴이 주를 이뤄요.
+
+---
+
+## 5. 스키마 반영도
+
+- **Presence 98.4%, Correctness 97.9%로 매우 높아요.** 실패의 대부분은 SQL이 잘려서 파싱이 안 된 경우예요(아래 6.1). 진짜 환각은 3건뿐이에요.
+  - `drug_exposure.device_type_concept_id` (재료에 없는 컬럼, 2건): device_exposure 컬럼을 drug_exposure에 붙인 혼동
+  - `observation.observation_end_date`, `procedure_occurrence.procedure_end_date` (1건): 실재하지 않는 종료일 컬럼을 유추
+- **Usage는 채점 방식을 고친 뒤 모든 모델이 거의 100%예요.**
+  - **처음 채점 방식의 문제:** 표를 잇는 조건은 SQL에서 `JOIN ... ON` 뒤, `EXISTS`/`WHERE` 안, `IN (SELECT ...)` 세 위치에 올 수 있어요. 처음 채점 코드는 `JOIN ... ON`만 봤어요. 정답 SQL은 612건 중 285건이 `EXISTS` 방식이라, 정답 SQL조차 4/439건만 통과했어요. 수정 전 값(파인튜닝 약 1.5%, base 84.7%, base+시스템 프롬프트 55.4%)은 연결 기준이 맞는지가 아니라 JOIN 문법을 얼마나 썼는지를 반영한 값이었어요.
+  - **수정 내용:** 세 위치의 연결 조건을 모두 찾고, 공통 테이블 식(CTE)이나 서브쿼리 별칭은 원본 표까지 되짚어요. `_id`로 끝나는 항목끼리의 조건만 연결로 보고, 날짜가 같은 기록을 찾는 조건은 제외해요. 재료의 연결로 이어지는 항목끼리는 맞는 연결로 봐요(예: 둘 다 환자 표의 환자 번호와 이어지는 약물 표·진단 표의 환자 번호).
+  - **검증:** 정답 SQL을 채점하면 학습셋 406/406, val 46/46건이 통과해요(나머지는 표 1개만 쓰거나 UNION으로만 합쳐서 평가 대상 아님). 의미가 다른 항목끼리 잇는 경우(예: 약물 표의 방문 번호 = 환자 표의 환자 번호)는 실패로 잡히는 것도 확인했어요.
+  - **재채점 결과:** 파인튜닝 모델과 base는 평가 대상 전부 통과(100%), base+시스템 프롬프트는 461건 중 1건 실패예요. 실패 1건(id 395)은 재료에 없는 `death`·`observation_period` 표를 쓰고 그 표로 연결한 경우라 정당한 실패예요.
+  - 결과적으로 **표를 잘못된 기준으로 잇는 실수는 어느 모델에서도 거의 없어요.** 이 지표로는 모델 간 차이가 드러나지 않아요.
+  - 재채점은 모델을 다시 호출하지 않고 CSV에 저장된 SQL로 했어요(`adapter_prompt_eval/rescore_schema.py`). 스키마 Usage·스키마 상세 외 다른 컬럼은 바뀌지 않았어요.
+
+---
+
+## 6. 오류 유형 분석
+
+### 6.1 SQL 문법 실패 (10건)
+
+- **대부분(8건)이 같은 퇴행 패턴이에요.** `… IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE …`처럼 하위 전개 서브쿼리를 끝없이 중첩하다가 약 2,550자(≈ `max_tokens=512`) 지점에서 잘려요.
+- 나머지는 CTE 뒤에 `;`로 문장을 끊어버린 경우(1건)와 CTE 다음에 SELECT가 하나 더 붙은 경우(1건)예요.
+- 대응: 추론 쪽에서는 `max_tokens`를 1024 이상으로 올리거나 `repetition_penalty`/`frequency_penalty`를 약하게 걸어볼 수 있어요. 학습 쪽에서는 하위 전개 패턴이 지나치게 학습된 신호일 수 있으니 반복 루프가 생기는 케이스의 공통점(복합 앵커 등)을 확인해볼 만해요.
+
+### 6.2 샌드박스 실행검증 실패 (50건)
+
+| 원인 | 건수 | 설명 |
+|---|---:|---|
+| 조인하지 않은 별칭 참조 (`missing FROM-clause entry for table "c"/"d"/"co"`) | 17 | SELECT 절에서 FROM/JOIN에 없는 별칭 사용 |
+| `INTERVAL 'N' WEEK` | 16 | 정답의 `INTERVAL '3' YEAR` 패턴을 WEEK로 일반화했지만 PostgreSQL은 WEEK 단위의 SQL 표준 interval 문법을 지원하지 않음 (`INTERVAL 'N weeks'` 또는 `N * INTERVAL '1 week'`가 맞음). 정답 SQL에는 이 패턴이 0건 |
+| 출력 잘림 (6.1과 같은 원인) | 8 | |
+| `MIN(date, date)` | 5 | 스칼라 최솟값에는 `LEAST()`를 써야 함 |
+| 기타 (`DATE_ADD … INTERVAL N MONTH` MySQL 문법, 없는 컬럼, `;` 분리, `LEFT` 위치 오류 등) | 4 | |
+
+→ 특히 **"N주 후" 계열(5.기간설정)과 "가장 이른 날짜" 계열의 학습 데이터 커버리지가 부족해요.** WEEK interval과 `LEAST` 예시를 보강하면 실행 실패를 3분의 1 이상 줄일 수 있을 것으로 보여요.
+
+### 6.3 실행은 되지만 EX가 틀린 경우 (146건)
+
+샌드박스 검증을 통과했는데 EX가 fail인 케이스가 146건으로, EX 실패의 대부분을 차지해요. 대표적인 패턴은 두 가지예요.
+
+- **SELECT 컬럼 구성 불일치 (EXPLORATORY_SEARCH에 집중):** "관찰기간이 A~B와 겹치는 환자"에서 정답은 `person_id, observation_period_start_date, observation_period_end_date`를 반환하지만 모델은 `person_id`만 반환해요. WHERE 조건은 완전히 같아요. EX가 행 튜플을 엄격하게 비교하므로 fail이 돼요. EXPLORATORY_SEARCH의 EX가 29.5%, EM이 0%인 주원인이에요.
+- **복합 조건 구조 차이 (STATISTICAL_AGGREGATION, 5.기간설정):** 정답은 `UNION ALL`로 서로 다른 테이블의 이벤트를 합치는데 모델은 한 테이블로 몰아넣는 경우(id 7), 또는 CASE식 대신 중간 CTE를 만들고 별칭을 놓치는 경우가 있어요.
+
+참고로 **EX pass · EM fail이 204건**이에요. 문자열 일치(EM)는 실제 정확도를 크게 과소평가하므로 EM은 보조 지표로만 보는 게 맞아요.
+
+---
+
+## 7. 세부 그룹별 EX (파인튜닝, n=612)
+
+| query_type | n | EX | EM |
+|---|---:|---:|---:|
+| COHORT_EXTRACTION | 332 | 76.2% | 39.5% |
+| VALUE_RETRIEVAL | 92 | 73.9% | 37.0% |
+| STATISTICAL_AGGREGATION | 144 | 56.9% | 32.6% |
+| EXPLORATORY_SEARCH | 44 | **29.5%** | **0.0%** |
+
+| difficulty | n | EX |
+|---|---:|---:|
+| EASY | 188 | 63.3% |
+| MEDIUM | 330 | 72.1% |
+| HARD | 94 | 62.8% |
+
+| section | n | EX | EM |
+|---|---:|---:|---:|
+| 1.연구대상자 | 108 | 85.2% | 31.5% |
+| 2.노출군 | 119 | 85.7% | 52.9% |
+| 3.비교군 | 105 | 56.2% | 32.4% |
+| 4.결과 | 83 | 51.8% | **0.0%** |
+| 5.기간설정 | 197 | 60.9% | 41.1% |
+
+- EASY가 MEDIUM보다 낮은 건 EXPLORATORY_SEARCH(컬럼 구성 불일치)가 EASY에 몰려 있기 때문으로 보여요.
+- **4.결과 섹션은 EM이 0%예요.** 결과(outcome) 정의 쿼리의 정답 스타일(UNION ALL 등)을 모델이 한 번도 그대로 재현하지 못했어요. 학습 데이터 스타일 일관성을 확인해볼 필요가 있어요.
+
+---
+
+## 8. 해석 시 주의사항
+
+- **학습셋 재현 테스트예요.** 학습에 쓴 데이터로 평가했으므로 일반화 성능이 아니라 학습 적합도를 본 거예요. 이 조건에서도 EX가 약 68%라면 학습이 충분히 수렴하지 않았거나("concept 랜덤화"로 학습 시 입력 분포와 다르다면 그 영향일 수도 있어요), 정답 SQL 스타일이 서로 일관되지 않을 가능성이 있어요. 독립 테스트셋(`proposed_input_val` 등)으로 함께 평가해야 결론을 낼 수 있어요.
+- EX는 샌드박스 DB 데이터에 의존해요. 두 쿼리가 모두 빈 결과를 반환하면 우연히 pass가 될 수 있어요(이번 분석에서는 검증하지 못했어요).
+
+---
+
+## 9. 다음 단계 제안
+
+1. ~~베이스 모델 재평가~~ → 완료(2.1절). `adapter_prompt_eval/.env`의 `BASE_MODEL_NAME`을 `xiyansql-qwencoder-14b-proposed-input`으로 수정해 뒀어요. 남은 일은 summary 집계(`summarize()`)가 Format 이탈 건을 분모에서 빼지 않도록 고치는 거예요. 지금은 형식 이탈이 많은 모델일수록 실행검증·EX·Adherence가 부풀려져요.
+2. ~~샌드박스 DB 정비~~ → 완료. 공유 메모리를 1GB로 늘리고 인프라 오류 문항의 EX를 다시 판정했어요(2절).
+3. ~~스키마 Usage 지표 수정~~ → 완료(5절). 새 지표를 만들거나 채점 방식을 바꿀 때는 정답 SQL로 먼저 채점해서 통과하는지 확인하는 점검을 기본으로 두기를 권장해요.
+4. **concept_id 지표 보완:** 정답 SQL 기준 재현율(필요 앵커 반영)과 교란 앵커 오사용률을 따로 리포트.
+5. **추론 설정:** `--max-tokens 1024`로 올려서 잘림 8건이 해소되는지 확인하고, 반복 루프 자체는 학습 데이터 쪽 원인을 점검.
+6. **학습 데이터 보강:** `INTERVAL 'N weeks'`, `LEAST()`, outcome 섹션의 UNION ALL 패턴, EXPLORATORY_SEARCH의 반환 컬럼 규칙.
+7. ~~체크포인트 선택~~ → eval_loss로 대표(3절). epoch을 늘린 학습에서는 체크포인트 비교를 다시 해요.
