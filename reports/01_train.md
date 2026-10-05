@@ -2,15 +2,15 @@
 
 > 종합 보고서와 지표 설명: [00_overview.md](00_overview.md)
 
-- 원본: `results/adapter_eval_{eval_loss,concept_id,final_step,base}_proposed_input_train.csv`, `results/adapter_eval_summary_261002_155905.json`(체크포인트 3개), `results/adapter_eval_summary_261002_171505.json`(베이스 모델 재실행), `results/adapter_eval_base_sysprompt_v2_proposed_input_train.csv` + `results/adapter_eval_summary_261002_210806.json`(베이스 모델 + 시스템 프롬프트, 프롬프트 원문은 `results/adapter_eval_base_sysprompt_v2_system_prompt.txt`)
-  - 참고: 이전 버전 시스템 프롬프트(v1) 결과 `results/adapter_eval_base_sysprompt_proposed_input_train.csv` / `adapter_eval_summary_261002_181028.json` / `adapter_eval_base_sysprompt_system_prompt.txt`도 남아 있어요. 이 보고서에는 성능이 더 좋은 v2 결과만 반영했어요.
+- 원본: `results/adapter_eval/train/adapter_eval_{eval_loss,concept_id,final_step,base}_proposed_input_train.csv`, `results/adapter_eval/summaries/adapter_eval_summary_261002_155905.json`(체크포인트 3개), `results/adapter_eval/summaries/adapter_eval_summary_261002_171505.json`(베이스 모델 재실행), `results/adapter_eval/train/adapter_eval_base_sysprompt_v2_proposed_input_train.csv` + `results/adapter_eval/summaries/adapter_eval_summary_261002_210806.json`(베이스 모델 + 시스템 프롬프트, 프롬프트 원문은 `results/adapter_eval/prompts/adapter_eval_base_sysprompt_v2_system_prompt.txt`)
+  - 참고: 이전 버전 시스템 프롬프트(v1) 결과 `results/adapter_eval/train/adapter_eval_base_sysprompt_proposed_input_train.csv` / `adapter_eval_summary_261002_181028.json` / `adapter_eval_base_sysprompt_system_prompt.txt`도 남아 있어요. 이 보고서에는 성능이 더 좋은 v2 결과만 반영했어요.
 - 테스트셋: `test_set/proposed_input_train.jsonl` (학습셋 재현, 612건 / 시나리오 64개)
   - query_type: COHORT_EXTRACTION 332 · STATISTICAL_AGGREGATION 144 · VALUE_RETRIEVAL 92 · EXPLORATORY_SEARCH 44
   - difficulty: EASY 188 · MEDIUM 330 · HARD 94
   - 개념 값 조건(앵커)이 있는 케이스 532건 (concept_id 지표·하위 전개 반영도의 분모)
 - 서빙 모델: 파인튜닝 = `by-loss`(eval_loss 기준 체크포인트, 3절), base = `xiyansql-qwencoder-14b-proposed-input`(`XGenerationLab/XiYanSQL-QwenCoder-14B-2504`)
   - 최초 실행 때 base는 잘못된 모델 이름(`llm-finetune-study`)으로 612건 모두 404가 나서, 올바른 이름으로 base만 같은 설정(max_tokens 512, 동시 요청 1)으로 다시 돌렸어요.
-  - **base+시스템 프롬프트:** 같은 베이스 모델에 직접 설계한 시스템 프롬프트를 붙인 추가 테스트예요. 하위 전개 규칙(등호·리터럴 IN 모두 금지), PostgreSQL 문법 규칙, 데이터셋 스타일 규칙, 그리고 검증셋(`proposed_input_val`)에서 뽑은 few-shot 예시 5개로 구성돼 있어요(→ 2.2절). 체크포인트와 base는 시스템 프롬프트 없이 테스트했어요.
+  - **base+시스템 프롬프트:** 같은 베이스 모델에 직접 설계한 시스템 프롬프트를 붙인 추가 테스트예요. 하위 전개 규칙(등호·리터럴 IN 모두 금지), PostgreSQL 문법 규칙, 데이터셋 스타일 규칙, 그리고 검증셋(`proposed_input_val`)에서 뽑은 few-shot 예시 5개로 구성돼 있어요(→ 2.2절). 파인튜닝 모델과 base는 모델 기본 시스템 프롬프트(한 줄)만 받아요. 사용자 메시지(질의 + 재료)는 모든 모델이 같아요([요청 프롬프트 구성](00_overview.md#요청-프롬프트-구성)).
 
 ---
 
@@ -51,8 +51,8 @@
 | 속도 | 평균 / 최대 응답(초) | 5.22 / 22.16 | 6.42 / 23.70 | 5.67 / 22.01 | **3.46** / 20.16 | 5.49 / 17.88 | – |
 
 - **FT1 (input·1ep)** = `proposed_input`으로 1 epoch 학습한 첫 파인튜닝 모델의 eval_loss 기준 체크포인트(`by-loss`)예요(→ 3절, [실험 목록](00_overview.md#파인튜닝-실험-목록)).
-- **FT0 (baseline·1ep)** = input(재료) 없이 질문만으로 학습한 기준선 모델(`baseline`, 같은 612건·같은 정답 SQL, 1 epoch, `by-loss`)이에요. 평가 프롬프트는 다른 모델과 똑같이 재료를 포함해요(→ 2.4절). 원본은 `results/adapter_eval_ft0_baseline_proposed_input_train.csv`, `results/adapter_eval_summary_261004_185030.json`이에요.
-- **FT2 (random·1ep)** = `proposed_random`(`proposed_input`의 concept_id를 랜덤화해 4배로 늘린 데이터, 2,202건)으로 1 epoch 학습한 모델의 `by-loss` 체크포인트예요(→ 2.3절). 원본은 `results/adapter_eval_ft2_random_proposed_input_train.csv`, `results/adapter_eval_summary_261004_160834.json`이에요.
+- **FT0 (baseline·1ep)** = input(재료) 없이 질문만으로 학습한 기준선 모델(`baseline`, 같은 612건·같은 정답 SQL, 1 epoch, `by-loss`)이에요. 평가 프롬프트는 다른 모델과 똑같이 재료를 포함해요(→ 2.4절). 원본은 `results/adapter_eval/train/adapter_eval_ft0_baseline_proposed_input_train.csv`, `results/adapter_eval/summaries/adapter_eval_summary_261004_185030.json`이에요.
+- **FT2 (random·1ep)** = `proposed_random`(`proposed_input`의 concept_id를 랜덤화해 4배로 늘린 데이터, 2,202건)으로 1 epoch 학습한 모델의 `by-loss` 체크포인트예요(→ 2.3절). 원본은 `results/adapter_eval/train/adapter_eval_ft2_random_proposed_input_train.csv`, `results/adapter_eval/summaries/adapter_eval_summary_261004_160834.json`이에요.
 - **정답 SQL 채점값(참고):** 테스트셋의 정답 SQL을 모델 답변과 같은 방식으로 채점한 값이에요. 재료에 정답에 필요 없는 코드가 섞여 있어서 concept_id 지표는 100%가 나오지 않아요. 이 값보다 높은 모델은 정답보다 나은 게 아니라, 정답이 쓰지 않은 불필요한 코드까지 SQL에 넣었다는 뜻이에요.
 - **EX는 샌드박스 DB를 고친 뒤 다시 판정한 값이에요.** 처음 실행 때는 DB 공유 메모리 부족으로 정답 쿼리조차 실행되지 못한 문항이 있어서 EX가 실제보다 낮게 나왔어요. DB 설정을 고친 뒤 해당 문항만 저장된 SQL로 다시 판정했어요(`adapter_prompt_eval/rescore_ex.py`). 이제 정답 쿼리 실행 실패는 0건이에요. 모델 SQL이 30초 제한을 넘긴 타임아웃(base 2건, base+시스템 프롬프트 6건)은 너무 느린 SQL로 보고 실패로 셌어요.
 - **base 수치는 분모를 612건(앵커 지표는 532건)으로 맞춰 다시 계산했어요.** base가 자연어로 답한 47건은 채점기가 "Format 이탈"로 처리하고 이후 지표에서 빼버려서, summary JSON에는 분모가 565건(앵커 지표는 505건)으로 기록돼 있어요. JSON 값을 그대로 쓰면 base가 과대평가돼요. 이 표에서는 형식 이탈 47건을 실패(0)로 넣었어요.
@@ -99,72 +99,9 @@
 - **PostgreSQL 규칙:** 주 단위는 일수로 환산(`INTERVAL 'N' WEEK`·`DATE_ADD` 금지)하고, 가장 이른 날짜는 `CASE WHEN`으로 고르고(`MIN(a, b)` 금지), 별칭은 모두 선언하게 했어요.
 - **few-shot 5개:** 검증셋(`proposed_input_val`, id 290·535·721·447·299)에서 골랐어요. 단순 코호트, 기준일, UNION ALL로 결과 합치기, 관찰기간 겹침, 추적 종료일 예시예요. 학습셋과 SQL이 겹치는 예시는 없어요.
 
-<details>
-<summary>사용한 시스템 프롬프트 전문 (<code>results/adapter_eval_base_sysprompt_v2_system_prompt.txt</code>)</summary>
+사용한 시스템 프롬프트 전문은 [00_overview.md의 요청 프롬프트 구성](00_overview.md#요청-프롬프트-구성)에 있어요. 모든 테스트셋에서 같은 프롬프트를 써요.
 
-```text
-당신은 OMOP CDM(PostgreSQL) 기반 Text-to-SQL 전문가입니다. [질의]는 사용자의 자연어 질문이고, [재료]에는 질의에 필요한 개념(concept)의 대표(앵커) concept_id, 사용 가능한 테이블/컬럼 스키마, 테이블 간 조인 관계가 이미 정리되어 있습니다.
-
-[재료]의 concept_id는 그 개념 전체를 대표하는 상위(앵커) 코드만 주어지며, 하위(descendant) 코드는 생략되어 있습니다. 앵커 코드를 그대로 비교하면 하위 개념이 전부 빠지므로, 모든 개념 조건은 concept_ancestor 테이블로 하위 개념까지 확장해서 조회해야 합니다.
-
-다음을 반드시 지키세요:
-1. *_concept_id 컬럼에 숫자를 직접 비교하는 것은 형태와 관계없이 모두 금지입니다.
-   - 금지: drug_concept_id = 1308842
-   - 금지: drug_concept_id IN (1308842)
-   - 금지: drug_concept_id IN (1308842, 1332418)
-   앵커가 1개뿐이어도, 성별(gender_concept_id)·방문 유형(visit_concept_id) 같은 단순 코드여도 예외 없이 항상 아래 형태만 쓰세요:
-   <컬럼> IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (<앵커 concept_id>))
-2. [재료]에 나열된 테이블/컬럼만 사용하세요. 나열되지 않은 테이블/컬럼을 추측해서 만들지 마세요.
-3. 환자 조건은 person 테이블을 기준으로 EXISTS (SELECT 1 FROM ... WHERE x.person_id = p.person_id AND ...) 형태로 거세요. 제외 조건은 NOT EXISTS를 쓰고, NOT IN은 쓰지 마세요.
-4. 서로 다른 개념의 사건을 함께 모을 때는 개념마다 별도 SELECT를 만들어 UNION ALL로 합치세요.
-5. PostgreSQL 문법만 쓰세요.
-   - 기간 더하기: INTERVAL 'N' DAY / INTERVAL 'N' MONTH / INTERVAL 'N' YEAR만 사용하세요. 주(week) 단위는 일수로 환산하세요(예: 12주 → INTERVAL '84' DAY). DATE_ADD, INTERVAL 'N' WEEK는 쓰지 마세요.
-   - 여러 날짜 중 가장 이른 날짜는 CASE WHEN으로 비교하세요. MIN(a, b)처럼 집계함수에 인자를 두 개 넣지 마세요.
-   - SELECT/WHERE에서 쓰는 테이블 별칭은 모두 FROM/JOIN에 선언돼 있어야 합니다. 여러 테이블에 있는 컬럼(person_id 등)은 항상 별칭을 붙이세요.
-6. 다른 설명 없이 SQL 쿼리 하나만 답하세요.
-
-아래는 올바른 답변 예시입니다([재료]는 개념 값 조건만 발췌).
-
-[예시 1]
-[질의] 현재 연도 기준 연령 65세 이상이고 여성 기록이고 골다공증 진단인 환자.
-[재료] 개념 값 조건:
-  - "골다공증" → condition_occurrence.condition_concept_id IN (80502)
-  - "여성" → person.gender_concept_id IN (8532)
-[SQL]
-SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM CURRENT_DATE) - p.year_of_birth) >= 65 AND p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)));
-
-[예시 2]
-[질의] 백내장 최초 진단일을 기준 시점으로 정의.
-[재료] 개념 값 조건:
-  - "백내장" → condition_occurrence.condition_concept_id IN (375545)
-[SQL]
-SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) GROUP BY co.person_id;
-
-[예시 3]
-[질의] 유방암 또는 전립선암의 최초 발생일을 조회.
-[재료] 개념 값 조건:
-  - "유방암" → condition_occurrence.condition_concept_id IN (4112853)
-  - "전립선암" → condition_occurrence.condition_concept_id IN (4163261)
-[SQL]
-WITH outcome_events AS ( SELECT co.person_id, co.condition_start_date AS event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) UNION ALL SELECT co.person_id, co.condition_start_date AS event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4163261)) ) SELECT oe.person_id, MIN(oe.event_date) AS first_event_date FROM outcome_events oe GROUP BY oe.person_id;
-
-[예시 4]
-[질의] 관찰기간이 2021-01-14부터 2022-12-31까지의 기간과 겹치는 환자.
-[재료] 개념 값 조건: 없음
-[SQL]
-SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2022-12-31' AND op.observation_period_end_date >= DATE '2021-01-14';
-
-[예시 5]
-[질의] 기준시점(로모소주맙 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 24개월)
-[재료] 개념 값 조건:
-  - "로모소주맙" → drug_exposure.drug_concept_id IN (1511251)
-[SQL]
-WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)) GROUP BY de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '24' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '24' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '24_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;
-```
-
-</details>
-
-> 이 프롬프트 이전에 RAG 평가용 프롬프트(`SYSTEM_PROMPT_RAG`, 하위 전개 규칙만 있고 few-shot 없음)로 먼저 테스트했어요. 그때는 하위 전개 32.7%, EX 36.0%에 그쳤어요. 그 프롬프트는 "리터럴 IN절"만 금지하고 등호를 언급하지 않아서, 하위 전개를 안 한 케이스의 약 3분의 2가 `= 1308842` 형태였어요. 현재 프롬프트는 그 결과보다 195건을 더 맞히고 10건을 잃었어요. 이전 결과 파일은 `results/`에 남아 있어요(`adapter_eval_base_sysprompt_*`).
+> 이 프롬프트 이전에 RAG 평가용 프롬프트(`SYSTEM_PROMPT_RAG`, 하위 전개 규칙만 있고 few-shot 없음)로 먼저 테스트했어요. 그때는 하위 전개 32.7%, EX 36.0%에 그쳤어요. 그 프롬프트는 "리터럴 IN절"만 금지하고 등호를 언급하지 않아서, 하위 전개를 안 한 케이스의 약 3분의 2가 `= 1308842` 형태였어요. 현재 프롬프트는 그 결과보다 195건을 더 맞히고 10건을 잃었어요. 이전 결과 파일은 `results/adapter_eval/train/adapter_eval_base_sysprompt_proposed_input_train.csv`에 남아 있어요.
 
 | 항목 | base | base+시스템 프롬프트 | FT1 (input·1ep) |
 |---|---:|---:|---:|
@@ -345,7 +282,7 @@ EX를 틀린 문항을 원인별로 나눴어요. 한 문항은 표 순서대로
 
 한 번의 학습(1 epoch)에서 서로 다른 기준으로 체크포인트 3개를 뽑아 모두 평가했어요: 검증 손실이 가장 낮은 지점(`by-loss`), 학습 중 concept_id 반영도가 가장 높은 지점(`by-adherence`), 마지막 지점(`final-step`).
 
-결과는 사실상 같은 모델이었어요. 612건 중 567건(92.6%)에서 세 체크포인트가 글자 하나 다르지 않은 SQL을 만들었고, EX도 416 / 414 / 415건(68.0% / 67.6% / 67.8%)으로 1~2건 차이이고, 세 체크포인트의 결과가 갈린 문항은 6건뿐이에요(validation 셋에서는 맞힌 문항까지 완전히 같아요). 그래서 **이 보고서는 일반적인 선택 기준인 eval_loss 체크포인트로 대표해요.** 나머지 두 체크포인트의 문항별 결과는 `results/adapter_eval_{concept_id,final_step}_*.csv`에 남아 있어요.
+결과는 사실상 같은 모델이었어요. 612건 중 567건(92.6%)에서 세 체크포인트가 글자 하나 다르지 않은 SQL을 만들었고, EX도 416 / 414 / 415건(68.0% / 67.6% / 67.8%)으로 1~2건 차이이고, 세 체크포인트의 결과가 갈린 문항은 6건뿐이에요(validation 셋에서는 맞힌 문항까지 완전히 같아요). 그래서 **이 보고서는 일반적인 선택 기준인 eval_loss 체크포인트로 대표해요.** 나머지 두 체크포인트의 문항별 결과는 `results/adapter_eval/{train,val}/adapter_eval_{concept_id,final_step}_*.csv`에 남아 있어요.
 
 - 1 epoch 학습이라 체크포인트 사이의 학습량 차이가 작았던 것으로 보여요. epoch을 늘리면 뒤로 갈수록 학습 데이터에 과하게 맞춰지면서 체크포인트 간 차이가 생길 수 있어서, 그때 다시 비교해요.
 

@@ -256,6 +256,8 @@ python run_eval.py \
 - 결과는 `../results/adapter_eval_<체크포인트>_<테스트셋>.csv`(문항별 상세)와
   `../results/adapter_eval_summary_<시각>.json`(체크포인트×테스트셋 전체 집계)에
   저장된다. `../results/`는 이미 `.gitignore` 처리돼 있다.
+  실행이 끝난 결과는 `../results/adapter_eval/{train,val,variant,summaries,prompts}/`로
+  옮겨서 보관한다(평가 보고서는 저장소 루트의 `reports/`).
 
 ## 기존 코드 재사용
 

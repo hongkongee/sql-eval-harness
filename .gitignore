@@ -6,8 +6,7 @@ venv/
 .idea/
 .vscode/
 .env
-results/*
-!results/reports/
+results/
 nohup.out
 *.log
 test_set/

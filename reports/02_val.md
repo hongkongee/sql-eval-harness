@@ -2,7 +2,7 @@
 
 > 종합 보고서와 지표 설명: [00_overview.md](00_overview.md) · 학습셋 결과: [01_train.md](01_train.md)
 
-- 원본: `results/adapter_eval_{ft0_baseline,eval_loss,ft2_random,base,base_sysprompt_v2}_proposed_input_val.csv`, `results/adapter_eval_summary_261004_185030.json`(FT0), `results/adapter_eval_summary_261004_160834.json`(FT2), `results/adapter_eval_summary_261003_173605.json`(파인튜닝 + base), `results/adapter_eval_summary_261003_174450.json`(base+시스템 프롬프트)
+- 원본: `results/adapter_eval/val/adapter_eval_{ft0_baseline,eval_loss,ft2_random,base,base_sysprompt_v2}_proposed_input_val.csv`, `results/adapter_eval/summaries/adapter_eval_summary_261004_185030.json`(FT0), `results/adapter_eval/summaries/adapter_eval_summary_261004_160834.json`(FT2), `results/adapter_eval/summaries/adapter_eval_summary_261003_173605.json`(파인튜닝 + base), `results/adapter_eval/summaries/adapter_eval_summary_261003_174450.json`(base+시스템 프롬프트)
 - 테스트셋: `test_set/proposed_input_val.jsonl` (68건 / 시나리오 7개, 학습에 쓰지 않은 데이터)
 - **집계 대상 63건:** id 290·535·721·447·299의 5건은 base+시스템 프롬프트의 few-shot 예시로 쓰여서 모든 모델에서 빼고 집계했어요.
   - query_type: COHORT_EXTRACTION 36 · STATISTICAL_AGGREGATION 14 · VALUE_RETRIEVAL 9 · EXPLORATORY_SEARCH 4
@@ -11,7 +11,7 @@
 - **FT1 (input·1ep)** = `proposed_input`으로 1 epoch 학습한 첫 파인튜닝 모델의 eval_loss 기준 체크포인트(`by-loss`)예요([실험 목록](00_overview.md#파인튜닝-실험-목록)). 다른 두 체크포인트(concept_id, final_step)도 같이 돌렸지만 결과가 똑같아서 표에서 뺐어요(→ 1절 5번).
 - **FT0 (baseline·1ep)** = input(재료) 없이 질문만으로 학습한 기준선 모델의 `by-loss` 체크포인트예요. 평가 프롬프트는 다른 모델과 똑같이 재료를 포함해요.
 - **FT2 (random·1ep)** = `proposed_random`(concept_id 랜덤화, 4배)으로 1 epoch 학습한 모델의 `by-loss` 체크포인트예요([실험 목록](00_overview.md#파인튜닝-실험-목록)).
-- 실행 설정은 학습셋과 같아요: temperature 0, max_tokens 512, 동시 요청 1. 파인튜닝 모델과 base는 시스템 프롬프트 없이, base+시스템 프롬프트는 학습셋과 같은 v2 프롬프트로 돌렸어요.
+- 실행 설정은 학습셋과 같아요: temperature 0, max_tokens 512, 동시 요청 1. 파인튜닝 모델과 base는 모델 기본 시스템 프롬프트만, base+시스템 프롬프트는 학습셋과 같은 v2 시스템 프롬프트를 받아요([요청 프롬프트 구성](00_overview.md#요청-프롬프트-구성)).
 - 스키마 Usage는 고친 채점 방식으로 다시 채점한 값이에요([01_train.md](01_train.md) 5절).
 
 ---
