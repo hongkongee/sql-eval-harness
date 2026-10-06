@@ -316,3 +316,100 @@ EOF
 | 같은 정답인데 EX가 이상하게 모두 fail | 샌드박스 DB 데이터를 바꿨는데 예전 정답 결과 캐시를 씀 | `rm -rf ../results/gold_cache` 후 4.2 |
 | `the following arguments are required: --testset` | zsh에서 테스트셋 인자를 문자열 변수로 넘김 | 2.2처럼 배열로 넘김 |
 | `컬럼 구성이 지금 스크립트와 다릅니다` (`--resume`) | 예전 버전 스크립트로 만든 CSV | 그 CSV를 다른 곳으로 옮기고 새로 실행 |
+
+---
+
+## 7. 직접 물어보기 (정성 평가)
+
+테스트셋 전체를 돌리지 않고, 문항 하나를 모델에 직접 보내서 답변을 눈으로 확인하는 방법이에요. 평가와 똑같은 조건(시스템 프롬프트, temperature 0, max_tokens 512)으로 보내요.
+
+먼저 공통 변수를 잡아 둬요(`adapter_prompt_eval/`에서 실행).
+
+```bash
+API=http://10.1.1.69:8007/v1/chat/completions
+MODEL=proposed-random-by-loss    # 1.2에서 확인한 서빙 이름
+SPF=../results/adapter_eval/prompts/adapter_eval_train_system_prompt.txt   # base+시스템 프롬프트는 v2 파일
+```
+
+### 7.1 가장 간단한 curl
+
+질문만 직접 써서 보내요. 재료가 없어서 평가 때와 입력이 달라요. 모델이 응답하는지 빠르게 볼 때 써요.
+
+```bash
+curl -s $API -H 'Content-Type: application/json' -d '{
+  "model": "'"$MODEL"'",
+  "messages": [
+    {"role": "system", "content": "당신은 OMOP-CDM v5.3 스키마 기반 임상 데이터베이스를 위한 SQL 생성 전문가입니다. 사용자의 질문에 대해 정확하고 실행 가능한 SQL 쿼리를 작성하세요. 스키마 정보나 concept_id 후보가 함께 제공되는 경우, 반드시 그 정보를 우선적으로 참고하여 SQL을 작성하세요. 부연 설명 없이 SQL 코드만 출력하세요."},
+    {"role": "user", "content": "[질의]\n외래 방문 방문이고 입원 방문인 환자."}
+  ],
+  "temperature": 0, "max_tokens": 512
+}' | python3 -c "import json,sys; print(json.load(sys.stdin)['choices'][0]['message']['content'])"
+```
+
+- 응답 JSON 전체를 보고 싶으면 마지막 `| python3 ...`를 `| python3 -m json.tool`로 바꿔요.
+- `[질의]` 아래에 `\n\n[재료]\n...`를 직접 붙여 써도 돼요. 재료 형식은 7.2의 출력이나 `reports/00_overview.md`의 "요청 프롬프트 구성"을 참고해요.
+
+### 7.2 테스트셋 문항을 평가 때와 똑같이 보내기
+
+문항 id로 평가 때와 똑같은 사용자 메시지(질의 + 재료)를 만들어 보내고, 정답 SQL과 나란히 보여줘요. 변형 테스트셋은 `TS`와 `ID`만 바꾸면 돼요(예: `TS=../test_set/eval_ready/paraphrase.jsonl ID=seed_181_test_paraphrase`).
+
+```bash
+TS=../test_set/proposed_input_val.jsonl
+ID=439
+
+# 1) 요청 본문 만들기 (재료 조립은 평가 스크립트와 같은 함수를 써요)
+python3 - "$TS" "$ID" "$MODEL" "$SPF" > /tmp/req.json <<'EOF'
+import json, sys
+import adherence as ad
+ts, cid, model, spf = sys.argv[1:]
+case = next(c for c in map(json.loads, open(ts, encoding='utf-8')) if str(c['id']) == cid)
+print(json.dumps({
+    "model": model,
+    "messages": [{"role": "system", "content": open(spf, encoding='utf-8').read().strip()},
+                 {"role": "user", "content": ad.build_prompt(case)}],
+    "temperature": 0, "max_tokens": 512}, ensure_ascii=False))
+print('--- 질의:', case['text'], file=sys.stderr)
+print('--- 정답 SQL:\n' + case['query'], file=sys.stderr)
+EOF
+
+# 2) 보내고 답변만 보기
+curl -s $API -H 'Content-Type: application/json' -d @/tmp/req.json \
+  | python3 -c "import json,sys; print('--- 모델 답변:'); print(json.load(sys.stdin)['choices'][0]['message']['content'])"
+```
+
+- 모델에 실제로 보낸 메시지를 보고 싶으면 `python3 -m json.tool /tmp/req.json`으로 열어요.
+- 결과 CSV의 `모델 답변 쿼리문`과 같은 답이 나와야 정상이에요(temperature 0). 서버 상태에 따라 아주 가끔 달라질 수 있어요.
+
+### 7.3 여러 모델의 답을 한 번에 비교하기
+
+7.2의 1)을 실행해 둔 상태에서, 모델 이름만 바꿔 같은 요청을 보내요.
+
+```bash
+for M in baseline-by-loss proposed-random-by-loss; do   # 1.2에서 확인한 서빙 이름들
+  echo "===== $M"
+  python3 -c "import json,sys; d=json.load(open('/tmp/req.json')); d['model']=sys.argv[1]; print(json.dumps(d, ensure_ascii=False))" $M \
+    | curl -s $API -H 'Content-Type: application/json' -d @- \
+    | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['choices'][0]['message']['content'] if 'choices' in r else r)"
+done
+```
+
+- 서버에 떠 있는 모델만 응답해요. 없는 이름이면 `404 … does not exist` 오류가 출력돼요(1.2로 이름 확인).
+- base+시스템 프롬프트와 비교하려면 `SPF`를 v2 파일로 바꿔 7.2의 1)을 다시 실행한 뒤 base 서빙 이름으로 보내요.
+
+### 7.4 모델 답변을 샌드박스 DB에서 실행해 정답과 비교하기
+
+답변 SQL을 `/tmp/pred.sql`에 붙여 넣고 실행해요. EX 판정과 같은 함수를 써요.
+
+```bash
+python3 - "$TS" "$ID" <<'EOF'
+import json, sys
+from run_eval import base
+ts, cid = sys.argv[1:]
+case = next(c for c in map(json.loads, open(ts, encoding='utf-8')) if str(c['id']) == cid)
+pred = open('/tmp/pred.sql', encoding='utf-8').read()
+conn = base.SandboxConnectionPool().get()
+print('EX:', base.check_ex(conn, pred, case['query']))
+print('모델 결과 (앞 5행):', base._run_rows(conn, pred)[:5])
+print('정답 결과 (앞 5행):', base._run_rows(conn, case['query'])[:5])
+EOF
+```
