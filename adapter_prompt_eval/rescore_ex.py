@@ -19,7 +19,12 @@ from pathlib import Path
 from rescore_schema import load_cases
 from run_eval import CSV_FIELDNAMES, base, parse_labeled_path
 
-_INFRA_MARKERS = ("could not resize shared memory segment", "canceling statement due to statement timeout")
+_INFRA_MARKERS = (
+    "could not resize shared memory segment", "canceling statement due to statement timeout",
+    # DB 연결이 쿼리 도중 끊긴 경우 (keepalive로 감지)
+    "server closed the connection", "consuming input failed", "the connection is closed",
+    "connection is lost", "SSL SYSCALL error",
+)
 
 
 def _is_infra(text: str) -> bool:

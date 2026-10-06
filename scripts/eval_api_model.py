@@ -276,7 +276,12 @@ def get_sandbox_connection() -> psycopg.Connection | None:
     password = os.environ.get("SANDBOX_DB_PASSWORD", "")
     timeout_ms = int(os.environ.get("SANDBOX_DB_TIMEOUT", "30000"))
     dsn = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
-    conn = psycopg.connect(dsn, connect_timeout=max(1, timeout_ms // 1000))
+    # 쿼리 도중 네트워크가 끊기면 응답을 끝없이 기다리며 멈추므로, TCP keepalive로
+    # 끊긴 연결을 1분 안에 감지해 에러로 끝낸다 (SandboxConnectionPool이 다시 연결).
+    conn = psycopg.connect(
+        dsn, connect_timeout=max(1, timeout_ms // 1000),
+        keepalives=1, keepalives_idle=30, keepalives_interval=10, keepalives_count=3,
+    )
     # 문항 하나가 실패해도 트랜잭션이 aborted 상태로 남아 이후 호출이 연쇄
     # 실패하지 않도록, eval_harness/db.py와 동일하게 autocommit으로 문항마다
     # 독립된 트랜잭션을 쓴다.
@@ -299,7 +304,7 @@ class SandboxConnectionPool:
 
     def get(self) -> psycopg.Connection | None:
         conn = getattr(self._local, "conn", "unset")
-        if conn != "unset":
+        if conn != "unset" and not (conn is not None and conn.closed):
             return conn
         conn = get_sandbox_connection()
         self._local.conn = conn
