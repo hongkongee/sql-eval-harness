@@ -46,8 +46,10 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import csv
+import hashlib
 import json
 import os
+import pickle
 import re
 import threading
 import time
@@ -352,13 +354,47 @@ def _run_rows(conn: psycopg.Connection, sql: str) -> list[tuple]:
     return conn.execute(substituted).fetchall()
 
 
+# 정답 쿼리 실행 결과 캐시. 정답 쿼리는 모델과 무관하므로 한 번 실행한 결과를
+# 저장해 두고 이후 EX 판정에 재사용한다. 키는 샌드박스 DB(host/port/dbname) +
+# 정답 SQL 원문이라, 정답 SQL을 고치면 자동으로 새로 실행된다. 날짜 함수가 들어간
+# 정답 SQL은 실행한 날짜도 키에 넣는다. 실행에 실패한 결과는 저장하지 않는다.
+# 샌드박스 DB의 데이터가 바뀌면 캐시 폴더를 지운다. EX_GOLD_CACHE=0이면 끈다.
+GOLD_CACHE_DIR = Path(os.environ.get("EX_GOLD_CACHE_DIR", Path(__file__).resolve().parent.parent / "results" / "gold_cache"))
+_DATE_DEPENDENT_RE = re.compile(r"\b(current_date|current_timestamp|localtimestamp|now\s*\()", re.IGNORECASE)
+
+
+def _gold_cache_path(conn: psycopg.Connection, gold_sql: str) -> Path:
+    key = f"{conn.info.host}:{conn.info.port}/{conn.info.dbname}\n{gold_sql}"
+    if _DATE_DEPENDENT_RE.search(gold_sql):
+        key += f"\n{time.strftime('%Y-%m-%d')}"
+    return GOLD_CACHE_DIR / f"{hashlib.sha256(key.encode('utf-8')).hexdigest()}.pkl"
+
+
+def _gold_rows(conn: psycopg.Connection, gold_sql: str) -> list[tuple]:
+    if os.environ.get("EX_GOLD_CACHE", "1") == "0":
+        return _run_rows(conn, gold_sql)
+    path = _gold_cache_path(conn, gold_sql)
+    try:
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    except (OSError, pickle.UnpicklingError, EOFError):
+        pass
+    rows = _run_rows(conn, gold_sql)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(f".{os.getpid()}.{threading.get_ident()}.tmp")
+    with open(tmp, "wb") as f:
+        pickle.dump(rows, f)
+    os.replace(tmp, path)
+    return rows
+
+
 def check_ex(conn: psycopg.Connection | None, pred_sql: str, gold_sql: str) -> tuple[str, str]:
     if conn is None:
         return "skip", ""
     if not gold_sql:
         return "N/A", ""
     try:
-        gold_rows = _run_rows(conn, gold_sql)
+        gold_rows = _gold_rows(conn, gold_sql)
     except psycopg.Error as exc:
         return "ERROR", f"정답 쿼리 실행 실패 (테스트셋/샌드박스 DB 확인 필요): {exc}".strip()
     try:

@@ -42,11 +42,19 @@ python3 -c "from run_eval import base; c=base.SandboxConnectionPool().get(); pri
 
 숫자가 나오면 정상이에요. DB 컨테이너의 공유 메모리는 1GB로 설정돼 있어야 해요(`docker exec lakefs-postgres df -h /dev/shm` → `1.0G`). 64MB면 큰 쿼리가 `could not resize shared memory segment` 오류로 실패해요.
 
+**정답 쿼리 결과 캐시:** EX를 판정할 때 정답 쿼리는 모델과 상관없이 결과가 같아서, 한 번 실행한 결과를 `../results/gold_cache/`에 저장해 두고 다음부터는 저장된 결과를 써요(`run_eval.py`, `rescore_ex.py` 모두). 모델 SQL은 매번 실행해요.
+
+- 정답 SQL을 고치면 자동으로 새로 실행해요(정답 SQL 원문과 DB 주소가 캐시 키예요).
+- `CURRENT_DATE`·`NOW()` 같은 날짜 함수가 들어간 정답 SQL은 실행한 날짜별로 따로 저장해요.
+- 정답 쿼리가 실패하거나 시간 초과가 나면 저장하지 않고, 다음 실행 때 다시 시도해요.
+- **샌드박스 DB의 데이터를 바꿨다면 캐시를 지워요:** `rm -rf ../results/gold_cache`
+- 캐시 없이 돌리려면 명령 앞에 `EX_GOLD_CACHE=0`을 붙여요(예: `EX_GOLD_CACHE=0 python3 run_eval.py ...`).
+
 ### 1.4 시스템 프롬프트 파일
 
 | 파일 | 쓰는 모델 |
 |---|---|
-| `../results/adapter_eval/prompts/adapter_eval_train_system_prompt.txt` | 파인튜닝 모델(FT0·FT1·FT2)과 base — **파인튜닝 학습 때 쓴 문구** |
+| `../results/adapter_eval/prompts/adapter_eval_train_system_prompt.txt` | 파인튜닝 모델(FT0·FT1·FT2·FT3 …)과 base — **파인튜닝 학습 때 쓴 문구** |
 | `../results/adapter_eval/prompts/adapter_eval_base_sysprompt_v2_system_prompt.txt` | base+시스템 프롬프트 — 규칙 + few-shot |
 
 **파인튜닝 모델은 반드시 학습 때 문구를 넣어서 평가해요.** `--system-prompt`를 빼면 모델 기본 문구("You are Qwen…")가 들어가서 학습 때와 조건이 달라지고, 점수가 낮게 나와요(FT1 val EX 74.6% → 58.7%).
@@ -204,7 +212,9 @@ python3 rescore_ex.py \
     ../results/adapter_eval_ft2_trainsys_*.csv
 ```
 
-다시 해도 `(여전히 인프라 오류)`로 남는 문항은 대부분 **모델 SQL이 30초를 넘기는 경우**예요. 너무 느린 SQL로 보고 실패로 둬요.
+다시 해도 `(여전히 인프라 오류)`로 남는 문항은 대부분 **모델 SQL이 30초를 넘기는 경우**예요. 너무 느린 SQL로 보고 실패로 둬요. `ERROR -> ERROR`는 정답 쿼리가 다시 실행해도 시간 초과가 난 경우예요(정답 쿼리 자체가 무거운 문항). DB가 한가할 때 다시 돌리거나 실패로 둬요.
+
+- 대상 문항은 원래 무거운 쿼리라 1건에 몇 분씩 걸릴 수 있어요. 진행 상황은 파일 하나가 끝날 때마다 출력돼요. 출력을 `| grep` 등으로 넘길 때는 `python3 -u`로 실행해야 바로 보여요.
 
 ### 4.3 결과 파일 옮기기
 
@@ -303,5 +313,6 @@ EOF
 | `EX 참고사항`에 `could not resize shared memory segment` | DB 공유 메모리 부족 | DB 컨테이너 `shm_size: '1gb'` 설정 후 4.2 |
 | `EX 참고사항`에 `canceling statement due to statement timeout` | 쿼리가 30초를 넘김 | 4.2로 재판정. 계속 남으면 실패로 둠 |
 | 로그가 15분 넘게 멈춤 | DB 연결 끊김 또는 서버 멈춤 | 3.2 |
+| 같은 정답인데 EX가 이상하게 모두 fail | 샌드박스 DB 데이터를 바꿨는데 예전 정답 결과 캐시를 씀 | `rm -rf ../results/gold_cache` 후 4.2 |
 | `the following arguments are required: --testset` | zsh에서 테스트셋 인자를 문자열 변수로 넘김 | 2.2처럼 배열로 넘김 |
 | `컬럼 구성이 지금 스크립트와 다릅니다` (`--resume`) | 예전 버전 스크립트로 만든 CSV | 그 CSV를 다른 곳으로 옮기고 새로 실행 |

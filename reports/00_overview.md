@@ -31,6 +31,7 @@
 | FT0 (baseline·1ep) | input(재료) 없이 질문만으로 학습한 기준선 파인튜닝 모델. 재료를 넣는 학습 방식의 효과를 확인하는 용도예요. 평가는 다른 모델과 똑같이 재료를 포함한 프롬프트로 해요 |
 | FT1 (input·1ep) | 첫 번째 LoRA 파인튜닝 모델(아래 파인튜닝 실험 목록 참고). 검증 손실(eval_loss)이 가장 낮은 체크포인트(`by-loss`)로 대표해요* |
 | FT2 (random·1ep) | concept_id 랜덤화 데이터로 학습한 파인튜닝 모델. `by-loss` 체크포인트만 평가해요 |
+| FT3 (random_augment·1ep) | FT2의 학습 데이터(`proposed_random`)를 증강한 데이터로 학습한 파인튜닝 모델 (⏳ 학습 중) |
 | base | 파인튜닝 전 베이스 모델 (`XiYanSQL-QwenCoder-14B-2504`). 파인튜닝 모델과 같은 시스템 프롬프트(학습 때 문구)를 받아요 |
 | base+시스템 프롬프트 | 베이스 모델 + 직접 설계한 규칙·few-shot 시스템 프롬프트 ([요청 프롬프트 구성](#요청-프롬프트-구성)) |
 
@@ -47,6 +48,7 @@
 | FT0 | `baseline` (`proposed_input`과 같은 612건, input 없음) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 기준선. FT1과 학습 조건을 똑같이 맞추고 학습 데이터에서 input만 뺌. 평가 프롬프트는 동일 |
 | FT1 | `proposed_input` (input에 RAG 프롬프트 포함, 증강 없음) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 빠른 검증용 첫 학습. 체크포인트 3개(`by-loss`·`by-adherence`·`final-step`)를 모두 평가했지만 사실상 같아서 하나로 대표 |
 | FT2 | `proposed_random` (`proposed_input`의 concept_id를 랜덤화, 4배) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 빠른 테스트를 위해 `by-loss`만 평가. 학습 데이터 2,202건 = 원본 612 + 랜덤화 사본 3×530 |
+| FT3 | `random_augment` (`proposed_random`을 증강) | 1 | eval_loss 최저 (`by-loss`) | ⏳ 학습 중 | 증강 방식과 학습 데이터 건수는 학습이 끝나면 적어요 |
 
 - 공통 설정: max_tokens 512, temperature 0, 동시 요청 1
 - **모든 모델은 같은 사용자 메시지(질의 + 재료)를 받아요. 다른 건 시스템 프롬프트뿐이에요.** 파인튜닝 모델과 base는 파인튜닝 학습 때 쓴 시스템 프롬프트(한 문단)를 받고, base+시스템 프롬프트는 그 대신 규칙과 few-shot이 담긴 긴 시스템 프롬프트를 받아요. 이름의 "+시스템 프롬프트"는 이 차이를 뜻해요(→ [요청 프롬프트 구성](#요청-프롬프트-구성)).
