@@ -436,3 +436,16 @@ WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS i
 
 - **학습 때 형식과의 차이:** 학습 데이터(LLaMA Factory)는 `<질의>` + 줄바꿈 + `[재료]…` 형식이라, 평가 때 붙는 `[질의]` 머리말과 빈 줄이 없습니다. 모든 모델에 똑같이 적용되는 차이라 모델 간 비교에는 영향이 없습니다.
 - FT0는 학습 때 재료 없이 질의만 받았지만, 평가 때는 다른 모델과 똑같이 재료를 포함해서 받습니다.
+
+<details>
+<summary>요약 보고서의 모델 이름과의 대응</summary>
+
+| 요약 보고서 | 이 문서 | 학습 데이터 |
+|---|---|---|
+| 프롬프트 미반영 학습 모델 | FT0 (baseline·1ep) | `baseline` |
+| 프롬프트 반영 학습 모델 | FT1 (input·1ep) | `proposed_input` |
+| 프롬프트 반영 + 코드 랜덤화 학습 모델 | FT2 (random·1ep) | `proposed_random` |
+| 베이스 모델 | base | – |
+| 베이스 모델 + 규칙·예시 프롬프트 | base+시스템 프롬프트 | – |
+
+</details>
