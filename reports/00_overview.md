@@ -48,7 +48,7 @@
 | FT0 | `baseline` (`proposed_input`과 같은 612건, input 없음) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 기준선. FT1과 학습 조건을 똑같이 맞추고 학습 데이터에서 input만 뺌. 평가 프롬프트는 동일 |
 | FT1 | `proposed_input` (input에 RAG 프롬프트 포함, 증강 없음) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 빠른 검증용 첫 학습. 체크포인트 3개(`by-loss`·`by-adherence`·`final-step`)를 모두 평가했지만 사실상 같아서 하나로 대표 |
 | FT2 | `proposed_random` (`proposed_input`의 concept_id를 랜덤화, 4배) | 1 | eval_loss 최저 (`by-loss`) | ✅ 평가 완료 | 빠른 테스트를 위해 `by-loss`만 평가. 학습 데이터 2,202건 = 원본 612 + 랜덤화 사본 3×530 |
-| FT3 | `random_augment` (`proposed_random`을 증강) | 1 | eval_loss 최저 (`by-loss`) | 🔄 val만 평가 완료 | val EX 93.7%(FT2 92.1%). 학습셋·변형 테스트셋은 평가 전. 증강 방식과 학습 데이터 건수는 추후 기입 |
+| FT3 | `random_augment` (`proposed_random`을 증강) | 1 | eval_loss 최저 (`by-loss`) | 🔄 학습셋·val 평가 완료 | EX 학습셋 94.8%(FT2 94.1%), val 93.7%(FT2 92.1%). 변형 테스트셋은 평가 전. 증강 방식과 학습 데이터 건수는 추후 기입 |
 
 - 공통 설정: max_tokens 512, temperature 0, 동시 요청 1
 - **모든 모델은 같은 사용자 메시지(질의 + 재료)를 받습니다. 다른 건 시스템 프롬프트뿐입니다.** 파인튜닝 모델과 base는 파인튜닝 학습 때 쓴 시스템 프롬프트(한 문단)를 받고, base+시스템 프롬프트는 그 대신 규칙과 few-shot이 담긴 긴 시스템 프롬프트를 받습니다. 이름의 "+시스템 프롬프트"는 이 차이를 뜻합니다(→ [요청 프롬프트 구성](#요청-프롬프트-구성)).
