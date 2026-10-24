@@ -1,0 +1,7 @@
+# concept span label(API의 GLiNER concept 라벨 4개) → 대상 테이블 (eval.score --concept 용).
+# 지금 API 응답의 concept span에는 label이 없어 쓰이지 않는다 (label 필드 추가 제안은 보류 -
+# BioMed의 라벨 정확도가 낮아 label → 테이블 환산이 자주 틀리기 때문. 세팅 문서 7절 참고).
+약물명: [drug_exposure]
+진단명 또는 질병명: [condition_occurrence]
+검사명 또는 측정 항목: [measurement]
+시술명 또는 수술명: [procedure_occurrence]

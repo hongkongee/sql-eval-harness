@@ -1,0 +1,5 @@
+# zero-shot GLiNER 스키마 라벨 → 대상 테이블 (eval.extract --system gliner의 schema_labels 판정용).
+환자 또는 대상자: [person]
+진단 행위: [condition_occurrence]
+처방 또는 투약 행위: [drug_exposure]
+측정 또는 검사 행위: [measurement]

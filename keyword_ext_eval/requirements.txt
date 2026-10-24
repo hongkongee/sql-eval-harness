@@ -1,0 +1,4 @@
+requests>=2.31
+sqlglot>=30
+pyyaml>=6
+pytest>=8

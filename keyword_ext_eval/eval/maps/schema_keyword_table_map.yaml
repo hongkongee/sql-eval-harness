@@ -1,0 +1,17 @@
+# 서비스 사전(gliner-entity-router/app/config/schema_keywords.yaml)의 대표 키워드(묶음) → 대상 테이블.
+# 평가 전용 - 서비스는 이 파일을 읽지 않는다. 사전에 새 묶음을 추가하면 여기에도 추가할 것
+# (없으면 eval.score가 경고하고, 그 묶음 키워드는 어떤 테이블도 덮지 않은 것으로 계산).
+# 빈 리스트([])는 "테이블을 가리키지 않는 묶음"이다 (미매핑과 다름).
+환자: [person]
+연령: [person]
+생년월일: [person]
+성별: [person]
+관찰기간: [observation_period]
+방문: [visit_occurrence]
+진단: [condition_occurrence]
+처방: [drug_exposure]
+시술: [procedure_occurrence]
+측정: [measurement]
+측정값: [measurement]
+사망: [death]
+추적기간: []

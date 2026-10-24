@@ -1,0 +1,7 @@
+# 실행 산출물 (재현은 make 타깃으로)
+eval/outputs/
+eval/runs/
+eval/.cache/
+__pycache__/
+.pytest_cache/
+.env
