@@ -88,3 +88,18 @@ def test_concept_without_labels_warns(fake_server, tmp_path, capsys):
     s = json.loads((run / "scores.json").read_text())
     assert set(s["results"]) == {"api"}
     assert any("라벨 없음으로 계산 불가" in w for w in s["warnings"])
+
+
+def test_table_prf():
+    from eval.score import compute
+
+    items = [
+        {"gold": {"person", "drug_exposure"}, "pred": {"person"}, "noise": [], "unmapped": [], "latency": 1.0},
+        {"gold": {"person"}, "pred": {"person", "measurement"}, "noise": ["값"], "unmapped": [], "latency": 3.0},
+    ]
+    m = compute(items)
+    assert m["micro"] == {"tp": 2, "fp": 1, "fn": 1, "precision": 2 / 3, "recall": 2 / 3, "f1": 2 / 3}
+    assert m["per_table"]["measurement"]["precision"] == 0.0 and m["per_table"]["measurement"]["recall"] is None
+    assert m["per_table"]["drug_exposure"]["recall"] == 0.0 and m["per_table"]["drug_exposure"]["f1"] == 0.0
+    assert m["per_table"]["death"]["f1"] is None
+    assert m["coverage"] == 0.5

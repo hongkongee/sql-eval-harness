@@ -117,15 +117,30 @@ def p95(values: list[float]) -> float | None:
     return v[min(len(v) - 1, int(round(0.95 * (len(v) - 1))))]
 
 
+def prf(tp: int, fp: int, fn: int) -> dict:
+    p = tp / (tp + fp) if tp + fp else None
+    r = tp / (tp + fn) if tp + fn else None
+    if tp:
+        f1 = 2 * p * r / (p + r)
+    else:
+        f1 = 0.0 if fp + fn else None  # 하나도 못 맞혔으면 0, 정답도 예측도 없으면 계산 불가
+    return {"tp": tp, "fp": fp, "fn": fn, "precision": p, "recall": r, "f1": f1}
+
+
 def compute(items: list[dict]) -> dict:
-    """items: 평가 대상 질의별 {gold, pred, noise, unmapped, latency}."""
+    """items: 평가 대상 질의별 {gold, pred, noise, unmapped, latency}.
+
+    테이블 단위 P/R/F1은 (질의, 테이블) 쌍을 판정 단위로 센다 - 키워드가 가리킨 테이블(pred)이
+    정답(gold)에 있으면 TP, 없으면 FP, 정답 테이블을 못 가리키면 FN. micro는 8개 테이블 합산.
+    """
     n = len(items)
     covered = sum(1 for it in items if it["gold"] <= it["pred"])
     per_table = {}
     for t in TARGET_TABLES:
         g = [it for it in items if t in it["gold"]]
         hit = sum(1 for it in g if t in it["pred"])
-        per_table[t] = {"gold": len(g), "hit": hit, "recall": hit / len(g) if g else None}
+        fp = sum(1 for it in items if t in it["pred"] and t not in it["gold"])
+        per_table[t] = {"gold": len(g), "hit": hit, **prf(hit, fp, len(g) - hit)}
     noise = sum(len(it["noise"]) for it in items)
     lat = [it["latency"] for it in items if it["latency"] is not None]
     return {
@@ -133,6 +148,8 @@ def compute(items: list[dict]) -> dict:
         "covered": covered,
         "coverage": covered / n if n else None,
         "per_table": per_table,
+        "micro": prf(sum(v["tp"] for v in per_table.values()), sum(v["fp"] for v in per_table.values()),
+                     sum(v["fn"] for v in per_table.values())),
         "noise_keywords": noise,
         "noise_per_query": noise / n if n else None,
         "unmapped_keywords": sum(len(it["unmapped"]) for it in items),
@@ -294,14 +311,16 @@ def write_md(path: Path, ctx: dict) -> None:
         L.append(f"> ⚠️ {w}")
     if ctx["warnings"]:
         L.append("")
-    L += ["## 전체", "", "| 시스템 | 평가 질의 | 커버리지 | 커버리지(중복 제거) | 잡음 키워드 (질의당) | 미매핑 단어 | latency 평균 / p95 (ms) | pred 없음 |",
-          "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    L += ["## 전체", "", "| 시스템 | 평가 질의 | 커버리지 | 커버리지(중복 제거) | 테이블 P / R / F1 (micro) | 잡음 키워드 (질의당) | 미매핑 단어 | latency 평균 / p95 (ms) | pred 없음 |",
+          "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for name, r in res.items():
         a, d = r["scopes"][ALL]["all"], r["scopes"][ALL]["dedup"]
+        m = a["micro"]
         L.append(f"| {name} | {a['n']} | {fmt_pct(a['coverage'])} | {fmt_pct(d['coverage'])} (n={d['n']}) | "
+                 f"{fmt_num(m['precision'], 3)} / {fmt_num(m['recall'], 3)} / {fmt_num(m['f1'], 3)} | "
                  f"{a['noise_keywords']} ({fmt_num(a['noise_per_query'], 2)}) | {a['unmapped_keywords']} | "
                  f"{fmt_num(a['latency_ms_mean'])} / {fmt_num(a['latency_ms_p95'])} | {r['missing_pred']} |")
-    L += ["", "## 테이블별 재현율 (전체, 중복 제거 전)", ""]
+    L += ["", "## 테이블별 재현율 (전체, 중복 제거 전)", "", "칸: 재현율 (정밀도 / F1)", ""]
     first = next(iter(res.values()), None)
     if first:
         pt = first["scopes"][ALL]["all"]["per_table"]
@@ -309,7 +328,9 @@ def write_md(path: Path, ctx: dict) -> None:
         L.append("|---|" + "---:|" * len(TARGET_TABLES))
         for name, r in res.items():
             p = r["scopes"][ALL]["all"]["per_table"]
-            L.append(f"| {name} | " + " | ".join(fmt_pct(p[t]["recall"]) for t in TARGET_TABLES) + " |")
+            L.append(f"| {name} | " + " | ".join(
+                f"{fmt_pct(p[t]['recall'])} ({fmt_num(p[t]['precision'], 2)} / {fmt_num(p[t]['f1'], 2)})"
+                for t in TARGET_TABLES) + " |")
     L += ["", "## 데이터 파일별 커버리지 (전체 / 중복 제거)", ""]
     ds = ctx["datasets"]
     L.append("| 시스템 | " + " | ".join(ds) + " |")
