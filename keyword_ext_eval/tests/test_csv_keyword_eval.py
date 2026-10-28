@@ -31,7 +31,7 @@ def test_score_row_paths():
     assert r["tables"]["schema+derived"]["fp"] == ["condition_occurrence"]
 
 
-def test_score_row_dict_concepts_v2():
+def test_score_row_dict_concepts_ke_r2():
     g = {"id": "K", "query": "외래 방문한 여자 환자", "case_type": "기본형", "schema": ["방문", "환자"], "gliner": [],
          "dict": [{"text": "외래", "domain": "Visit", "value": "외래"}, {"text": "여자", "domain": "Gender", "value": "여성"}],
          "derived": ["방문", "성별"], "tables": ["visit_occurrence", "person"]}

@@ -1,36 +1,36 @@
-# 키워드 추출 API 평가 (정답셋 50문장) — API v2
+# 키워드 추출 API 평가 (정답셋 50문장) — KE-r2
 
 - 날짜: 2026-10-28
-- 대상: **API v2** = v1 + 비의료 concept 사전(Visit = 방문 유형, Gender = 성별). 구성은 [API 리비전](01_API%20리비전.md) 참고
-- 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (v1과 같은 50문장. 정답은 수정하지 않음)
-- 비교 기준: [API v1 평가](04_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20API%20v1.md). v1 결과는 같은 채점기로 다시 채점해 v1 보고서 숫자와 같음을 확인했다.
+- 대상: **KE-r2** = KE-r1 + 비의료 concept 사전(Visit = 방문 유형, Gender = 성별). 구성은 [API 리비전](01_API%20리비전.md) 참고
+- 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (KE-r1과 같은 50문장. 정답은 수정하지 않음)
+- 비교 기준: [KE-r1 평가](04_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r1.md). KE-r1 결과는 같은 채점기로 다시 채점해 KE-r1 보고서 숫자와 같음을 확인했다.
 - 오염 방지: 사전은 이 정답셋을 보지 않고 만들었다. 평가하면서도 사전 파일(`concept_keywords.yaml`)은 열지 않고 API 응답만 채점했다.
 
 ## 요약
 
-| 경로 | v1 P / R / F1 | **v2 P / R / F1** | 변화 |
+| 경로 | KE-r1 P / R / F1 | **KE-r2 P / R / F1** | 변화 |
 |---|---|---|---|
 | 스키마 키워드 (사전) | 98.3 / 94.3 / 96.3 | 98.3 / 94.3 / 96.3 | 변화 없음 (응답 동일) |
 | concept (GLiNER, 의료 4라벨) | 87.1 / 91.4 / 89.2 | 87.1 / 91.4 / 89.2 | 변화 없음 (응답 동일) |
 | **concept (Visit/Gender 사전)** | — / 0 / 0 | **100 / 52.2 / 68.6** | TP 0 → 12, FP 0, FN 23 → 11 |
 | 대체 스키마 (모의) | 90.0 / 72.7 / 80.4 | 91.3 / 84.8 / 88.0 | 방문·성별 묶음이 채워짐 |
 
-| 테이블 | v1 | v2 |
+| 테이블 | KE-r1 | KE-r2 |
 |---|---|---|
 | 스키마 키워드만: P / R / 커버리지 | 67.6 / 62.9 / 42% | 67.6 / 62.9 / 42% |
 | 스키마 + 대체(모의): P / R / 커버리지 | 71.3 / 92.2 / 82% | 71.5 / 93.1 / **84%** |
 
 **정리하면**
 
-1. **추가한 사전이 낸 결과는 전부 맞았다** (FP 0, 정밀도 100%). 기존 두 경로(스키마, GLiNER)의 응답은 50문장 모두 v1과 글자 하나 다르지 않다. 즉 회귀는 없다.
+1. **추가한 사전이 낸 결과는 전부 맞았다** (FP 0, 정밀도 100%). 기존 두 경로(스키마, GLiNER)의 응답은 50문장 모두 KE-r1과 글자 하나 다르지 않다. 즉 회귀는 없다.
 2. **재현율은 절반(12/23)이다.** 놓친 11개는 두 종류다.
    - **같은 개념인데 형태가 다른 표현** 4개: 사전이 "○○ 방문" 형태로 잡는 것으로 보이는데, 문장에서는 "응급실 내원", "응급실을 방문", "외래 진료", "외래에서"로 나왔다.
    - **사전에 없는 어휘** 7개: 여자, 여환, male, 남아, 퇴원, 재원, 119로 이송.
 3. **테이블 커버리지는 82% → 84%로 1문장(K036)만 늘었다.** Visit 정답 문장 대부분은 "방문"·"입원" 같은 스키마 단어가 이미 visit_occurrence를 가리키고 있었다. 그래서 사전 경로의 효과는 테이블보다 **값(어떤 방문인지, 어떤 성별인지)** 쪽에서 나온다. 성별은 스키마 단어가 없는 문장(K036 "여성의")에서 person을 새로 찾았다.
 
-## 1. 채점 방법 (v1에서 바뀐 점만)
+## 1. 채점 방법 (KE-r1에서 바뀐 점만)
 
-- API v2는 사전 concept를 `type: "concept"`, `category: "방문 유형"` 또는 `"성별"`, score 없이 낸다. 채점기(`eval/csv_keyword_eval.py`)를 이렇게 바꿨다.
+- KE-r2는 사전 concept를 `type: "concept"`, `category: "방문 유형"` 또는 `"성별"`, score 없이 낸다. 채점기(`eval/csv_keyword_eval.py`)를 이렇게 바꿨다.
   - category가 방문 유형/성별인 concept span은 **사전 concept 경로**로 따로 채점한다. GLiNER concept 채점에는 섞지 않는다.
   - 정답 `gold_concept_dict`와 위치가 겹치고 도메인(Visit ↔ 방문 유형, Gender ↔ 성별)이 같으면 TP다.
   - 대체 스키마(모의)에 방문 유형 → 방문, 성별 → 성별 묶음을 추가했다. 테이블은 각각 visit_occurrence, person이다.
@@ -78,11 +78,11 @@
 
 ### GLiNER와의 관계
 
-GLiNER가 v1에서 낸 "여환 → 진단명"(K013)과 "외래 진료 → 시술명"(K010) 오탐은 v2에서도 그대로다. v2는 사전 span과 **정확히 같은 위치**의 GLiNER span만 버리는데, 사전이 이 두 표현을 잡지 못해 겹칠 일이 없었다. 사전에 이 표현들이 들어가면 같이 사라질 수 있다.
+GLiNER가 KE-r1에서 낸 "여환 → 진단명"(K013)과 "외래 진료 → 시술명"(K010) 오탐은 KE-r2에서도 그대로다. KE-r2는 사전 span과 **정확히 같은 위치**의 GLiNER span만 버리는데, 사전이 이 두 표현을 잡지 못해 겹칠 일이 없었다. 사전에 이 표현들이 들어가면 같이 사라질 수 있다.
 
 ## 3. 테이블
 
-| 테이블 (스키마 + 대체 모의) | v1 TP / FP / FN | v2 TP / FP / FN |
+| 테이블 (스키마 + 대체 모의) | KE-r1 TP / FP / FN | KE-r2 TP / FP / FN |
 |---|---|---|
 | person | 10 / 33 / 4 | 11 / 33 / 3 |
 | visit_occurrence | 10 / 0 / 3 | 10 / 0 / 3 |
@@ -98,11 +98,11 @@ GLiNER가 v1에서 낸 "여환 → 진단명"(K013)과 "외래 진료 → 시술
 
 ## 4. 결론과 다음 단계
 
-1. **v2는 회귀 없이 사전 concept 경로를 추가했다.** 정밀도 100%, 재현율 52%다. 지금 맞히는 표현(입원, 외래 방문, 응급실 방문, 남성, 여성)은 확실하게 잡는다.
+1. **KE-r2는 회귀 없이 사전 concept 경로를 추가했다.** 정밀도 100%, 재현율 52%다. 지금 맞히는 표현(입원, 외래 방문, 응급실 방문, 남성, 여성)은 확실하게 잡는다.
 2. **재현율을 올리는 방향은 두 가지다.**
    - 형태 변형 대응: "응급실 내원", "응급실을 방문", "외래 진료"처럼 뒤에 붙는 말이 바뀌는 경우. 표면형을 하나씩 늘리기보다 핵심어("응급실", "외래")를 잡는 방식이 맞는지 검토가 필요하다. 다만 앞서 짚은 함정("만성 외래 복막투석", "응급수술")과 부딪친다.
    - 어휘 확장: 여자, 여환, 남자, 퇴원, 재원, female/male 등
-3. **⚠ 이 보고서의 FN 목록을 보고 사전을 고치면, 이 정답셋은 더 이상 공정한 테스트셋이 아니다.** 지적하신 오염 문제가 그대로 생긴다. 다음 리비전(v3)부터는 이렇게 하길 권한다.
+3. **⚠ 이 보고서의 FN 목록을 보고 사전을 고치면, 이 정답셋은 더 이상 공정한 테스트셋이 아니다.** 지적하신 오염 문제가 그대로 생긴다. 다음 리비전(KE-r3)부터는 이렇게 하길 권한다.
    - 이 50문장은 **개발셋**으로 돌린다. FN을 보고 사전을 고치는 데 써도 되는 셋이다.
    - 성능 주장용으로는 **새 held-out 셋**을 따로 만든다. 사전을 고친 사람이 보지 않은 문장이어야 한다. 짧은 구어체와 사전 concept 함정("남아 있는 환자", "여성형 유방증", "만성 외래 복막투석", "Female")을 포함하면 좋다.
    - 보조로, 정답 SQL에서 만든 방문·성별 정답(`eval/visit_gender_eval.py`, 2,236문장 중 102문장)도 독립 검증에 쓸 수 있다. 이 정답셋과 출처가 달라 오염되지 않았다.
@@ -114,9 +114,9 @@ GLiNER가 v1에서 낸 "여환 → 진단명"(K013)과 "외래 진료 → 시술
 
 ```bash
 C=../test_set/keyword_ext/keyword_eval_samples_50.csv
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_api_v2.jsonl --overwrite
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_api_v2.jsonl --out-dir eval/runs/kw50_v2
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_api.jsonl --out-dir eval/runs/kw50_v1   # v1 재채점
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r2.jsonl --overwrite
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r2.jsonl --out-dir eval/runs/kw50_ke-r2
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1   # KE-r1 재채점
 ```
 
-결과는 `eval/runs/kw50_v2/`의 `kw50_scores.json`, `kw50_per_query.csv`(문장별 FN/FP, 사전 concept FN/FP 열 추가), `kw50_per_query.json`에 있다.
+결과는 `eval/runs/kw50_ke-r2/`의 `kw50_scores.json`, `kw50_per_query.csv`(문장별 FN/FP, 사전 concept FN/FP 열 추가), `kw50_per_query.json`에 있다.

@@ -187,12 +187,12 @@ python -m eval.candidates --data <경로> --base eval/outputs/api.jsonl --ref ev
 
 ## 5. 정답 CSV 채점과 운영 LLM 기준선 — `python -m eval.csv_keyword_eval`
 
-사람이 만든 키워드 정답 CSV(`../test_set/keyword_ext/keyword_eval_samples_50.csv`)로 schema / concept(GLiNER) / concept(Visit·Gender) / 테이블을 따로 채점합니다. API 리비전(v1, v2 …)과 운영 LLM을 같은 기준으로 비교합니다.
+사람이 만든 키워드 정답 CSV(`../test_set/keyword_ext/keyword_eval_samples_50.csv`)로 schema / concept(GLiNER) / concept(Visit·Gender) / 테이블을 따로 채점합니다. API 리비전(KE-r1, KE-r2 …)과 운영 LLM을 같은 기준으로 비교합니다.
 
 ```bash
 C=../test_set/keyword_ext/keyword_eval_samples_50.csv
 # 키워드 추출 API (지금 떠 있는 리비전)
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_api_v2.jsonl
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r2.jsonl
 # 운영 LLM (설정은 .env의 PROD_LLM_*, 시스템 프롬프트는 eval/prompts/prod_llm_system.local.txt)
 python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50_prod_llm.jsonl --concurrency 4
 python -m eval.csv_keyword_eval extract --system prod-llm --mock --csv $C --out /tmp/llm_mock.jsonl   # 서버 없이 흐름 확인

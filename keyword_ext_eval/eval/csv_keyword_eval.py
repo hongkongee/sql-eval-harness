@@ -7,16 +7,16 @@ gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..
 - schema: API schema span 텍스트 vs gold_schema_keywords (표면형 그대로 비교)
 - concept(GLiNER): API concept span vs gold_concept_gliner. 위치가 겹치고 라벨까지 같으면 TP.
   겹치기만 하고 라벨이 다르면 "라벨 오류"로 따로 센다 (채점상 FN+FP).
-- concept(사전): gold_concept_dict vs API의 방문 유형/성별 concept span (API v2부터, score 없음).
+- concept(사전): gold_concept_dict vs API의 방문 유형/성별 concept span (KE-r2부터, score 없음).
   위치가 겹치고 도메인(Visit=방문 유형, Gender=성별)이 같으면 TP. 응답에 값(입원/여성 등)이
-  없어 값 정규화는 채점하지 않는다. v1처럼 경로가 없으면 전부 FN.
+  없어 값 정규화는 채점하지 않는다. KE-r1처럼 경로가 없으면 전부 FN.
 - derived: concept 라벨 → 대체 스키마 묶음(약물명 → 처방, 방문 유형 → 방문 등). API는 이걸 내지
   않으므로, API concept 라벨에서 결정론적으로 만들어 본 값(모의)이다.
 - tables: (a) schema 키워드만, (b) schema + derived 모의 로 가리킨 테이블 vs gold_tables
 
-    python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_api.jsonl
+    python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_ke-r1.jsonl
     python -m eval.csv_keyword_eval extract --system prod-llm --csv ... --out eval/outputs/kw50_prod_llm.jsonl  # 운영 LLM 기준선
-    python -m eval.csv_keyword_eval score --csv ... --pred eval/outputs/kw50_api.jsonl --out-dir eval/runs/kw50
+    python -m eval.csv_keyword_eval score --csv ... --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50
 """
 
 from __future__ import annotations

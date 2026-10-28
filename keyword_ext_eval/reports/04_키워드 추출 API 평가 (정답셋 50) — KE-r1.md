@@ -1,7 +1,7 @@
-# 키워드 추출 API 평가 (정답셋 50문장) — API v1
+# 키워드 추출 API 평가 (정답셋 50문장) — KE-r1
 
 - 날짜: 2026-10-27
-- 대상: **API v1** (구성은 [API 리비전](01_API%20리비전.md) 참고) — 키워드 추출 API `POST http://localhost:8001/keyword-extraction` (gliner-entity-router `app/`)
+- 대상: **KE-r1** (구성은 [API 리비전](01_API%20리비전.md) 참고) — 키워드 추출 API `POST http://localhost:8001/keyword-extraction` (gliner-entity-router `app/`)
   - schema: 사전 최장 일치 (`schema_keywords.yaml`, sha256 `b1630690…`, 컨테이너와 로컬 파일 일치 확인)
   - concept: GLiNER `Ihor/gliner-biomed-large-v1.0`, 라벨 4개, threshold **0.3** (컨테이너 `GLINER_THRESHOLD=0.3`)
 - 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (50문장, 사람이 직접 만든 정답, `case_type`으로 유형 구분)
@@ -147,7 +147,7 @@ GLiNER 라벨만으로 만드는 부분(처방·진단·측정·시술)은 정�
 | observation_period | 100% | 100% | 100% |
 | person | 71% | 71% | 23% |
 
-- 진단·시술은 "고혈압 환자", "혈액투석을 시행받은"처럼 **concept만 있고 스키마 단어가 없는 문장**이 많다. 사전 v1 평가에서 "시행"이 빠져서 시술 재현율이 낮았던 것과 같은 현상이다. 대체 스키마로 둘 다 100%가 된다.
+- 진단·시술은 "고혈압 환자", "혈액투석을 시행받은"처럼 **concept만 있고 스키마 단어가 없는 문장**이 많다. schema-dict v1 평가에서 "시행"이 빠져서 시술 재현율이 낮았던 것과 같은 현상이다. 대체 스키마로 둘 다 100%가 된다.
 - 대체 스키마로도 남는 **미커버 9문장**:
 
   | 원인 | 문장 |
@@ -193,12 +193,12 @@ GLiNER 라벨만으로 만드는 부분(처방·진단·측정·시술)은 정�
 
 ```bash
 C=../test_set/keyword_ext/keyword_eval_samples_50.csv
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_api.jsonl --overwrite
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_api.jsonl --out-dir eval/runs/kw50_min0
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_api.jsonl --out-dir eval/runs/kw50_min0.5 --min-score 0.5
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r1.jsonl --overwrite
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1_min0
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1_min0.5 --min-score 0.5
 ```
 
-결과 파일(`eval/runs/kw50_min0/`):
+결과 파일(`eval/runs/kw50_ke-r1_min0/`):
 - `kw50_scores.json`: 경로별, 테이블별, 유형별 P/R/F1
 - `kw50_per_query.csv`: 문장별 FN/FP (엑셀로 열어 검토용)
 - `kw50_per_query.json`: 문장별 상세 (TP 포함)

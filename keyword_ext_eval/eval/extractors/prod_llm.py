@@ -1,6 +1,6 @@
 """비교 기준선: 운영 환경의 프롬프트 기반 LLM 키워드 추출.
 
-키워드 추출 API(v1, v2 …)와 같은 정답셋·채점기(eval.csv_keyword_eval)로 비교하려고, LLM 응답을
+키워드 추출 API(KE-r1, KE-r2 …)와 같은 정답셋·채점기(eval.csv_keyword_eval)로 비교하려고, LLM 응답을
 API와 같은 spans 형태({type, text, start, end, category})로 바꿔 저장한다.
 
 설정은 전부 PROD_LLM_* 환경변수(keyword_ext_eval/.env)로 받는다. 개발서버 Qwen 기준선(QWEN_*,
