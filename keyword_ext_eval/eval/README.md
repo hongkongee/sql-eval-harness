@@ -185,6 +185,28 @@ python -m eval.candidates --data <경로> --base eval/outputs/api.jsonl --ref ev
 4. `scores.md`, `misses_api.csv`, `diff_prev_api.md`(회귀 확인), `candidates.csv`를 검토합니다.
 5. 1번으로 돌아가 반복합니다.
 
+## 5. 정답 CSV 채점과 운영 LLM 기준선 — `python -m eval.csv_keyword_eval`
+
+사람이 만든 키워드 정답 CSV(`../test_set/keyword_ext/keyword_eval_samples_50.csv`)로 schema / concept(GLiNER) / concept(Visit·Gender) / 테이블을 따로 채점합니다. API 리비전(v1, v2 …)과 운영 LLM을 같은 기준으로 비교합니다.
+
+```bash
+C=../test_set/keyword_ext/keyword_eval_samples_50.csv
+# 키워드 추출 API (지금 떠 있는 리비전)
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_api_v2.jsonl
+# 운영 LLM (설정은 .env의 PROD_LLM_*, 시스템 프롬프트는 eval/prompts/prod_llm_system.local.txt)
+python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50_prod_llm.jsonl --concurrency 4
+python -m eval.csv_keyword_eval extract --system prod-llm --mock --csv $C --out /tmp/llm_mock.jsonl   # 서버 없이 흐름 확인
+# 채점 (같은 채점기)
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_prod_llm.jsonl --out-dir eval/runs/kw50_prod_llm
+```
+
+- 운영 LLM 응답은 API와 같은 spans 형식으로 바꿔 저장합니다. LLM이 위치를 주지 않으므로 질의에서 글자 그대로 찾아 붙이고, 못 찾은 단어는 `dropped`에 남깁니다. 원본 응답은 `raw`에 저장합니다.
+- 응답 JSON은 `spans`, `schema_keywords`/`concept_keywords`(및 한국어 키), `{카테고리: [단어]}` 형식을 받습니다(`eval/extractors/prod_llm.py` 맨 위 설명 참고). 운영 출력 형식이 이와 다르면 `parse_response`를 맞추고 `tests/test_prod_llm.py`에 예시를 추가합니다.
+- LLM의 카테고리 이름은 `eval/maps/llm_category_map.yaml`로 API 라벨에 맞춥니다.
+- 이어하기: 모델·시스템 프롬프트·URL 같은 설정이 바뀐 상태로 같은 결과 파일에 이어 쓰면 멈춥니다. 모델이나 프롬프트를 바꾸면 결과 파일을 따로 둡니다.
+- `--ignore-concept-label`: concept를 위치만으로 채점합니다(라벨 체계가 다른 LLM 비교용 참고 지표).
+- 운영 시스템 프롬프트 파일(`*.local.txt`)은 .gitignore 대상입니다.
+
 ## concept span `label` 필드 (보류)
 
 API 응답의 concept span에 GLiNER 라벨(지금 쓰는 4개 중 하나)을 같이 내서 concept도 테이블로 환산하자는 제안이 있었는데, **보류했습니다.** 이전 평가에서 BioMed의 라벨 정확도가 낮았기 때문입니다. 위치는 잘 찾지만 약물을 진단명으로 붙이는 경우가 많아서, 라벨을 테이블로 바꾸면 자주 틀립니다(`GLiNER_제로샷_키워드추출_평가보고서.md` 6절).
@@ -200,13 +222,17 @@ keyword_ext_eval/
 ├── eval/
 │   ├── extract.py / score.py / candidates.py     # CLI 3개
 │   ├── extractors/{api,gliner,qwen}.py           # 추출기 (공통 출력 형식)
+│   ├── extractors/prod_llm.py                    # 운영 LLM 기준선 (PROD_LLM_*)
+│   ├── csv_keyword_eval.py                       # 정답 CSV 채점 (API 리비전·운영 LLM 비교)
+│   ├── visit_gender_eval.py                      # GLiNER 방문·성별 라벨 제로샷 평가
 │   ├── sql_tables.py      # 정답 SQL → 테이블 (sqlglot, 캐시)
 │   ├── keyword_map.py     # 표면형 → 묶음 → 테이블
 │   ├── httpclient.py      # 재시도·백오프 POST
 │   ├── common.py          # 데이터 로딩, 해시, 하드웨어 정보
-│   ├── maps/*.yaml        # 평가 전용 매핑 3종
+│   ├── maps/*.yaml        # 평가 전용 매핑 (llm_category_map.yaml 포함)
 │   ├── prompts/qwen_schema_keywords.txt   # Qwen 작업 프롬프트 (초안)
 │   ├── prompts/qwen_system_temp.txt       # Qwen 시스템 프롬프트 (임시, 확정 전)
+│   ├── prompts/prod_llm_system.local.txt  # 운영 LLM 시스템 프롬프트 (직접 넣음, gitignore)
 │   ├── outputs/  runs/  .cache/           # 산출물 (.gitignore)
 └── tests/                 # 가짜 API·GLiNER 서버, Qwen mock, 샘플 8건 통합 테스트
 ```

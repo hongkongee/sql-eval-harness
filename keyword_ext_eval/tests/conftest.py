@@ -133,5 +133,8 @@ def isolated_env(tmp_path, monkeypatch):
     monkeypatch.setattr(st, "CACHE_PATH", tmp_path / "cache" / "sql_tables.json")
     for k in ("KEYWORD_API_URL", "GLINER_EXTRACT_URL", "QWEN_BASE_URL", "QWEN_MODEL", "QWEN_API_KEY",
               "QWEN_SYSTEM_PROMPT_FILE", "QWEN_SYSTEM_PROMPT", "QWEN_PROMPT_FILE", "QWEN_MAX_TOKENS",
-              "QWEN_TIMEOUT", "QWEN_MAX_RETRIES", "QWEN_CONCURRENCY", "QWEN_EXTRA_BODY"):
+              "QWEN_TIMEOUT", "QWEN_MAX_RETRIES", "QWEN_CONCURRENCY", "QWEN_EXTRA_BODY",
+              "PROD_LLM_BASE_URL", "PROD_LLM_MODEL", "PROD_LLM_API_KEY", "PROD_LLM_SYSTEM_PROMPT_FILE",
+              "PROD_LLM_SYSTEM_PROMPT", "PROD_LLM_USER_TEMPLATE", "PROD_LLM_TEMPERATURE", "PROD_LLM_MAX_TOKENS",
+              "PROD_LLM_TIMEOUT", "PROD_LLM_MAX_RETRIES", "PROD_LLM_EXTRA_BODY"):
         monkeypatch.delenv(k, raising=False)

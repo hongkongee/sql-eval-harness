@@ -15,6 +15,7 @@ gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..
 - tables: (a) schema 키워드만, (b) schema + derived 모의 로 가리킨 테이블 vs gold_tables
 
     python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_api.jsonl
+    python -m eval.csv_keyword_eval extract --system prod-llm --csv ... --out eval/outputs/kw50_prod_llm.jsonl  # 운영 LLM 기준선
     python -m eval.csv_keyword_eval score --csv ... --pred eval/outputs/kw50_api.jsonl --out-dir eval/runs/kw50
 """
 
@@ -22,12 +23,16 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from eval.common import append_jsonl, read_jsonl, write_json
+from eval.common import append_jsonl, load_dotenv, read_jsonl, write_json
+from eval.extractors import ExtractError, PreflightError
+from eval.extractors.prod_llm import ProdLLMExtractor, mock_chat_post
 from eval.httpclient import RequestFailed, post_json
 from eval.keyword_map import KeywordTableMap
 
@@ -73,28 +78,64 @@ def locate(query: str, text: str, used: list) -> tuple[int, int] | None:
 # ---------------------------------------------------------------- extract
 
 
+def _make_extractor(args):
+    """→ (질의 하나를 받아 {spans, latency_ms, …}를 돌려주는 함수, 이어하기 판정용 설정)."""
+    if args.system == "api":
+        def call(text):
+            resp = post_json(args.url, {"text": text}, timeout=args.timeout, max_retries=3)
+            return {"spans": resp.body["spans"], "latency_ms": round(resp.latency_ms, 1)}
+        return call, {"system": "api", "url": args.url}
+    ex = ProdLLMExtractor(post=mock_chat_post if args.mock else None)
+    if args.mock:
+        ex.base_url, ex.model = ex.base_url or "mock://llm", ex.model or "mock"
+        ex.system_prompt = ex.system_prompt or "(mock)"
+    ex.preflight()
+    return ex.extract, {**ex.config(), "mock": args.mock}
+
+
 def cmd_extract(args) -> int:
+    load_dotenv()
     rows = load_csv(args.csv)
     out = Path(args.out)
+    meta_path = out.with_suffix(".meta.json")
+    try:
+        call, config = _make_extractor(args)
+    except PreflightError as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 2
     if out.exists() and not args.overwrite:
+        old = json.loads(meta_path.read_text(encoding="utf-8")).get("config") if meta_path.exists() else None
+        if old is not None and old != config:
+            print(f"{out}: 설정이 다른 기존 결과가 있습니다 (모델/프롬프트/URL 등). 새 파일로 저장하거나 --overwrite",
+                  file=sys.stderr)
+            return 2
         done = {r["id"] for r in read_jsonl(out)}
     else:
         out.unlink(missing_ok=True)
         done = set()
-    fails = 0
-    for r in rows:
-        if r["id"] in done:
-            continue
+    failed_path = out.with_suffix(".failed.jsonl")
+    failed_path.unlink(missing_ok=True)
+    todo = [r for r in rows if r["id"] not in done]
+
+    def one(r):
         try:
-            resp = post_json(args.url, {"text": r["query"]}, timeout=args.timeout, max_retries=3)
-            append_jsonl(out, {"id": r["id"], "text": r["query"], "spans": resp.body["spans"],
-                               "latency_ms": round(resp.latency_ms, 1)})
-        except RequestFailed as e:
-            fails += 1
-            print(f"[fail] {r['id']}: {e}", file=sys.stderr)
-    write_json(out.with_suffix(".meta.json"), {"url": args.url, "csv": str(args.csv),
-                                               "finished_at": time.strftime("%Y-%m-%dT%H:%M:%S")})
-    print(f"완료: {len(rows)}건, 실패 {fails}건", file=sys.stderr)
+            return {"id": r["id"], "text": r["query"], **call(r["query"])}
+        except (RequestFailed, ExtractError) as e:
+            return {"id": r["id"], "text": r["query"], "error": str(e), "raw": getattr(e, "raw", None)}
+
+    fails = 0
+    with ThreadPoolExecutor(max(1, args.concurrency)) as pool:
+        for row in pool.map(one, todo):
+            if "error" in row:
+                fails += 1
+                append_jsonl(failed_path, row)
+                print(f"[fail] {row['id']}: {row['error']}", file=sys.stderr)
+            else:
+                append_jsonl(out, row)
+    write_json(meta_path, {"config": config, "csv": str(args.csv),
+                           "finished_at": time.strftime("%Y-%m-%dT%H:%M:%S")})
+    print(f"완료: {len(rows)}건 중 {len(todo)}건 추출, 실패 {fails}건"
+          + (f" (실패 목록 {failed_path})" if fails else ""), file=sys.stderr)
     return 1 if fails else 0
 
 
@@ -112,11 +153,11 @@ def overlaps(a, b):
     return a[0] < b[1] and b[0] < a[1]
 
 
-def score_row(g, pred, km: KeywordTableMap, min_score: float):
+def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool = False):
     spans = pred["spans"]
     schema_pred = [s["text"] for s in spans if s["type"] == "schema"]
     concepts = [s for s in spans if s["type"] == "concept" and s["category"] not in DICT_CATEGORY_TO_DOMAIN
-                and (s.get("score") or 0) >= min_score]
+                and (s.get("score") is None or s["score"] >= min_score)]
     dict_concepts = [s for s in spans if s["type"] == "concept" and s["category"] in DICT_CATEGORY_TO_DOMAIN]
     res = {"id": g["id"], "case_type": g["case_type"]}
 
@@ -124,7 +165,8 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float):
     gs, ps = set(g["schema"]), set(schema_pred)
     res["schema"] = {"tp": sorted(gs & ps), "fn": sorted(gs - ps), "fp": sorted(ps - gs)}
 
-    # concept(GLiNER): 위치 겹침 + 라벨
+    # concept(GLiNER): 위치 겹침 + 라벨 (ignore_label이면 위치만)
+    lab_ok = lambda p, c: ignore_label or p["category"] == c["label"]  # noqa: E731
     used = []
     gold = []
     for c in g["gliner"]:
@@ -136,8 +178,8 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float):
         if c["loc"] is None:
             fn.append(f"{c['text']}(원문에 없음)")
             continue
-        same = [p for p in concepts if overlaps((p["start"], p["end"]), c["loc"]) and p["category"] == c["label"]]
-        other = [p for p in concepts if overlaps((p["start"], p["end"]), c["loc"]) and p["category"] != c["label"]]
+        same = [p for p in concepts if overlaps((p["start"], p["end"]), c["loc"]) and lab_ok(p, c)]
+        other = [p for p in concepts if overlaps((p["start"], p["end"]), c["loc"]) and not lab_ok(p, c)]
         if same:
             exact = any(p["start"] == c["loc"][0] and p["end"] == c["loc"][1] for p in same)
             tp.append({"gold": c["text"], "pred": same[0]["text"], "exact": exact})
@@ -148,7 +190,7 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float):
     fp = []
     for p in concepts:
         loc = (p["start"], p["end"])
-        if any(c["loc"] and overlaps(loc, c["loc"]) and p["category"] == c["label"] for c in gold):
+        if any(c["loc"] and overlaps(loc, c["loc"]) and lab_ok(p, c) for c in gold):
             continue
         hits_dict = any(d and overlaps(loc, d) for d in dict_locs)
         fp.append({"text": p["text"], "category": p["category"], "score": round(p.get("score", 0), 3),
@@ -214,11 +256,12 @@ def cmd_score(args) -> int:
     gold = load_csv(args.csv)
     preds = {r["id"]: r for r in read_jsonl(args.pred)}
     km = KeywordTableMap(warn=False)
-    results = [score_row(g, preds[g["id"]], km, args.min_score) for g in gold if g["id"] in preds]
+    results = [score_row(g, preds[g["id"]], km, args.min_score, args.ignore_concept_label)
+               for g in gold if g["id"] in preds]
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    summary = {"n": len(results), "min_score": args.min_score,
+    summary = {"n": len(results), "min_score": args.min_score, "ignore_concept_label": args.ignore_concept_label,
                "schema": agg(results, "schema"), "concept": agg(results, "concept"),
                "derived_sim": agg(results, "derived"),
                "concept_dict": agg(results, "concept_dict"),
@@ -291,14 +334,20 @@ def main(argv=None) -> int:
     e = sub.add_parser("extract")
     e.add_argument("--csv", required=True)
     e.add_argument("--out", required=True)
-    e.add_argument("--url", default="http://localhost:8001/keyword-extraction")
-    e.add_argument("--timeout", type=float, default=60)
+    e.add_argument("--system", choices=["api", "prod-llm"], default="api",
+                   help="api: 키워드 추출 API / prod-llm: 운영 프롬프트 LLM (설정은 .env의 PROD_LLM_*)")
+    e.add_argument("--url", default="http://localhost:8001/keyword-extraction", help="--system api일 때")
+    e.add_argument("--timeout", type=float, default=60, help="--system api일 때 (LLM은 PROD_LLM_TIMEOUT)")
+    e.add_argument("--concurrency", type=int, default=1)
+    e.add_argument("--mock", action="store_true", help="prod-llm: 서버 없이 가짜 응답으로 흐름 확인")
     e.add_argument("--overwrite", action="store_true")
     s = sub.add_parser("score")
     s.add_argument("--csv", required=True)
     s.add_argument("--pred", required=True)
     s.add_argument("--out-dir", required=True)
     s.add_argument("--min-score", type=float, default=0.0, help="concept span 점수 하한 (API threshold 위로만 의미 있음)")
+    s.add_argument("--ignore-concept-label", action="store_true",
+                   help="concept는 위치만 맞으면 TP (라벨을 안 주거나 다른 체계를 쓰는 LLM 비교용, 참고 지표)")
     args = ap.parse_args(argv)
     return cmd_extract(args) if args.cmd == "extract" else cmd_score(args)
 

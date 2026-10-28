@@ -1,0 +1,10 @@
+# 운영 LLM이 내는 카테고리 이름 → 키워드 추출 API의 category (eval.extractors.prod_llm 용).
+# 채점기(eval.csv_keyword_eval)는 API category 기준으로 맞힘을 판정하므로, LLM이 다른 이름을 쓰면
+# 여기서 맞춘다. 대소문자는 무시. 표에 없는 이름은 그대로 남아 "라벨이 다른 것"으로 계산된다.
+# 운영 프롬프트의 실제 카테고리 이름이 확인되면 그 이름을 추가할 것.
+진단명 또는 질병명: [진단명, 질병명, 진단, 질병, 질환, condition, disease, diagnosis]
+약물명: [약물, 약, 약품, drug, medication]
+검사명 또는 측정 항목: [검사명, 검사, 측정 항목, 측정, measurement, lab, test]
+시술명 또는 수술명: [시술명, 수술명, 시술, 수술, procedure, surgery]
+방문 유형: [방문, 방문유형, visit, visit type]
+성별: [gender, sex]

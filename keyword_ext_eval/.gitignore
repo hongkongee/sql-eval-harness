@@ -5,3 +5,6 @@ eval/.cache/
 __pycache__/
 .pytest_cache/
 .env
+
+# 운영 프롬프트 등 레포에 올리지 않을 로컬 파일
+eval/prompts/*.local.txt
