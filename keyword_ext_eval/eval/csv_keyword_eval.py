@@ -10,8 +10,8 @@ gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..
 - concept(사전): gold_concept_dict vs API의 방문 유형/성별 concept span (KE-r2부터, score 없음).
   위치가 겹치고 도메인(Visit=방문 유형, Gender=성별)이 같으면 TP. 응답에 값(입원/여성 등)이
   없어 값 정규화는 채점하지 않는다. KE-r1처럼 경로가 없으면 전부 FN.
-- derived: concept 라벨 → 대체 스키마 묶음(약물명 → 처방, 방문 유형 → 방문 등). API는 이걸 내지
-  않으므로, API concept 라벨에서 결정론적으로 만들어 본 값(모의)이다.
+- derived: concept 라벨 → 추론 스키마 묶음(약물명 → 처방, 방문 유형 → 방문 등). API는 이걸 내지
+  않으므로, API concept 라벨에서 결정론적으로 만들어 본 값(가정)이다. API에는 넣지 않기로 했다(테이블 판단은 다운스트림 몫).
 - tables: (a) schema 키워드만, (b) schema + derived 모의 로 가리킨 테이블 vs gold_tables
 
     python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_ke-r1.jsonl
@@ -38,10 +38,10 @@ from eval.keyword_map import KeywordTableMap
 
 LABEL_TO_GROUP = {"약물명": "처방", "진단명 또는 질병명": "진단", "검사명 또는 측정 항목": "측정",
                   "시술명 또는 수술명": "시술"}
-# API의 사전 concept category → 정답 CSV의 도메인, 대체 스키마 묶음
+# API의 사전 concept category → 정답 CSV의 도메인, 추론 스키마 묶음
 DICT_CATEGORY_TO_DOMAIN = {"방문 유형": "Visit", "성별": "Gender"}
 DOMAIN_TO_GROUP = {"Visit": "방문", "Gender": "성별"}
-# 대체 묶음 → 테이블은 사전 묶음 표(schema_keyword_table_map.yaml)를 그대로 쓴다
+# 추론 묶음 → 테이블은 사전 묶음 표(schema_keyword_table_map.yaml)를 그대로 쓴다
 
 
 def load_csv(path) -> list[dict]:
@@ -234,7 +234,7 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool
             dfp.append(f"{p['text']}:{p['category']}")
     res["concept_dict"] = {"tp": dtp, "fn": dfn, "fp": dfp, "label_err": dlab, "n_gold": len(g["dict"])}
 
-    # derived(모의): API concept 라벨 → 묶음
+    # derived(다운스트림 추론 가정): API concept 라벨 → 묶음
     dp = {LABEL_TO_GROUP[p["category"]] for p in concepts if p["category"] in LABEL_TO_GROUP}
     dp |= {DOMAIN_TO_GROUP[DICT_CATEGORY_TO_DOMAIN[p["category"]]] for p in dict_concepts}
     dg = set(g["derived"])

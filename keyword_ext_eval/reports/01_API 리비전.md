@@ -28,9 +28,9 @@ API는 `r`, 사전은 `v`를 쓴다. 리비전은 구성 요소 버전의 조합
 | concept threshold | **0.3**. 컨테이너 환경변수 `GLINER_THRESHOLD=0.3` (docker-compose 기본값 `KEYWORD_EXTRACTION_THRESHOLD:-0.3`). 코드 기본값은 0.2 | KE-r1과 같음 (0.3, GLiNER에만 적용) | KE-r2와 같음 (0.3) |
 | concept 후처리 | concept span 양 끝에 붙은 스키마 단어를 잘라냄. 잘라낸 결과가 비거나 스키마 span과 같아지면 버림. 같은 위치에 라벨이 여럿이면 최고 점수 하나만 남김 | KE-r1 규칙 + 사전 concept span과 **정확히 같은 위치**의 GLiNER span은 버림. 사전 concept span은 schema span과 같은 위치여도 유지 (예: "입원") | 기존 엔드포인트는 KE-r2와 같음. llm-compat 변환: `llm_compat_map.yaml`(`eb76be02c49d…`)로 label/table 매핑, 같은 위치는 concept 우선, **더 긴 span 안의 schema span 제거(GLiNER span 포함)**, 제외어 9개(`llm_compat_exclude.yaml`, `e4c19435b3cb…`) 완전 일치 제거 |
 | Visit/Gender 값 (입원·외래·응급실, 여성·남성 등) | **없음**. "입원"·"방문"·"성별"은 스키마 사전으로만 잡힘 | **사전 매칭으로 추가**. 다만 응답에는 도메인(category)만 있고 값(입원/외래, 여성/남성)이나 concept_id는 없음 | KE-r2와 같음. llm-compat에서는 방문 유형 → EVENT/visit_occurrence, 성별 → ATTRIBUTE/person (값 없음) |
-| 대체 스키마 (concept 라벨 → 묶음) | **없음** | **없음** | **없음** (llm-compat에서도 concept table은 null) |
+| concept 라벨 → 테이블 추론 | **없음** | **없음** | **없음** (llm-compat에서도 concept table은 null). API에 넣지 않기로 결정(2026-10-28), 다운스트림 몫 |
 | 평가 | [키워드 추출 API 평가 (정답셋 50) — KE-r1](04_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r1.md) | [키워드 추출 API 평가 (정답셋 50) — KE-r2](05_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r2.md) | [키워드 추출 API 평가 (정답셋 50) — KE-r3 llm-compat](07_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r3%20llm-compat.md) |
-| 핵심 수치 (정답셋 50) | 스키마 P 98.3 / R 94.3 / F1 96.3 · concept P 87.1 / R 91.4 / F1 89.2 · Visit/Gender R 0 (미구현) · 테이블 커버리지 42% (대체 스키마 모의 시 82%) | 스키마·concept(GLiNER) KE-r1과 동일 · **Visit/Gender P 100 / R 52.2 / F1 68.6** · 테이블 커버리지 42% (대체 스키마 모의 시 84%) | 기존 엔드포인트 KE-r2와 동일 · llm-compat: 스키마(겹침) P 94.9 / R 90.2 / F1 92.5 · concept KE-r2와 동일 · 방문·성별 도메인 맞음 12/23 · 응답 table 커버리지 40% (모의 84%) |
+| 핵심 수치 (정답셋 50) | 스키마 P 98.3 / R 94.3 / F1 96.3 · concept P 87.1 / R 91.4 / F1 89.2 · Visit/Gender R 0 (미구현) · 테이블 커버리지 42% (다운스트림 추론 가정 시 82%) | 스키마·concept(GLiNER) KE-r1과 동일 · **Visit/Gender P 100 / R 52.2 / F1 68.6** · 테이블 커버리지 42% (다운스트림 추론 가정 시 84%) | 기존 엔드포인트 KE-r2와 동일 · llm-compat: 스키마(겹침) P 94.9 / R 90.2 / F1 92.5 · concept KE-r2와 동일 · 방문·성별 도메인 맞음 12/23 · 응답 table 커버리지 40% (모의 84%) |
 
 ## 주의
 
