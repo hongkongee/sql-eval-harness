@@ -15,6 +15,8 @@ API와 같은 spans 형태({type, text, start, end, category})로 바꿔 저장�
 
 응답 해석 (운영 출력 형식이 정해지면 그에 맞는지 tests/test_prod_llm.py에 예시를 추가해 확인할 것):
 - <think>…</think>, ```json 코드 펜스는 떼고 첫 JSON 객체(또는 배열)를 읽는다.
+- 운영 프롬프트 형식 [{"keyword", "label", "table"}] 배열: label이 EVENT/ATTRIBUTE/ENTITY면 schema,
+  VALUE/OPERATOR/TIME이면 other(채점 제외), 나머지(DISEASE 등)는 concept. table은 span에 그대로 남긴다.
 - {"spans": [{type, text, category}]}이면 그대로 쓴다.
 - 아니면 키 이름으로 경로를 나눈다. SCHEMA_KEYS는 schema, CONCEPT_KEYS는 concept. 항목은 문자열이거나
   {text|keyword|name|word, category|label|domain|type} 객체다. {"진단명": [...], "약물명": [...]}처럼
@@ -44,6 +46,10 @@ SCHEMA_KEYS = ("schema_keywords", "schema", "schemas", "스키마", "스키마_�
 CONCEPT_KEYS = ("concept_keywords", "concepts", "concept", "컨셉", "컨셉_키워드", "컨셉 키워드", "개념")
 TEXT_KEYS = ("text", "keyword", "name", "word", "term", "value", "키워드", "단어")
 CAT_KEYS = ("category", "label", "domain", "type", "카테고리", "라벨", "도메인")
+# 운영 프롬프트(2026-10)의 라벨 10개 중 의료 개체값 4개(DISEASE/DRUG/MEASUREMENT/PROCEDURE)가 아닌 것의 경로.
+# 데이터 구조 참조 3개는 schema, 조건 3개(값·비교·시점)는 API에 대응 경로가 없어 other(채점 제외)로 둔다.
+LABEL_TYPE = {"EVENT": "schema", "ATTRIBUTE": "schema", "ENTITY": "schema",
+              "VALUE": "other", "OPERATOR": "other", "TIME": "other"}
 
 
 class ParseError(ValueError):
@@ -84,7 +90,13 @@ def _item(it, default_type, default_cat=None):
         typ = it.get("type") if it.get("type") in ("schema", "concept") else default_type
         if cat is None and isinstance(it.get("type"), str) and it["type"] not in ("schema", "concept"):
             cat = it["type"]  # {"text": .., "type": "약물"}처럼 type에 카테고리를 넣은 경우
-        return {"type": typ, "text": text.strip(), "category": cat or default_cat}
+        cat = cat or default_cat
+        if isinstance(cat, str) and cat.upper() in LABEL_TYPE:
+            typ = LABEL_TYPE[cat.upper()]
+        out = {"type": typ, "text": text.strip(), "category": cat}
+        if isinstance(it.get("table"), str) and it["table"].strip():
+            out["table"] = it["table"].strip()  # 운영 프롬프트는 schema 키워드에 테이블을 같이 낸다
+        return out
     raise ParseError(f"알 수 없는 항목 형식: {it!r}")
 
 
@@ -98,7 +110,7 @@ def _items(value, default_type):
 
 
 def parse_response(content: str) -> list[dict]:
-    """→ [{type: schema|concept, text, category}] (위치 없음)."""
+    """→ [{type: schema|concept|other, text, category, table?}] (위치 없음)."""
     obj = _extract_json(content)
     if isinstance(obj, list):
         return [_item(it, "concept") for it in obj]
@@ -119,7 +131,7 @@ def parse_response(content: str) -> list[dict]:
 
 def to_spans(items: list[dict], text: str, category_map: dict[str, str]) -> tuple[list[dict], list[str]]:
     """질의에서 위치를 찾아 API 형식 span으로. 같은 경로의 같은 단어가 여러 번 나오면 차례로 다음 위치."""
-    spans, dropped, used = [], [], {"schema": [], "concept": []}
+    spans, dropped, used = [], [], {"schema": [], "concept": [], "other": []}
     for it in items:
         t = it["text"]
         if not t:
@@ -135,6 +147,8 @@ def to_spans(items: list[dict], text: str, category_map: dict[str, str]) -> tupl
         if cat is not None and it["type"] == "concept":  # schema는 표면형으로 채점하므로 그대로 둔다
             cat = category_map.get(cat.lower(), cat)
         span = {"type": it["type"], "text": t, "start": start, "end": start + len(t), "category": cat}
+        if "table" in it:
+            span["table"] = it["table"]
         spans.append(span)
     return sorted(spans, key=lambda s: (s["start"], s["type"])), dropped
 
@@ -245,6 +259,12 @@ class ProdLLMExtractor:
         except (KeyError, IndexError, TypeError):
             raise ExtractError("응답에 choices[0].message.content가 없음", attempts=resp.attempts,
                                raw=str(resp.body)[:2000]) from None
+        if not content.strip():
+            ch = resp.body["choices"][0]
+            why = (" - 추론(reasoning)으로 max_tokens를 다 썼습니다. PROD_LLM_EXTRA_BODY로 thinking을 끄거나"
+                   " PROD_LLM_MAX_TOKENS를 늘리세요" if ch.get("finish_reason") == "length" else "")
+            raise ExtractError(f"빈 응답 (finish_reason={ch.get('finish_reason')}){why}", attempts=resp.attempts,
+                               raw=str((ch.get("message") or {}).get("reasoning") or "")[:2000])
         try:
             items = parse_response(content)
         except ParseError as exc:

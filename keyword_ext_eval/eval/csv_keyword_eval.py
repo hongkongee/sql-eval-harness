@@ -153,9 +153,10 @@ def overlaps(a, b):
     return a[0] < b[1] and b[0] < a[1]
 
 
-def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool = False):
+def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool = False, llm_table: bool = False):
     spans = pred["spans"]
-    schema_pred = [s["text"] for s in spans if s["type"] == "schema"]
+    schema_spans = [s for s in spans if s["type"] == "schema"]
+    schema_pred = [s["text"] for s in schema_spans]
     concepts = [s for s in spans if s["type"] == "concept" and s["category"] not in DICT_CATEGORY_TO_DOMAIN
                 and (s.get("score") is None or s["score"] >= min_score)]
     dict_concepts = [s for s in spans if s["type"] == "concept" and s["category"] in DICT_CATEGORY_TO_DOMAIN]
@@ -164,6 +165,13 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool
     # schema: 표면형 집합 비교
     gs, ps = set(g["schema"]), set(schema_pred)
     res["schema"] = {"tp": sorted(gs & ps), "fn": sorted(gs - ps), "fp": sorted(ps - gs)}
+    # schema(겹침): 정답 표현이 나오는 위치와 예측 span이 겹치면 맞힘. LLM은 "처방 이력"처럼 구 단위로 내서
+    # 표면형 집합 비교로는 정답 "처방"과 다르게 계산되므로 참고 지표로 같이 본다.
+    occ = {k: [(i, i + len(k)) for i in range(len(g["query"])) if g["query"].startswith(k, i)] for k in gs}
+    hit = lambda sp, k: any(overlaps((sp["start"], sp["end"]), o) for o in occ[k])  # noqa: E731
+    res["schema_overlap"] = {"tp": sorted(k for k in gs if any(hit(sp, k) for sp in schema_spans)),
+                             "fn": sorted(k for k in gs if not any(hit(sp, k) for sp in schema_spans)),
+                             "fp": sorted({sp["text"] for sp in schema_spans if not any(hit(sp, k) for k in gs)})}
 
     # concept(GLiNER): 위치 겹침 + 라벨 (ignore_label이면 위치만)
     lab_ok = lambda p, c: ignore_label or p["category"] == c["label"]  # noqa: E731
@@ -234,7 +242,12 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float, ignore_label: bool
                 t_both.append(t)
     gt = set(g["tables"])
     res["tables"] = {}
-    for name, pt in (("schema", set(t_schema)), ("schema+derived", set(t_both))):
+    variants = [("schema", set(t_schema)), ("schema+derived", set(t_both))]
+    if llm_table:  # 운영 LLM이 schema 키워드마다 직접 지정한 table
+        t_llm = {sp["table"] for sp in schema_spans if sp.get("table")}
+        t_llm_both = t_llm | {t for grp in dp for t in km.group_to_tables.get(grp, [])}
+        variants += [("llm_table", t_llm), ("llm_table+derived", t_llm_both)]
+    for name, pt in variants:
         res["tables"][name] = {"pred": sorted(pt), "tp": sorted(gt & pt), "fn": sorted(gt - pt), "fp": sorted(pt - gt),
                                "covered": gt <= pt}
     return res
@@ -256,24 +269,26 @@ def cmd_score(args) -> int:
     gold = load_csv(args.csv)
     preds = {r["id"]: r for r in read_jsonl(args.pred)}
     km = KeywordTableMap(warn=False)
-    results = [score_row(g, preds[g["id"]], km, args.min_score, args.ignore_concept_label)
+    llm_table = any("table" in sp for p in preds.values() for sp in p["spans"])
+    results = [score_row(g, preds[g["id"]], km, args.min_score, args.ignore_concept_label, llm_table)
                for g in gold if g["id"] in preds]
+    variants = list(results[0]["tables"]) if results else []
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
     summary = {"n": len(results), "min_score": args.min_score, "ignore_concept_label": args.ignore_concept_label,
-               "schema": agg(results, "schema"), "concept": agg(results, "concept"),
+               "schema": agg(results, "schema"), "schema_overlap": agg(results, "schema_overlap"),
+               "concept": agg(results, "concept"),
                "derived_sim": agg(results, "derived"),
                "concept_dict": agg(results, "concept_dict"),
-               "tables": {k: agg(results, "tables", k) for k in ("schema", "schema+derived")},
-               "coverage": {k: sum(r["tables"][k]["covered"] for r in results) / len(results)
-                            for k in ("schema", "schema+derived")},
+               "tables": {k: agg(results, "tables", k) for k in variants},
+               "coverage": {k: sum(r["tables"][k]["covered"] for r in results) / len(results) for k in variants},
                "concept_exact_tp": sum(t["exact"] for r in results for t in r["concept"]["tp"]),
                "concept_label_err": sum(len(r["concept"]["label_err"]) for r in results)}
     # 테이블 person 제외
     np_ = defaultdict(lambda: [0, 0, 0])
     for r in results:
-        for k in ("schema", "schema+derived"):
+        for k in variants:
             t = r["tables"][k]
             np_[k][0] += sum(x != "person" for x in t["tp"])
             np_[k][1] += sum(x != "person" for x in t["fp"])
@@ -282,7 +297,7 @@ def cmd_score(args) -> int:
     # 테이블별
     per_table = defaultdict(lambda: Counter())
     for r in results:
-        for k in ("schema", "schema+derived"):
+        for k in variants:
             for kind in ("tp", "fp", "fn"):
                 for t in r["tables"][k][kind]:
                     per_table[(k, t)][kind] += 1
@@ -317,11 +332,11 @@ def cmd_score(args) -> int:
 
     s = summary
     print(f"문장 {s['n']}건 (concept score ≥ {args.min_score})")
-    for k in ("schema", "concept", "concept_dict", "derived_sim"):
+    for k in ("schema", "schema_overlap", "concept", "concept_dict", "derived_sim"):
         m = s[k]
-        print(f"  {k:<12} P {pct(m['precision'])} R {pct(m['recall'])} F1 {pct(m['f1'])}  (TP {m['tp']} FP {m['fp']} FN {m['fn']})")
+        print(f"  {k:<14} P {pct(m['precision'])} R {pct(m['recall'])} F1 {pct(m['f1'])}  (TP {m['tp']} FP {m['fp']} FN {m['fn']})")
     print(f"  concept 경계 정확 TP {s['concept_exact_tp']}, 라벨 오류 {s['concept_label_err']}")
-    for k in ("schema", "schema+derived"):
+    for k in variants:
         m, mn = s["tables"][k], s["tables_no_person"][k]
         print(f"  tables[{k}] P {pct(m['precision'])} R {pct(m['recall'])} F1 {pct(m['f1'])} 커버리지 {pct(s['coverage'][k])}"
               f" | person 제외 P {pct(mn['precision'])} R {pct(mn['recall'])}")

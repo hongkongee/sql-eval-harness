@@ -201,9 +201,10 @@ python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_prod_llm
 ```
 
 - 운영 LLM 응답은 API와 같은 spans 형식으로 바꿔 저장합니다. LLM이 위치를 주지 않으므로 질의에서 글자 그대로 찾아 붙이고, 못 찾은 단어는 `dropped`에 남깁니다. 원본 응답은 `raw`에 저장합니다.
-- 응답 JSON은 `spans`, `schema_keywords`/`concept_keywords`(및 한국어 키), `{카테고리: [단어]}` 형식을 받습니다(`eval/extractors/prod_llm.py` 맨 위 설명 참고). 운영 출력 형식이 이와 다르면 `parse_response`를 맞추고 `tests/test_prod_llm.py`에 예시를 추가합니다.
+- 응답 JSON은 운영 프롬프트 형식 `[{"keyword", "label", "table"}]`(라벨 10개: EVENT/ATTRIBUTE/ENTITY → schema, DISEASE/DRUG/MEASUREMENT/PROCEDURE → concept, VALUE/OPERATOR/TIME → 채점 제외), `spans`, `schema_keywords`/`concept_keywords`(및 한국어 키), `{카테고리: [단어]}` 형식을 받습니다(`eval/extractors/prod_llm.py` 맨 위 설명 참고). 운영 출력 형식이 이와 다르면 `parse_response`를 맞추고 `tests/test_prod_llm.py`에 예시를 추가합니다.
 - LLM의 카테고리 이름은 `eval/maps/llm_category_map.yaml`로 API 라벨에 맞춥니다.
 - 이어하기: 모델·시스템 프롬프트·URL 같은 설정이 바뀐 상태로 같은 결과 파일에 이어 쓰면 멈춥니다. 모델이나 프롬프트를 바꾸면 결과 파일을 따로 둡니다.
+- LLM은 "처방 이력"처럼 구 단위 키워드를 내므로 `schema_overlap`(정답 표현 위치와 겹치면 맞힘)을 같이 봅니다. LLM이 schema 키워드에 `table`을 주면 그 테이블로 채점한 `llm_table` 결과도 나옵니다.
 - `--ignore-concept-label`: concept를 위치만으로 채점합니다(라벨 체계가 다른 LLM 비교용 참고 지표).
 - 운영 시스템 프롬프트 파일(`*.local.txt`)은 .gitignore 대상입니다.
 

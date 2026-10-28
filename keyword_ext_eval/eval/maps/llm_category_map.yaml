@@ -1,7 +1,8 @@
 # 운영 LLM이 내는 카테고리 이름 → 키워드 추출 API의 category (eval.extractors.prod_llm 용).
 # 채점기(eval.csv_keyword_eval)는 API category 기준으로 맞힘을 판정하므로, LLM이 다른 이름을 쓰면
 # 여기서 맞춘다. 대소문자는 무시. 표에 없는 이름은 그대로 남아 "라벨이 다른 것"으로 계산된다.
-# 운영 프롬프트의 실제 카테고리 이름이 확인되면 그 이름을 추가할 것.
+# 운영 프롬프트(2026-10)의 의료 라벨 DISEASE/DRUG/MEASUREMENT/PROCEDURE는 아래 영문 별칭으로 맞춰진다.
+# EVENT/ATTRIBUTE/ENTITY(schema)와 VALUE/OPERATOR/TIME(채점 제외)은 eval/extractors/prod_llm.py의 LABEL_TYPE에서 처리.
 진단명 또는 질병명: [진단명, 질병명, 진단, 질병, 질환, condition, disease, diagnosis]
 약물명: [약물, 약, 약품, drug, medication]
 검사명 또는 측정 항목: [검사명, 검사, 측정 항목, 측정, measurement, lab, test]

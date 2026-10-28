@@ -150,3 +150,56 @@ def test_ignore_concept_label_option(tmp_path):
         run = tmp_path / f"run{len(flag)}"
         assert csv_keyword_eval.main(["score", "--csv", str(gold), "--pred", str(pred), "--out-dir", str(run)] + flag) == 0
         assert json.loads((run / "kw50_scores.json").read_text())["concept"]["recall"] == recall
+
+
+PROD_ANSWER = ('[{"keyword":"현재 연도","label":"TIME","table":null},{"keyword":"연령","label":"ATTRIBUTE","table":"person"},'
+               '{"keyword":"65세","label":"VALUE","table":null},{"keyword":"이상","label":"OPERATOR","table":null},'
+               '{"keyword":"골다공증","label":"DISEASE","table":null},{"keyword":"진단","label":"EVENT","table":"condition_occurrence"},'
+               '{"keyword":"알렌드론산","label":"DRUG"},{"keyword":"처방 이력","label":"EVENT","table":"drug_exposure"},'
+               '{"keyword":"여성 환자","label":"ENTITY","table":"person"}]')
+
+
+def test_parse_production_prompt_format():
+    """운영 프롬프트 형식: [{"keyword","label","table"}], 라벨 10개."""
+    q = "현재 연도 기준 연령 65세 이상이고 골다공증 진단을 받은 알렌드론산 처방 이력이 있는 여성 환자."
+    spans, dropped = to_spans(parse_response(PROD_ANSWER), q, CMAP)
+    got = {(s["type"], s["text"], s["category"], s.get("table")) for s in spans}
+    assert ("other", "현재 연도", "TIME", None) in got and ("other", "65세", "VALUE", None) in got
+    assert ("schema", "연령", "ATTRIBUTE", "person") in got
+    assert ("schema", "처방 이력", "EVENT", "drug_exposure") in got
+    assert ("concept", "골다공증", "진단명 또는 질병명", None) in got
+    assert ("concept", "알렌드론산", "약물명", None) in got
+    assert dropped == []
+
+
+def test_score_llm_schema_overlap_and_llm_table(tmp_path):
+    gold = tmp_path / "gold.csv"
+    q = "알렌드론산 처방 이력이 있는 여성 환자의 골다공증 진단."
+    with open(gold, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(GOLD_COLS)
+        w.writerow(["K1", q, "처방|환자|진단", "알렌드론산:약물명|골다공증:진단명 또는 질병명", "여성:Gender:여성",
+                    "처방|진단|성별", "drug_exposure|person|condition_occurrence", "기본형", ""])
+    answer = ('[{"keyword":"알렌드론산","label":"DRUG"},{"keyword":"처방 이력","label":"EVENT","table":"drug_exposure"},'
+              '{"keyword":"여성 환자","label":"ENTITY","table":"person"},{"keyword":"골다공증","label":"DISEASE"},'
+              '{"keyword":"진단","label":"EVENT","table":"condition_occurrence"}]')
+    spans, _ = to_spans(parse_response(answer), q, CMAP)
+    pred = tmp_path / "p.jsonl"
+    pred.write_text(json.dumps({"id": "K1", "text": q, "spans": spans}, ensure_ascii=False) + "\n", encoding="utf-8")
+    run = tmp_path / "run"
+    assert csv_keyword_eval.main(["score", "--csv", str(gold), "--pred", str(pred), "--out-dir", str(run)]) == 0
+    s = json.loads((run / "kw50_scores.json").read_text())
+    # 표면형 비교로는 "처방 이력"≠"처방", "여성 환자"≠"환자"지만 겹침 기준으로는 맞힘
+    assert s["schema"]["tp"] == 1 and s["schema_overlap"]["tp"] == 3 and s["schema_overlap"]["fp"] == 0
+    assert s["coverage"]["llm_table"] == 1.0
+    # 성별 값은 운영 라벨 체계에 따로 없어서(ENTITY "여성 환자") Visit/Gender 경로는 FN
+    assert s["concept_dict"]["fn"] == 1
+
+
+def test_empty_content_from_reasoning_model_explains(monkeypatch, tmp_path):
+    _env(monkeypatch, tmp_path)
+    body = {"choices": [{"finish_reason": "length", "message": {"content": None, "reasoning": "We need..."}}]}
+    ex = ProdLLMExtractor(post=lambda url, **kw: _MockResponse(200, body))
+    with pytest.raises(ExtractError, match="thinking을 끄거나") as e:
+        ex.extract("환자")
+    assert e.value.raw == "We need..."

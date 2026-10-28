@@ -1,7 +1,7 @@
 # 키워드 추출 API 평가 (정답셋 50문장) — API v1
 
 - 날짜: 2026-10-27
-- 대상: **API v1** (구성은 [API 리비전](API%20리비전.md) 참고) — 키워드 추출 API `POST http://localhost:8001/keyword-extraction` (gliner-entity-router `app/`)
+- 대상: **API v1** (구성은 [API 리비전](01_API%20리비전.md) 참고) — 키워드 추출 API `POST http://localhost:8001/keyword-extraction` (gliner-entity-router `app/`)
   - schema: 사전 최장 일치 (`schema_keywords.yaml`, sha256 `b1630690…`, 컨테이너와 로컬 파일 일치 확인)
   - concept: GLiNER `Ihor/gliner-biomed-large-v1.0`, 라벨 4개, threshold **0.3** (컨테이너 `GLINER_THRESHOLD=0.3`)
 - 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (50문장, 사람이 직접 만든 정답, `case_type`으로 유형 구분)
@@ -123,7 +123,7 @@ concept 점수 하한을 0.5로 올린 결과도 같이 쟀다(3-2).
 - Gender 표현: 남성, 여성, 여자, 여환, male, 남아
 - 일부는 스키마 사전이 대신 잡는다. "입원"은 방문 묶음에 있어 visit_occurrence를 가리킨다. 하지만 9201(입원)/9202(외래) 같은 **값**으로는 이어지지 않는다.
 - "여성"/"남성"은 스키마 사전에도 없다. 그래서 "성별"이라는 단어가 없는 문장(K002, K036)은 person을 못 찾는다.
-- 앞서 GLiNER 제로샷으로 방문·성별 라벨을 시험한 결과도 부적합으로 나왔다(`reports/GLiNER 방문·성별 라벨 제로샷 평가.md`). 이 경로는 사전으로 만드는 게 맞다.
+- 앞서 GLiNER 제로샷으로 방문·성별 라벨을 시험한 결과도 부적합으로 나왔다(`reports/03_GLiNER 방문·성별 라벨 제로샷 평가.md`). 이 경로는 사전으로 만드는 게 맞다.
 
 ### 3-4. 대체 스키마 (모의) — P 90.0 / R 72.7 / F1 80.4
 
