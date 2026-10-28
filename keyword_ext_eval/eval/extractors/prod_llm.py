@@ -111,7 +111,11 @@ def _items(value, default_type):
 
 def parse_response(content: str) -> list[dict]:
     """→ [{type: schema|concept|other, text, category, table?}] (위치 없음)."""
-    obj = _extract_json(content)
+    return parse_obj(_extract_json(content))
+
+
+def parse_obj(obj) -> list[dict]:
+    """이미 디코딩된 JSON(운영 LLM 응답 본문, 또는 같은 형식의 /keyword-extraction/llm-compat 응답)을 항목 목록으로."""
     if isinstance(obj, list):
         return [_item(it, "concept") for it in obj]
     if not isinstance(obj, dict):

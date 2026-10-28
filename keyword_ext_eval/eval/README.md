@@ -193,6 +193,8 @@ python -m eval.candidates --data <경로> --base eval/outputs/api.jsonl --ref ev
 C=../test_set/keyword_ext/keyword_eval_samples_50.csv
 # 키워드 추출 API (지금 떠 있는 리비전)
 python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r2.jsonl
+# 같은 API의 운영 LLM 호환 출력 (KE-r3부터, /keyword-extraction/llm-compat). 운영 LLM과 같은 해석기로 읽음
+python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50_ke-r3_compat.jsonl
 # 운영 LLM (설정은 .env의 PROD_LLM_*, 시스템 프롬프트는 eval/prompts/prod_llm_system.local.txt)
 python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50_prod_llm.jsonl --concurrency 4
 python -m eval.csv_keyword_eval extract --system prod-llm --mock --csv $C --out /tmp/llm_mock.jsonl   # 서버 없이 흐름 확인

@@ -47,3 +47,22 @@ def test_score_row_dict_concepts_ke_r2():
     assert r["concept_dict"]["tp"] == ["외래:Visit"] and r["concept_dict"]["fn"] == ["여자:Gender"]
     assert r["concept_dict"]["fp"] == ["여자:방문 유형"] and r["concept_dict"]["label_err"] == ["여자→방문 유형"]
     assert r["derived"]["tp"] == ["방문"] and r["derived"]["fn"] == ["성별"]
+
+
+def test_ke_compat_extractor_maps_llm_format(monkeypatch):
+    """KE-r3 /keyword-extraction/llm-compat 응답을 운영 LLM과 같은 해석기로 span화한다."""
+    import argparse
+    from eval import csv_keyword_eval as m
+    from eval.httpclient import Response
+
+    body = [{"keyword": "외래 방문", "label": "EVENT", "table": "visit_occurrence"},
+            {"keyword": "여성", "label": "ATTRIBUTE", "table": "person"},
+            {"keyword": "고혈압", "label": "DISEASE", "table": None}]
+    monkeypatch.setattr(m, "post_json", lambda url, payload, **kw: Response(body=body, latency_ms=3.0, attempts=1))
+    call, config = m._make_extractor(argparse.Namespace(system="ke-compat", url="http://x/llm-compat", timeout=1))
+    out = call("외래 방문한 여성 고혈압 환자")
+    assert config == {"system": "ke-compat", "url": "http://x/llm-compat"}
+    assert [(s["type"], s["text"], s["category"], s.get("table")) for s in out["spans"]] == [
+        ("schema", "외래 방문", "EVENT", "visit_occurrence"),
+        ("schema", "여성", "ATTRIBUTE", "person"),
+        ("concept", "고혈압", "진단명 또는 질병명", None)]

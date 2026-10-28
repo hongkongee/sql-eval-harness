@@ -32,7 +32,7 @@ from pathlib import Path
 
 from eval.common import append_jsonl, load_dotenv, read_jsonl, write_json
 from eval.extractors import ExtractError, PreflightError
-from eval.extractors.prod_llm import ProdLLMExtractor, mock_chat_post
+from eval.extractors.prod_llm import ParseError, ProdLLMExtractor, load_category_map, mock_chat_post, parse_obj, to_spans
 from eval.httpclient import RequestFailed, post_json
 from eval.keyword_map import KeywordTableMap
 
@@ -85,6 +85,17 @@ def _make_extractor(args):
             resp = post_json(args.url, {"text": text}, timeout=args.timeout, max_retries=3)
             return {"spans": resp.body["spans"], "latency_ms": round(resp.latency_ms, 1)}
         return call, {"system": "api", "url": args.url}
+    if args.system == "ke-compat":  # 운영 LLM과 같은 [{keyword,label,table}] 형식 → 운영 LLM과 같은 해석기로 span화
+        category_map = load_category_map()
+
+        def call(text):
+            resp = post_json(args.url, {"text": text}, timeout=args.timeout, max_retries=3)
+            try:
+                spans, dropped = to_spans(parse_obj(resp.body), text, category_map)
+            except ParseError as e:
+                raise ExtractError(f"llm-compat 응답 해석 실패: {e}") from None
+            return {"spans": spans, "dropped": dropped, "raw": resp.body, "latency_ms": round(resp.latency_ms, 1)}
+        return call, {"system": "ke-compat", "url": args.url}
     ex = ProdLLMExtractor(post=mock_chat_post if args.mock else None)
     if args.mock:
         ex.base_url, ex.model = ex.base_url or "mock://llm", ex.model or "mock"
@@ -349,10 +360,12 @@ def main(argv=None) -> int:
     e = sub.add_parser("extract")
     e.add_argument("--csv", required=True)
     e.add_argument("--out", required=True)
-    e.add_argument("--system", choices=["api", "prod-llm"], default="api",
-                   help="api: 키워드 추출 API / prod-llm: 운영 프롬프트 LLM (설정은 .env의 PROD_LLM_*)")
-    e.add_argument("--url", default="http://localhost:8001/keyword-extraction", help="--system api일 때")
-    e.add_argument("--timeout", type=float, default=60, help="--system api일 때 (LLM은 PROD_LLM_TIMEOUT)")
+    e.add_argument("--system", choices=["api", "ke-compat", "prod-llm"], default="api",
+                   help="api: 키워드 추출 API / ke-compat: 같은 API의 운영 LLM 호환 출력(/keyword-extraction/llm-compat) / "
+                        "prod-llm: 운영 프롬프트 LLM (설정은 .env의 PROD_LLM_*)")
+    e.add_argument("--url", default=None, help="api 기본 http://localhost:8001/keyword-extraction, "
+                                               "ke-compat 기본 …/keyword-extraction/llm-compat")
+    e.add_argument("--timeout", type=float, default=60, help="api, ke-compat일 때 (LLM은 PROD_LLM_TIMEOUT)")
     e.add_argument("--concurrency", type=int, default=1)
     e.add_argument("--mock", action="store_true", help="prod-llm: 서버 없이 가짜 응답으로 흐름 확인")
     e.add_argument("--overwrite", action="store_true")
@@ -364,6 +377,8 @@ def main(argv=None) -> int:
     s.add_argument("--ignore-concept-label", action="store_true",
                    help="concept는 위치만 맞으면 TP (라벨을 안 주거나 다른 체계를 쓰는 LLM 비교용, 참고 지표)")
     args = ap.parse_args(argv)
+    if args.cmd == "extract" and args.url is None:
+        args.url = "http://localhost:8001/keyword-extraction" + ("/llm-compat" if args.system == "ke-compat" else "")
     return cmd_extract(args) if args.cmd == "extract" else cmd_score(args)
 
 
