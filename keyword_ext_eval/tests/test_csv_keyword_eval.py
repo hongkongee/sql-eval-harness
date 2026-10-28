@@ -29,3 +29,21 @@ def test_score_row_paths():
     assert r["derived"] == {"tp": [], "fn": ["성별", "측정"], "fp": ["진단"]}
     assert r["tables"]["schema"]["covered"] is True
     assert r["tables"]["schema+derived"]["fp"] == ["condition_occurrence"]
+
+
+def test_score_row_dict_concepts_v2():
+    g = {"id": "K", "query": "외래 방문한 여자 환자", "case_type": "기본형", "schema": ["방문", "환자"], "gliner": [],
+         "dict": [{"text": "외래", "domain": "Visit", "value": "외래"}, {"text": "여자", "domain": "Gender", "value": "여성"}],
+         "derived": ["방문", "성별"], "tables": ["visit_occurrence", "person"]}
+    pred = {"spans": [
+        {"type": "concept", "text": "외래 방문", "start": 0, "end": 5, "category": "방문 유형"},
+        {"type": "schema", "text": "방문", "start": 3, "end": 5, "category": "방문"},
+        {"type": "concept", "text": "여자", "start": 7, "end": 9, "category": "방문 유형"},
+        {"type": "schema", "text": "환자", "start": 10, "end": 12, "category": "환자"},
+    ]}
+    r = score_row(g, pred, KeywordTableMap(warn=False), 0.0)
+    # 사전 concept는 GLiNER concept 채점에 섞이지 않는다
+    assert r["concept"]["fp"] == []
+    assert r["concept_dict"]["tp"] == ["외래:Visit"] and r["concept_dict"]["fn"] == ["여자:Gender"]
+    assert r["concept_dict"]["fp"] == ["여자:방문 유형"] and r["concept_dict"]["label_err"] == ["여자→방문 유형"]
+    assert r["derived"]["tp"] == ["방문"] and r["derived"]["fn"] == ["성별"]

@@ -7,9 +7,11 @@ gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..
 - schema: API schema span 텍스트 vs gold_schema_keywords (표면형 그대로 비교)
 - concept(GLiNER): API concept span vs gold_concept_gliner. 위치가 겹치고 라벨까지 같으면 TP.
   겹치기만 하고 라벨이 다르면 "라벨 오류"로 따로 센다 (채점상 FN+FP).
-- concept(사전): gold_concept_dict. 지금 API에는 이 경로가 없어 전부 FN이다.
-- derived: concept 라벨 → 대체 스키마 묶음(약물명 → 처방 등). API는 이걸 내지 않으므로,
-  API concept 라벨에서 결정론적으로 만들어 본 값(모의)이다.
+- concept(사전): gold_concept_dict vs API의 방문 유형/성별 concept span (API v2부터, score 없음).
+  위치가 겹치고 도메인(Visit=방문 유형, Gender=성별)이 같으면 TP. 응답에 값(입원/여성 등)이
+  없어 값 정규화는 채점하지 않는다. v1처럼 경로가 없으면 전부 FN.
+- derived: concept 라벨 → 대체 스키마 묶음(약물명 → 처방, 방문 유형 → 방문 등). API는 이걸 내지
+  않으므로, API concept 라벨에서 결정론적으로 만들어 본 값(모의)이다.
 - tables: (a) schema 키워드만, (b) schema + derived 모의 로 가리킨 테이블 vs gold_tables
 
     python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_api.jsonl
@@ -31,8 +33,10 @@ from eval.keyword_map import KeywordTableMap
 
 LABEL_TO_GROUP = {"약물명": "처방", "진단명 또는 질병명": "진단", "검사명 또는 측정 항목": "측정",
                   "시술명 또는 수술명": "시술"}
+# API의 사전 concept category → 정답 CSV의 도메인, 대체 스키마 묶음
+DICT_CATEGORY_TO_DOMAIN = {"방문 유형": "Visit", "성별": "Gender"}
 DOMAIN_TO_GROUP = {"Visit": "방문", "Gender": "성별"}
-GROUP_TABLES_EXTRA = {}  # 대체 묶음 → 테이블은 사전 묶음 표(schema_keyword_table_map.yaml)를 그대로 쓴다
+# 대체 묶음 → 테이블은 사전 묶음 표(schema_keyword_table_map.yaml)를 그대로 쓴다
 
 
 def load_csv(path) -> list[dict]:
@@ -111,7 +115,9 @@ def overlaps(a, b):
 def score_row(g, pred, km: KeywordTableMap, min_score: float):
     spans = pred["spans"]
     schema_pred = [s["text"] for s in spans if s["type"] == "schema"]
-    concepts = [s for s in spans if s["type"] == "concept" and s.get("score", 1) >= min_score]
+    concepts = [s for s in spans if s["type"] == "concept" and s["category"] not in DICT_CATEGORY_TO_DOMAIN
+                and (s.get("score") or 0) >= min_score]
+    dict_concepts = [s for s in spans if s["type"] == "concept" and s["category"] in DICT_CATEGORY_TO_DOMAIN]
     res = {"id": g["id"], "case_type": g["case_type"]}
 
     # schema: 표면형 집합 비교
@@ -150,10 +156,26 @@ def score_row(g, pred, km: KeywordTableMap, min_score: float):
     res["concept"] = {"tp": tp, "fn": fn, "fp": fp, "label_err": label_err, "n_gold": len(gold)}
 
     # concept(사전): API에 경로 없음 → 전부 FN
-    res["concept_dict"] = {"n_gold": len(g["dict"]), "fn": [f"{d['text']}:{d['domain']}" for d in g["dict"]]}
+    used = []
+    dgold = [{**d, "loc": locate(g["query"], d["text"], used)} for d in g["dict"]]
+    dtp, dfn, dfp, dlab = [], [], [], []
+    for d in dgold:
+        hit = [p for p in dict_concepts if d["loc"] and overlaps((p["start"], p["end"]), d["loc"])]
+        if any(DICT_CATEGORY_TO_DOMAIN[p["category"]] == d["domain"] for p in hit):
+            dtp.append(f"{d['text']}:{d['domain']}")
+        else:
+            dfn.append(f"{d['text']}:{d['domain']}")
+            if hit:
+                dlab.append(f"{d['text']}→{hit[0]['category']}")
+    for p in dict_concepts:
+        if not any(d["loc"] and overlaps((p["start"], p["end"]), d["loc"])
+                   and DICT_CATEGORY_TO_DOMAIN[p["category"]] == d["domain"] for d in dgold):
+            dfp.append(f"{p['text']}:{p['category']}")
+    res["concept_dict"] = {"tp": dtp, "fn": dfn, "fp": dfp, "label_err": dlab, "n_gold": len(g["dict"])}
 
     # derived(모의): API concept 라벨 → 묶음
     dp = {LABEL_TO_GROUP[p["category"]] for p in concepts if p["category"] in LABEL_TO_GROUP}
+    dp |= {DOMAIN_TO_GROUP[DICT_CATEGORY_TO_DOMAIN[p["category"]]] for p in dict_concepts}
     dg = set(g["derived"])
     res["derived"] = {"tp": sorted(dg & dp), "fn": sorted(dg - dp), "fp": sorted(dp - dg)}
 
@@ -199,7 +221,7 @@ def cmd_score(args) -> int:
     summary = {"n": len(results), "min_score": args.min_score,
                "schema": agg(results, "schema"), "concept": agg(results, "concept"),
                "derived_sim": agg(results, "derived"),
-               "concept_dict": {"n_gold": sum(r["concept_dict"]["n_gold"] for r in results), "recall": 0.0},
+               "concept_dict": agg(results, "concept_dict"),
                "tables": {k: agg(results, "tables", k) for k in ("schema", "schema+derived")},
                "coverage": {k: sum(r["tables"][k]["covered"] for r in results) / len(results)
                             for k in ("schema", "schema+derived")},
@@ -227,6 +249,7 @@ def cmd_score(args) -> int:
     for r in results:
         by_case[r["case_type"]].append(r)
     summary["by_case"] = {c: {"n": len(rs), "schema": agg(rs, "schema"), "concept": agg(rs, "concept"),
+                              "concept_dict": agg(rs, "concept_dict"),
                               "coverage_schema": sum(r["tables"]["schema"]["covered"] for r in rs) / len(rs),
                               "coverage_both": sum(r["tables"]["schema+derived"]["covered"] for r in rs) / len(rs)}
                           for c, rs in by_case.items()}
@@ -236,7 +259,7 @@ def cmd_score(args) -> int:
     with open(out / "kw50_per_query.csv", "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
         w.writerow(["id", "case_type", "query", "schema_FN", "schema_FP", "concept_FN", "concept_label_err",
-                    "concept_FP", "concept_dict_FN", "tables_gold", "tables_pred(schema)", "tables_FN(schema)",
+                    "concept_FP", "concept_dict_FN", "concept_dict_FP", "tables_gold", "tables_pred(schema)", "tables_FN(schema)",
                     "tables_FP(schema)", "tables_FN(schema+derived)", "note"])
         gi = {g["id"]: g for g in gold}
         for r in results:
@@ -244,17 +267,17 @@ def cmd_score(args) -> int:
             w.writerow([r["id"], r["case_type"], g["query"], "|".join(r["schema"]["fn"]), "|".join(r["schema"]["fp"]),
                         "|".join(r["concept"]["fn"]), "|".join(r["concept"]["label_err"]),
                         "|".join(f"{p['text']}:{p['category']}({p['score']})" for p in r["concept"]["fp"]),
-                        "|".join(r["concept_dict"]["fn"]), "|".join(g["tables"]),
+                        "|".join(r["concept_dict"]["fn"]), "|".join(r["concept_dict"]["fp"]), "|".join(g["tables"]),
                         "|".join(r["tables"]["schema"]["pred"]), "|".join(r["tables"]["schema"]["fn"]),
                         "|".join(r["tables"]["schema"]["fp"]), "|".join(r["tables"]["schema+derived"]["fn"]), g["note"]])
     write_json(out / "kw50_per_query.json", results)
 
     s = summary
     print(f"문장 {s['n']}건 (concept score ≥ {args.min_score})")
-    for k in ("schema", "concept", "derived_sim"):
+    for k in ("schema", "concept", "concept_dict", "derived_sim"):
         m = s[k]
         print(f"  {k:<12} P {pct(m['precision'])} R {pct(m['recall'])} F1 {pct(m['f1'])}  (TP {m['tp']} FP {m['fp']} FN {m['fn']})")
-    print(f"  concept 경계 정확 TP {s['concept_exact_tp']}, 라벨 오류 {s['concept_label_err']}, 사전 concept 정답 {s['concept_dict']['n_gold']}개 전부 FN")
+    print(f"  concept 경계 정확 TP {s['concept_exact_tp']}, 라벨 오류 {s['concept_label_err']}")
     for k in ("schema", "schema+derived"):
         m, mn = s["tables"][k], s["tables_no_person"][k]
         print(f"  tables[{k}] P {pct(m['precision'])} R {pct(m['recall'])} F1 {pct(m['f1'])} 커버리지 {pct(s['coverage'][k])}"
