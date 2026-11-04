@@ -5,7 +5,7 @@
 - 위치+테이블 일치: 겹치고 table까지 같으면 일치
 - 불일치 문장 목록을 CSV로 남겨 사람이 볼 곳을 고른다
 
-    python -m eval.schema_agreement --ref eval/outputs/pp573_prod_llm.jsonl --pred eval/outputs/pp573_ft-gliner_compat.jsonl --out eval/runs/pp573_agreement
+    python -m eval.schema_agreement --ref eval/outputs/pp573/pp573_prod_llm.jsonl --pred eval/outputs/pp573/pp573_ft-gliner_compat.jsonl --out eval/runs/pp573/pp573_agreement
 """
 
 from __future__ import annotations

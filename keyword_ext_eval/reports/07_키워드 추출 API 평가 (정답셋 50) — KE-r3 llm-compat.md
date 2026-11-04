@@ -3,7 +3,7 @@
 - 평가일: 2026-10-28
 - 대상: **KE-r3** = KE-r2 + 운영 LLM 호환 출력 엔드포인트 `POST /keyword-extraction/llm-compat` (gliner-entity-router `5708649`). 구성은 [API 리비전](01_API%20리비전.md) 참고
 - 비교 기준: [KE-r2](05_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r2.md) (같은 추출 결과의 기존 형식), [운영 LLM](06_운영%20LLM%20키워드%20추출%20평가%20(정답셋%2050).md) (같은 출력 형식)
-- 원자료: `eval/outputs/kw50_ke-r3.jsonl` (기존 엔드포인트), `eval/outputs/kw50_ke-r3_compat.jsonl` (새 엔드포인트, 응답 원문 `raw` 포함), 채점 결과 `eval/runs/kw50_ke-r3_compat/`
+- 원자료: `eval/outputs/kw50/kw50_ke-r3.jsonl` (기존 엔드포인트), `eval/outputs/kw50/kw50_ke-r3_compat.jsonl` (새 엔드포인트, 응답 원문 `raw` 포함), 채점 결과 `eval/runs/kw50/kw50_ke-r3_compat/`
 
 ## 요약
 
@@ -130,9 +130,9 @@ KE-r2와 같다(P 87.1 / R 91.4 / F1 89.2, 라벨 오류 7). 변환이 concept s
 ## 5. 재현
 
 ```bash
-C=../test_set/keyword_ext/keyword_eval_samples_50.csv
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r3.jsonl                            # 기존 엔드포인트 (회귀 확인)
-python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50_ke-r3_compat.jsonl  # 새 엔드포인트
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r3_compat.jsonl --out-dir eval/runs/kw50_ke-r3_compat
+C=../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50/kw50_ke-r3.jsonl                            # 기존 엔드포인트 (회귀 확인)
+python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50/kw50_ke-r3_compat.jsonl  # 새 엔드포인트
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r3_compat.jsonl --out-dir eval/runs/kw50/kw50_ke-r3_compat
 ```
 회귀 비교(3.1절)와 방문·성별 도메인 맞음(3.4절)은 채점기에 아직 없어서 출력 jsonl로 따로 계산했다.

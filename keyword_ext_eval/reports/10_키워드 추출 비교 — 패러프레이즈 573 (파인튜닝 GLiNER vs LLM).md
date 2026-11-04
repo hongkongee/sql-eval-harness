@@ -221,18 +221,18 @@
 ## 7. 재현
 
 ```bash
-P=../test_set/keyword_ext
+P=../test_set/keyword_ext/paraphrase573
 FT=<파인튜닝 서버>   # 사내 서버 주소
 # 정답 만들기 (재료·SQL → 키워드 정답 CSV)
 python -m eval.paraphrase_gold --src ../test_set/paraphrase.jsonl --out $P/paraphrase_573_gold.csv
 # 추출 (둘 다 순차 호출)
-python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat --csv $P/paraphrase_573_gold.csv --out eval/outputs/pp573_ft-gliner_compat.jsonl
-python -m eval.csv_keyword_eval extract --system prod-llm --csv $P/paraphrase_573_gold.csv --out eval/outputs/pp573_prod_llm.jsonl
+python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat --csv $P/paraphrase_573_gold.csv --out eval/outputs/pp573/pp573_ft-gliner_compat.jsonl
+python -m eval.csv_keyword_eval extract --system prod-llm --csv $P/paraphrase_573_gold.csv --out eval/outputs/pp573/pp573_prod_llm.jsonl
 # 채점
-python -m eval.csv_keyword_eval score --csv $P/paraphrase_573_gold.csv --pred eval/outputs/pp573_ft-gliner_compat.jsonl --out-dir eval/runs/pp573_ft-gliner_compat
-python -m eval.csv_keyword_eval score --csv $P/paraphrase_573_gold.csv --pred eval/outputs/pp573_prod_llm.jsonl --out-dir eval/runs/pp573_prod_llm
+python -m eval.csv_keyword_eval score --csv $P/paraphrase_573_gold.csv --pred eval/outputs/pp573/pp573_ft-gliner_compat.jsonl --out-dir eval/runs/pp573/pp573_ft-gliner_compat
+python -m eval.csv_keyword_eval score --csv $P/paraphrase_573_gold.csv --pred eval/outputs/pp573/pp573_prod_llm.jsonl --out-dir eval/runs/pp573/pp573_prod_llm
 # 스키마 키워드 일치도
-python -m eval.schema_agreement --ref eval/outputs/pp573_prod_llm.jsonl --pred eval/outputs/pp573_ft-gliner_compat.jsonl --out eval/runs/pp573_agreement
+python -m eval.schema_agreement --ref eval/outputs/pp573/pp573_prod_llm.jsonl --pred eval/outputs/pp573/pp573_ft-gliner_compat.jsonl --out eval/runs/pp573/pp573_agreement
 ```
 
 - 채점기의 `schema`, `derived_sim` 지표는 이 셋에 정답이 없어 0으로 나온다. 무시한다.

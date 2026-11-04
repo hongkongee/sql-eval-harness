@@ -187,19 +187,19 @@ python -m eval.candidates --data <경로> --base eval/outputs/api.jsonl --ref ev
 
 ## 5. 정답 CSV 채점과 운영 LLM 기준선 — `python -m eval.csv_keyword_eval`
 
-사람이 만든 키워드 정답 CSV(`../test_set/keyword_ext/keyword_eval_samples_50.csv`)로 schema / concept(GLiNER) / concept(Visit·Gender) / 테이블을 따로 채점합니다. API 리비전(KE-r1, KE-r2 …)과 운영 LLM을 같은 기준으로 비교합니다.
+사람이 만든 키워드 정답 CSV(`../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv`)로 schema / concept(GLiNER) / concept(Visit·Gender) / 테이블을 따로 채점합니다. API 리비전(KE-r1, KE-r2 …)과 운영 LLM을 같은 기준으로 비교합니다.
 
 ```bash
-C=../test_set/keyword_ext/keyword_eval_samples_50.csv
+C=../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv
 # 키워드 추출 API (지금 떠 있는 리비전)
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r2.jsonl
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50/kw50_ke-r2.jsonl
 # 같은 API의 운영 LLM 호환 출력 (KE-r3부터, /keyword-extraction/llm-compat). 운영 LLM과 같은 해석기로 읽음
-python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50_ke-r3_compat.jsonl
+python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50/kw50_ke-r3_compat.jsonl
 # 운영 LLM (설정은 .env의 PROD_LLM_*, 시스템 프롬프트는 eval/prompts/prod_llm_system.local.txt)
-python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50_prod_llm.jsonl --concurrency 4
+python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50/kw50_prod_llm.jsonl --concurrency 4
 python -m eval.csv_keyword_eval extract --system prod-llm --mock --csv $C --out /tmp/llm_mock.jsonl   # 서버 없이 흐름 확인
 # 채점 (같은 채점기)
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_prod_llm.jsonl --out-dir eval/runs/kw50_prod_llm
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_prod_llm.jsonl --out-dir eval/runs/kw50/kw50_prod_llm
 ```
 
 - 운영 LLM 응답은 API와 같은 spans 형식으로 바꿔 저장합니다. LLM이 위치를 주지 않으므로 질의에서 글자 그대로 찾아 붙이고, 못 찾은 단어는 `dropped`에 남깁니다. 원본 응답은 `raw`에 저장합니다.

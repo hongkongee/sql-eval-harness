@@ -11,7 +11,7 @@
 | 비의료 concept 사전 (`concept_keywords.yaml`) | `concept-dict v<번호>` | concept-dict v1 |
 | 운영 LLM 기준선 | `prod-llm` | prod-llm |
 
-API는 `r`, 사전은 `v`를 쓴다. 리비전은 구성 요소 버전의 조합이다. 예: KE-r2 = schema-dict v1 + concept-dict v1 + GLiNER biomed 4라벨 (threshold 0.3). 결과 파일도 같은 이름을 쓴다(`eval/outputs/kw50_ke-r2.jsonl`, `eval/runs/kw50_ke-r2/`).
+API는 `r`, 사전은 `v`를 쓴다. 리비전은 구성 요소 버전의 조합이다. 예: KE-r2 = schema-dict v1 + concept-dict v1 + GLiNER biomed 4라벨 (threshold 0.3). 결과 파일도 같은 이름을 쓴다(`eval/outputs/kw50/kw50_ke-r2.jsonl`, `eval/runs/kw50/kw50_ke-r2/`).
 
 ## 리비전 표
 

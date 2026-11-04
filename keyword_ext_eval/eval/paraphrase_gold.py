@@ -7,7 +7,7 @@
 - gold_schema_keywords, gold_derived_schema: 만들 수 없어 비운다 (스키마 키워드 F1은 이 셋으로 재지 않는다)
 - 원문에 키워드가 그대로 없는 개념 값 조건, 재료 오류(KNOWN_BAD)는 빼고 note에 남긴다
 
-    python -m eval.paraphrase_gold --src ../test_set/paraphrase.jsonl --out ../test_set/keyword_ext/paraphrase_573_gold.csv
+    python -m eval.paraphrase_gold --src ../test_set/paraphrase.jsonl --out ../test_set/keyword_ext/paraphrase573/paraphrase_573_gold.csv
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""키워드 추출 정답 CSV(test_set/keyword_ext/keyword_eval_samples_50.csv)로 API를 채점한다.
+"""키워드 추출 정답 CSV(test_set/keyword_ext/kw50/keyword_eval_samples_50.csv)로 API를 채점한다.
 
 CSV 열: id, query, gold_schema_keywords("a|b"), gold_concept_gliner("텍스트:라벨|..."),
 gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..."), gold_tables, case_type, note
@@ -14,9 +14,9 @@ gold_concept_dict("텍스트:도메인:값|..."), gold_derived_schema("묶음|..
   않으므로, API concept 라벨에서 결정론적으로 만들어 본 값(가정)이다. API에는 넣지 않기로 했다(테이블 판단은 다운스트림 몫).
 - tables: (a) schema 키워드만, (b) schema + derived 모의 로 가리킨 테이블 vs gold_tables
 
-    python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/keyword_eval_samples_50.csv --out eval/outputs/kw50_ke-r1.jsonl
-    python -m eval.csv_keyword_eval extract --system prod-llm --csv ... --out eval/outputs/kw50_prod_llm.jsonl  # 운영 LLM 기준선
-    python -m eval.csv_keyword_eval score --csv ... --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50
+    python -m eval.csv_keyword_eval extract --csv ../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv --out eval/outputs/kw50/kw50_ke-r1.jsonl
+    python -m eval.csv_keyword_eval extract --system prod-llm --csv ... --out eval/outputs/kw50/kw50_prod_llm.jsonl  # 운영 LLM 기준선
+    python -m eval.csv_keyword_eval score --csv ... --pred eval/outputs/kw50/kw50_ke-r1.jsonl --out-dir eval/runs/kw50/kw50_ke-r1
 """
 
 from __future__ import annotations
@@ -108,6 +108,7 @@ def cmd_extract(args) -> int:
     load_dotenv()
     rows = load_csv(args.csv)
     out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     meta_path = out.with_suffix(".meta.json")
     try:
         call, config = _make_extractor(args)

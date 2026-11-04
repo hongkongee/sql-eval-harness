@@ -4,7 +4,7 @@
 - 대상: **KE-r1** (구성은 [API 리비전](01_API%20리비전.md) 참고) — 키워드 추출 API `POST http://localhost:8001/keyword-extraction` (gliner-entity-router `app/`)
   - schema: 사전 최장 일치 (`schema_keywords.yaml`, sha256 `b1630690…`, 컨테이너와 로컬 파일 일치 확인)
   - concept: GLiNER `Ihor/gliner-biomed-large-v1.0`, 라벨 4개, threshold **0.3** (컨테이너 `GLINER_THRESHOLD=0.3`)
-- 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (50문장, 사람이 직접 만든 정답, `case_type`으로 유형 구분)
+- 정답셋: `test_set/keyword_ext/kw50/keyword_eval_samples_50.csv` (50문장, 사람이 직접 만든 정답, `case_type`으로 유형 구분)
 - 응답 시간: 평균 0.56초, 최대 1.15초
 
 ## 요약
@@ -193,13 +193,13 @@ GLiNER 라벨만으로 만드는 부분(처방·진단·측정·시술)은 정�
 `keyword_ext_eval/`에서:
 
 ```bash
-C=../test_set/keyword_ext/keyword_eval_samples_50.csv
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r1.jsonl --overwrite
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1_min0
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1_min0.5 --min-score 0.5
+C=../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50/kw50_ke-r1.jsonl --overwrite
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r1.jsonl --out-dir eval/runs/kw50/kw50_ke-r1_min0
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r1.jsonl --out-dir eval/runs/kw50/kw50_ke-r1_min0.5 --min-score 0.5
 ```
 
-결과 파일(`eval/runs/kw50_ke-r1_min0/`):
+결과 파일(`eval/runs/kw50/kw50_ke-r1_min0/`):
 - `kw50_scores.json`: 경로별, 테이블별, 유형별 P/R/F1
 - `kw50_per_query.csv`: 문장별 FN/FP (엑셀로 열어 검토용)
 - `kw50_per_query.json`: 문장별 상세 (TP 포함)

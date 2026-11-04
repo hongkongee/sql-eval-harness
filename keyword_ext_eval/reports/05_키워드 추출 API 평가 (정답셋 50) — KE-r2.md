@@ -2,7 +2,7 @@
 
 - 날짜: 2026-10-28
 - 대상: **KE-r2** = KE-r1 + 비의료 concept 사전(Visit = 방문 유형, Gender = 성별). 구성은 [API 리비전](01_API%20리비전.md) 참고
-- 정답셋: `test_set/keyword_ext/keyword_eval_samples_50.csv` (KE-r1과 같은 50문장. 정답은 수정하지 않음)
+- 정답셋: `test_set/keyword_ext/kw50/keyword_eval_samples_50.csv` (KE-r1과 같은 50문장. 정답은 수정하지 않음)
 - 비교 기준: [KE-r1 평가](04_키워드%20추출%20API%20평가%20(정답셋%2050)%20—%20KE-r1.md). KE-r1 결과는 같은 채점기로 다시 채점해 KE-r1 보고서 숫자와 같음을 확인했다.
 - 오염 방지: 사전은 이 정답셋을 보지 않고 만들었다. 평가하면서도 사전 파일(`concept_keywords.yaml`)은 열지 않고 API 응답만 채점했다.
 
@@ -113,10 +113,10 @@ GLiNER가 KE-r1에서 낸 "여환 → 진단명"(K013)과 "외래 진료 → 시
 `keyword_ext_eval/`에서:
 
 ```bash
-C=../test_set/keyword_ext/keyword_eval_samples_50.csv
-python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50_ke-r2.jsonl --overwrite
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r2.jsonl --out-dir eval/runs/kw50_ke-r2
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r1.jsonl --out-dir eval/runs/kw50_ke-r1   # KE-r1 재채점
+C=../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv
+python -m eval.csv_keyword_eval extract --csv $C --out eval/outputs/kw50/kw50_ke-r2.jsonl --overwrite
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r2.jsonl --out-dir eval/runs/kw50/kw50_ke-r2
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r1.jsonl --out-dir eval/runs/kw50/kw50_ke-r1   # KE-r1 재채점
 ```
 
-결과는 `eval/runs/kw50_ke-r2/`의 `kw50_scores.json`, `kw50_per_query.csv`(문장별 FN/FP, 사전 concept FN/FP 열 추가), `kw50_per_query.json`에 있다.
+결과는 `eval/runs/kw50/kw50_ke-r2/`의 `kw50_scores.json`, `kw50_per_query.csv`(문장별 FN/FP, 사전 concept FN/FP 열 추가), `kw50_per_query.json`에 있다.

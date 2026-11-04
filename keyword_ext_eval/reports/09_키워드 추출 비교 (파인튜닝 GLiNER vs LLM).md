@@ -85,7 +85,7 @@
 
 ### 1.5 공통 조건
 
-- **정답셋:** 사람이 직접 정답을 단 50문장이다. 파일은 `test_set/keyword_ext/keyword_eval_samples_50.csv`이다.
+- **정답셋:** 사람이 직접 정답을 단 50문장이다. 파일은 `test_set/keyword_ext/kw50/keyword_eval_samples_50.csv`이다.
   - 정답 SQL에서 뽑은 것이 아니다. 자세한 내용은 2절에 있다.
   - 어느 방식의 개발에도 쓰지 않았다. 파인튜닝 GLiNER의 학습 데이터와도 겹치지 않는다(1.1절).
 - **채점:** 모든 방식의 응답을 같은 해석기로 읽고 같은 채점기로 채점한다.
@@ -280,20 +280,20 @@ GLiNER 쪽은 학습 라벨과 추론 라벨에 이 항목이 없다. 정답이 
 ## 7. 재현
 
 ```bash
-C=../test_set/keyword_ext/keyword_eval_samples_50.csv
+C=../test_set/keyword_ext/kw50/keyword_eval_samples_50.csv
 FT=<파인튜닝 서버>   # 사내 서버 주소
 # 파인튜닝 GLiNER
-python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat --csv $C --out eval/outputs/kw50_ft-gliner_compat.jsonl
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ft-gliner_compat.jsonl --out-dir eval/runs/kw50_ft-gliner_compat
+python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat --csv $C --out eval/outputs/kw50/kw50_ft-gliner_compat.jsonl
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ft-gliner_compat.jsonl --out-dir eval/runs/kw50/kw50_ft-gliner_compat
 # LLM
-python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50_prod_llm.jsonl --concurrency 4
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_prod_llm.jsonl --out-dir eval/runs/kw50_prod_llm
+python -m eval.csv_keyword_eval extract --system prod-llm --csv $C --out eval/outputs/kw50/kw50_prod_llm.jsonl --concurrency 4
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_prod_llm.jsonl --out-dir eval/runs/kw50/kw50_prod_llm
 # 참고: 제로샷 GLiNER
-python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat/zero-shot --csv $C --out eval/outputs/kw50_zs-gliner_compat.jsonl
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_zs-gliner_compat.jsonl --out-dir eval/runs/kw50_zs-gliner_compat
+python -m eval.csv_keyword_eval extract --system ke-compat --url $FT/keyword-extraction/llm-compat/zero-shot --csv $C --out eval/outputs/kw50/kw50_zs-gliner_compat.jsonl
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_zs-gliner_compat.jsonl --out-dir eval/runs/kw50/kw50_zs-gliner_compat
 # 참고: GLiNER + 사전 매칭 (로컬 KE-r3)
-python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50_ke-r3_compat.jsonl
-python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50_ke-r3_compat.jsonl --out-dir eval/runs/kw50_ke-r3_compat
+python -m eval.csv_keyword_eval extract --system ke-compat --csv $C --out eval/outputs/kw50/kw50_ke-r3_compat.jsonl
+python -m eval.csv_keyword_eval score --csv $C --pred eval/outputs/kw50/kw50_ke-r3_compat.jsonl --out-dir eval/runs/kw50/kw50_ke-r3_compat
 ```
 
 방문 유형·성별 도메인 맞음, 라벨별 재현율, 형식 위반 건수는 채점기에 아직 없어서 출력 jsonl과 `kw50_per_query.json`으로 따로 계산했다.

@@ -7,7 +7,7 @@
 - 근거:
   - 운영 시스템 프롬프트의 출력 규칙
   - 서비스 코드(gliner-entity-router `5708649`의 `LlmCompatItem`, `API.md`)
-  - 50문장 실제 응답(`eval/outputs/kw50_prod_llm.jsonl`, `kw50_ke-r3_compat.jsonl`)
+  - 50문장 실제 응답(`eval/outputs/kw50/kw50_prod_llm.jsonl`, `kw50_ke-r3_compat.jsonl`)
 
 이 문서의 1~4절이 **표준**이고, 5절은 두 구현이 표준을 실제로 어떻게 지키는지다. 표준을 바꾸려면 엔진과 두 구현을 함께 바꿔야 한다.
 
