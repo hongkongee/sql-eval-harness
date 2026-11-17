@@ -1,0 +1,42 @@
+[질의]
+현재 연도를 기준으로 연령이 80세 초과인 환자, 제2형 당뇨병 진단 이력이 있는 환자, 또는 크레아티닌 측정값이 50 미만인 환자를 추출하시오.
+
+[재료]
+개념 값 조건:
+  - "제2형 당뇨병" → condition_occurrence.condition_concept_id IN (201826)
+  - "크레아티닌" → measurement.measurement_concept_id IN (3016723)
+테이블(컬럼 전체):
+  # condition_occurrence(진단 발생) PK=condition_occurrence_id
+    - condition_occurrence_id (진단 발생 ID) integer  [PK]
+    - person_id (환자 ID) integer  [→person]
+    - condition_concept_id (진단 개념 ID) integer  [→concept]
+    - condition_start_date (진단 시작 일자) date
+    - condition_start_datetime (진단 시작 일시) datetime
+    - condition_end_date (진단 종료 일자) date
+    - condition_end_datetime (진단 종료 일시) datetime
+    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]
+    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]
+    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]
+    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]
+  # measurement(검사) PK=measurement_id
+    - measurement_id (검사 ID) integer  [PK]
+    - person_id (환자 ID) integer  [→person]
+    - measurement_concept_id (검사 개념 ID) integer  [→concept]
+    - measurement_date (검사 일자) date
+    - measurement_datetime (검사 일시) datetime
+    - measurement_time (검사 시각) varchar(10)
+    - measurement_type_concept_id (검사 유형 개념 ID) integer  [→concept]
+    - value_as_number (숫자형 값) float
+    - range_low (참조 범위 하한) float
+    - range_high (참조 범위 상한) float
+    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]
+    - measurement_source_concept_id (검사 원천 개념 ID) integer  [→concept]
+  # person(환자) PK=person_id
+    - person_id (환자 ID) integer  [PK]
+    - gender_concept_id (성별 개념 ID) integer  [→concept]
+    - year_of_birth (출생 연도) integer
+    - birth_datetime (출생 일시) datetime
+    - race_concept_id (인종 개념 ID) integer  [→concept]
+조인:
+  - condition_occurrence.person_id = person.person_id
+  - measurement.person_id = person.person_id

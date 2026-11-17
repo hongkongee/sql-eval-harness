@@ -1,0 +1,1 @@
+{"text":"현재 연도를 기준으로 연령이 80세 초과인 환자, 제2형 당뇨병 진단 이력이 있는 환자, 또는 크레아티닌 측정값이 50 미만인 환자를 추출하시오.","success":false,"status":"failed","error":"'크레아티닌'에 해당하는 개념을 찾지 못했습니다.","error_kind":"concept_unmapped"}

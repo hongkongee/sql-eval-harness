@@ -1,0 +1,51 @@
+[질의]
+사망·자료 관찰 종료·추적기간(30일) 도달 중 가장 먼저 오는 시점 (기준: 경피관상동맥중재술(PCI) 시술일)
+
+[재료]
+개념 값 조건:
+  - "경피관상동맥중재술" → procedure_occurrence.procedure_concept_id IN (4216130)
+  - "PCI" → condition_occurrence.condition_concept_id IN (4298207)
+테이블(컬럼 전체):
+  # condition_occurrence(진단 발생) PK=condition_occurrence_id
+    - condition_occurrence_id (진단 발생 ID) integer  [PK]
+    - person_id (환자 ID) integer  [→person]
+    - condition_concept_id (진단 개념 ID) integer  [→concept]
+    - condition_start_date (진단 시작 일자) date
+    - condition_start_datetime (진단 시작 일시) datetime
+    - condition_end_date (진단 종료 일자) date
+    - condition_end_datetime (진단 종료 일시) datetime
+    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]
+    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]
+    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]
+    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]
+  # death(사망) PK=None
+    - person_id (환자 ID) integer  [→person]
+    - death_date (사망 일자) date
+    - death_datetime (사망 일시) datetime
+    - death_type_concept_id (사망 유형 개념 ID) integer  [→concept]
+  # observation_period(관찰 기간) PK=observation_period_id
+    - observation_period_id (관찰 기간 ID) integer  [PK]
+    - person_id (환자 ID) integer  [→person]
+    - observation_period_start_date (관찰 기간 시작 일자) date
+    - observation_period_end_date (관찰 기간 종료 일자) date
+    - period_type_concept_id (기간 유형 개념 ID) integer  [→concept]
+  # person(환자) PK=person_id
+    - person_id (환자 ID) integer  [PK]
+    - gender_concept_id (성별 개념 ID) integer  [→concept]
+    - birth_datetime (출생 일시) datetime
+    - race_concept_id (인종 개념 ID) integer  [→concept]
+  # procedure_occurrence(시술 발생) PK=procedure_occurrence_id
+    - procedure_occurrence_id (시술 발생 ID) integer  [PK]
+    - person_id (환자 ID) integer  [→person]
+    - procedure_concept_id (시술 개념 ID) integer  [→concept]
+    - procedure_date (시술 일자) date
+    - procedure_datetime (시술 일시) datetime
+    - procedure_type_concept_id (시술 유형 개념 ID) integer  [→concept]
+    - quantity (수량) integer
+    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]
+    - procedure_source_concept_id (시술 원천 개념 ID) integer  [→concept]
+조인:
+  - condition_occurrence.person_id = person.person_id
+  - death.person_id = person.person_id
+  - observation_period.person_id = person.person_id
+  - procedure_occurrence.person_id = person.person_id

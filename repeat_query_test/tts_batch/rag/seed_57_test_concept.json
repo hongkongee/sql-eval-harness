@@ -1,0 +1,411 @@
+{
+ "id": "seed_57_test_concept",
+ "text": "사망·자료 관찰 종료·추적기간(48개월) 도달 중 가장 먼저 오는 시점 (기준: 플루바스타틴 최초 처방일)",
+ "gold": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1549686)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '48' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '48' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '48_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+ "tries": [
+  {
+   "request": {
+    "query": "사망·자료 관찰 종료·추적기간(48개월) 도달 중 가장 먼저 오는 시점 (기준: 플루바스타틴 최초 처방일)",
+    "top_k": 5
+   },
+   "response": {
+    "text": "사망·자료 관찰 종료·추적기간(48개월) 도달 중 가장 먼저 오는 시점 (기준: 플루바스타틴 최초 처방일)",
+    "success": true,
+    "status": "success",
+    "concepts": [
+     {
+      "surface": "플루바스타틴",
+      "candidates": [
+       {
+        "concept_id": 1549686,
+        "ko": "자이렙캡슐20밀리그램(플루바스타틴나트륨)",
+        "en": "fluvastatin",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.625,
+        "source_file": "약물처방_EDI.csv",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 1539403,
+        "ko": "대웅심바스타틴정20밀리그람(심바스타틴)(수출명:Starzoko20mg)",
+        "en": "simvastatin",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.2,
+        "source_file": "약물처방_EDI.csv",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 797399,
+        "ko": "가비스타캡슐300밀리그램(가바펜틴)",
+        "en": "gabapentin",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.16666667,
+        "source_file": "약물처방_EDI.csv",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 1592085,
+        "ko": "로바정(로바스타틴)",
+        "en": "lovastatin",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.14285715,
+        "source_file": "약물처방_EDI.csv",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 40165636,
+        "ko": "환인피타바스타틴정1밀리그램(피타바스타틴칼슘)(수출용)(수출명:WIE-1906)",
+        "en": "pitavastatin",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.09090909,
+        "source_file": "약물처방_EDI.csv",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       }
+      ]
+     }
+    ],
+    "schemas": [
+     {
+      "table_name": "death",
+      "table_name_ko": "사망",
+      "pk": null,
+      "columns": [
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "death_date",
+        "column_ko": "사망 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "death_datetime",
+        "column_ko": "사망 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "death_type_concept_id",
+        "column_ko": "사망 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "death_date",
+      "end_date": null
+     },
+     {
+      "table_name": "drug_exposure",
+      "table_name_ko": "약물 노출",
+      "pk": "drug_exposure_id",
+      "columns": [
+       {
+        "column": "drug_exposure_id",
+        "column_ko": "약물 노출 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_concept_id",
+        "column_ko": "약물 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_start_date",
+        "column_ko": "약물 노출 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_start_datetime",
+        "column_ko": "약물 노출 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_end_date",
+        "column_ko": "약물 노출 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_end_datetime",
+        "column_ko": "약물 노출 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "drug_type_concept_id",
+        "column_ko": "약물 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "quantity",
+        "column_ko": "수량",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "days_supply",
+        "column_ko": "공급 일수",
+        "datatype": "integer",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_source_concept_id",
+        "column_ko": "약물 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "drug_exposure_start_date",
+      "end_date": "drug_exposure_end_date"
+     },
+     {
+      "table_name": "observation_period",
+      "table_name_ko": "관찰 기간",
+      "pk": "observation_period_id",
+      "columns": [
+       {
+        "column": "observation_period_id",
+        "column_ko": "관찰 기간 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "observation_period_start_date",
+        "column_ko": "관찰 기간 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "observation_period_end_date",
+        "column_ko": "관찰 기간 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "period_type_concept_id",
+        "column_ko": "기간 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "observation_period_start_date",
+      "end_date": "observation_period_end_date"
+     },
+     {
+      "table_name": "person",
+      "table_name_ko": "환자",
+      "pk": "person_id",
+      "columns": [
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "gender_concept_id",
+        "column_ko": "성별 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "MALE",
+          "id": "8507",
+          "ko": "남성"
+         },
+         {
+          "en": "FEMALE",
+          "id": "8532",
+          "ko": "여성"
+         }
+        ],
+        "enum": [
+         {
+          "id": "8507",
+          "name": "남성(MALE)"
+         },
+         {
+          "id": "8532",
+          "name": "여성(FEMALE)"
+         }
+        ]
+       },
+       {
+        "column": "birth_datetime",
+        "column_ko": "출생 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "race_concept_id",
+        "column_ko": "인종 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Korean",
+          "id": "38003585",
+          "ko": "한국인"
+         },
+         {
+          "en": "Other Race",
+          "id": "8522",
+          "ko": "기타 인종"
+         }
+        ],
+        "enum": [
+         {
+          "id": "38003585",
+          "name": "한국인(Korean)"
+         },
+         {
+          "id": "8522",
+          "name": "기타 인종(Other Race)"
+         }
+        ]
+       }
+      ],
+      "event_date": "birth_datetime",
+      "end_date": null
+     }
+    ],
+    "joins": [
+     {
+      "from": "death.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "drug_exposure.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "observation_period.person_id",
+      "to": "person.person_id"
+     }
+    ],
+    "schema_domains": [
+     "Condition",
+     "Drug",
+     "Route"
+    ],
+    "prompt": "[질의]\n사망·자료 관찰 종료·추적기간(48개월) 도달 중 가장 먼저 오는 시점 (기준: 플루바스타틴 최초 처방일)\n\n[재료]\n기준일: DATE '2026-11-12'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n조건:\n  - [VALUE] \"48개월\"\n  - [OPERATOR] \"가장 먼저 오는 시점\"\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"플루바스타틴\":\n      · 1549686  fluvastatin / 자이렙캡슐20밀리그램(플루바스타틴나트륨)  [Drug → drug_exposure.drug_concept_id]\n      · 1539403  simvastatin / 대웅심바스타틴정20밀리그람(심바스타틴)(수출명:Starzoko20mg)  [Drug → drug_exposure.drug_concept_id]\n      · 797399  gabapentin / 가비스타캡슐300밀리그램(가바펜틴)  [Drug → drug_exposure.drug_concept_id]\n      · 1592085  lovastatin / 로바정(로바스타틴)  [Drug → drug_exposure.drug_concept_id]\n      · 40165636  pitavastatin / 환인피타바스타틴정1밀리그램(피타바스타틴칼슘)(수출용)(수출명:WIE-1906)  [Drug → drug_exposure.drug_concept_id]\n테이블(컬럼 전체):\n  # death(사망) PK=None\n    - person_id (환자 ID) integer  [→person]\n    - death_date (사망 일자) date  [형식: YYYY-MM-DD]\n    - death_datetime (사망 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - death_type_concept_id (사망 유형 개념 ID) integer  [→concept]\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - drug_exposure_end_date (약물 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # observation_period(관찰 기간) PK=observation_period_id\n    - observation_period_id (관찰 기간 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - observation_period_start_date (관찰 기간 시작 일자) date  [형식: YYYY-MM-DD]\n    - observation_period_end_date (관찰 기간 종료 일자) date  [형식: YYYY-MM-DD]\n    - period_type_concept_id (기간 유형 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n조인:\n  - death.person_id = person.person_id\n  - drug_exposure.person_id = person.person_id\n  - observation_period.person_id = person.person_id"
+   }
+  }
+ ],
+ "prompt": "[질의]\n사망·자료 관찰 종료·추적기간(48개월) 도달 중 가장 먼저 오는 시점 (기준: 플루바스타틴 최초 처방일)\n\n[재료]\n기준일: DATE '2026-11-12'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n조건:\n  - [VALUE] \"48개월\"\n  - [OPERATOR] \"가장 먼저 오는 시점\"\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"플루바스타틴\":\n      · 1549686  fluvastatin / 자이렙캡슐20밀리그램(플루바스타틴나트륨)  [Drug → drug_exposure.drug_concept_id]\n      · 1539403  simvastatin / 대웅심바스타틴정20밀리그람(심바스타틴)(수출명:Starzoko20mg)  [Drug → drug_exposure.drug_concept_id]\n      · 797399  gabapentin / 가비스타캡슐300밀리그램(가바펜틴)  [Drug → drug_exposure.drug_concept_id]\n      · 1592085  lovastatin / 로바정(로바스타틴)  [Drug → drug_exposure.drug_concept_id]\n      · 40165636  pitavastatin / 환인피타바스타틴정1밀리그램(피타바스타틴칼슘)(수출용)(수출명:WIE-1906)  [Drug → drug_exposure.drug_concept_id]\n테이블(컬럼 전체):\n  # death(사망) PK=None\n    - person_id (환자 ID) integer  [→person]\n    - death_date (사망 일자) date  [형식: YYYY-MM-DD]\n    - death_datetime (사망 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - death_type_concept_id (사망 유형 개념 ID) integer  [→concept]\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - drug_exposure_end_date (약물 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # observation_period(관찰 기간) PK=observation_period_id\n    - observation_period_id (관찰 기간 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - observation_period_start_date (관찰 기간 시작 일자) date  [형식: YYYY-MM-DD]\n    - observation_period_end_date (관찰 기간 종료 일자) date  [형식: YYYY-MM-DD]\n    - period_type_concept_id (기간 유형 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n조인:\n  - death.person_id = person.person_id\n  - drug_exposure.person_id = person.person_id\n  - observation_period.person_id = person.person_id"
+}
