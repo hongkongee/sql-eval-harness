@@ -266,3 +266,73 @@ A, B, C는 답에 붙인 이름입니다. 순차 1회차 답을 A로 하고 나�
 | `requests.json`, `rag/` | 고정한 요청과 `/rag` 응답 |
 | `responses.jsonl`, `responses_par.jsonl` | 응답 원문 (순차 500, 병렬 900) |
 | `README.md` | 질의 고르는 방법, 실행 방법, 결과가 달라진 5개의 전체 SQL |
+
+## 참고: 설정으로 줄이는 방법의 근거 자료
+
+"설정으로 줄이기"의 세 가지(batch-invariant 모드, LoRA 병합, prefix caching 끄기)에 대해 찾은 근거입니다. 일부는 원문이 아니라 요약 기사나 초록으로만 확인했으며, 각 항목의 "한계"에 적었습니다.
+
+### 1. batch-invariant 모드: 근거 강함
+
+| 자료 | 내용 |
+|---|---|
+| **Thinking Machines Lab, "Defeating Nondeterminism in LLM Inference" (2025년 9월)** | Qwen3-235B에 temperature 0으로 같은 요청을 1,000번 보냈더니 서로 다른 답이 **80종** 나왔습니다. 묶음 크기와 상관없이 같은 결과를 내는 batch-invariant 커널로 바꾸자 **1,000번 모두 같은 답**이 나왔습니다. 원인은 "묶음 크기에 따라 계산 순서가 바뀌는 커널(RMSNorm, 행렬 곱셈, attention)"이라고 봤습니다. vLLM의 batch-invariant 모드가 이 연구를 바탕으로 만들어졌습니다 |
+| **vLLM 공식 문서 (v0.26.0)** | `VLLM_BATCH_INVARIANT=1`로 켭니다. compute capability 8.0 이상 GPU가 필요하고(v0.20 문서까지는 9.0 이상), 기본 모드보다 느리다고 적혀 있습니다 |
+| 한계 | Thinking Machines 결과는 원 블로그가 아니라 여러 기사 요약으로 확인했습니다. 인용 전에 원문을 확인해야 합니다. LoRA와 함께 쓸 때의 결과는 찾지 못했습니다 |
+
+### 2. LoRA 병합: 우리 상황과 거의 같은 논문이 있음
+
+| 자료 | 내용 |
+|---|---|
+| **"Same Command, Different Answer: vLLM's Runtime LoRA Path Breaks Within-Configuration Reproducibility" (NeurIPS 2026)** | 동시 요청 1개, 캐시를 끈 상태에서 **베이스 모델 요청은 바이트까지 같은 답**이었지만 **LoRA 어댑터를 붙인 요청은 같은 답이 나오지 않았습니다.** 결론은 "묶음 구성이 없어도 vLLM이 LoRA를 실행 중에 붙여 계산하는 경로 자체가 재현성을 깬다"입니다 |
+| 우리 결과와의 관계 | 이번 시험에서 **순차 요청(서버에서 혼자 처리, 묶음 1)에서도 1.4%가 갈린 것**과 맞습니다. batch-invariant 모드로 묶음 문제를 없애도 LoRA 경로 때문에 갈림이 남을 수 있으므로, **병합이 따로 필요하다는 근거**가 됩니다 |
+| 한계 | 초록만 확인했습니다. 논문도 정확한 원인 위치는 특정하지 않았다고 합니다. 병합 후 같은 답이 나오는지는 직접 확인해야 합니다 |
+
+### 3. prefix caching 끄기: 근거 약함
+
+| 자료 | 내용 |
+|---|---|
+| 기술 블로그 | 캐시를 쓸 때와 새로 계산할 때 KV 값이 미세하게 달라질 수 있다고 설명합니다. 대부분 추정이고 실험 근거는 약합니다 |
+| vLLM 이슈 #39146 | prefix caching을 **꺼도** 동시 요청에서 같은 프롬프트의 답이 갈렸다는 보고입니다. 미러 사이트로만 확인했고 GitHub 원문은 확인하지 못했습니다 |
+| **우리 1차 시험 (`../tts_batch`, seed_103)** | 캐시를 못 쓰게 한 요청 5번에서도 A, B, C가 섞여 나왔습니다. **캐시만으로는 설명되지 않았습니다** |
+
+이 근거로는 보고에서 "효과 불확실"로 적거나 빼는 것이 맞다고 봅니다.
+
+### 함께 참고할 자료: 정밀도
+
+- **"Give Me FP32 or Give Me Death? Challenges and Solutions for Reproducible Reasoning"** (arXiv 2506.09501). 개정판 제목은 "Understanding and Mitigating Numerical Sources of Nondeterminism in LLM Inference"이고 NeurIPS 2025 논문입니다.
+  - 묶음 크기, GPU 수, GPU 종류만 바꿔도 출력이 바뀌는 것을 실험으로 보였습니다. bf16에서 fp16이나 fp32로 정밀도를 올리면 이 현상이 크게 줄었습니다.
+  - "temperature 0이어도 bf16 서빙에서는 답이 갈린다"는 현상 자체의 근거로 쓸 수 있습니다.
+  - 지금 서버(L40S 46GB)는 메모리가 모자라 fp32로 띄울 수 없습니다.
+
+### 현재 서버에 적용할 수 있는지 (2026-11-18 확인)
+
+| 항목 | 현재 값 | 판단 |
+|---|---|---|
+| vLLM | v0.26.0 (`vllm/vllm-openai:v0.26.0`) | batch-invariant 모드가 있는 버전 |
+| GPU | NVIDIA L40S 1장, compute capability 8.9, 46GB | batch-invariant 조건(8.0 이상) 충족. fp32는 메모리 부족으로 불가 |
+| 텐서 병렬 | 1 | 이미 GPU 1장. "텐서 병렬 끄기"는 해당 없음 |
+| 정밀도 | bf16 | — |
+| prefix caching / chunked prefill | 켜짐 / 켜짐 | 끌 수 있음 |
+| CUDA graph | 켜짐. 묶음 크기 1, 2, 4, 8, …마다 따로 만들어 둠 | `--enforce-eager`로 끌 수 있음. 묶음 크기마다 계산 경로가 달라서, 순차(묶음 1)와 same(묶음 4)이 서로 다른 답으로 일관되게 기운 것과 맞는 설정임 |
+| LoRA | 베이스 + `by-loss` + `final-step`을 한 서버에서 서빙 (실행 중에 붙여 계산) | 병합 모델(bf16 약 28GB)은 GPU 1장에 들어감 |
+| 시험 여건 | GPU 1장을 85% 사용 중 | 같은 GPU에 시험용 서버를 더 띄울 수 없음. 운영 서버를 잠시 내리거나 다른 GPU 서버가 필요 |
+
+### 보고 문구 예시
+
+> temperature 0에서도 답이 갈리는 현상은 이미 알려진 문제입니다(Thinking Machines Lab 2025, NeurIPS 2025 논문). 원인은 요청을 묶는 크기에 따라 GPU 계산 순서가 바뀌는 것이고, vLLM의 batch-invariant 모드로 해결된다고 보고됐습니다(1,000번 중 80종 → 1종). 또 vLLM에서 LoRA를 실행 중에 붙여 서빙하면 동시 요청이 없어도 답이 갈린다는 보고가 있어(NeurIPS 2026), LoRA를 베이스에 병합해 서빙하는 방법도 함께 검토합니다. 두 방법 모두 우리 환경(vLLM v0.26.0, L40S)에서는 아직 검증하지 않았습니다.
+
+**가장 확실한 근거는 우리 환경에서 직접 시험한 결과입니다.** 이번에 갈린 10개 질의를 같은 방식(순차 5번 + 병렬 9번, 140건)으로 다음 세 가지 경우에 보내 비교하면 됩니다.
+1. batch-invariant 모드만 켬
+2. LoRA 병합만 함
+3. 둘 다 함
+
+batch-invariant 모드를 적용·해제·확인하는 절차는 `batch_invariant_guide.md`에 정리했습니다.
+
+### 출처
+
+- Thinking Machines Lab 결과 요약: [Medium](https://medium.com/@siddhantg314/defeating-nondeterminism-in-llm-inference-in-practice-38a7dd1e4112), [OpenAI 커뮤니티 소개글](https://community.openai.com/t/defeating-nondeterminism-in-llm-inference/1358623), [Analytics India Magazine](https://analyticsindiamag.com/ai-news-updates/mira-muratis-thinking-machines-cracks-the-code-on-llm-nondeterminism/)
+- [vLLM batch invariance 문서 (v0.26.0)](https://docs.vllm.ai/en/v0.26.0/features/batch_invariance/), [v0.20.2 (9.0 이상 요구)](https://docs.vllm.ai/en/v0.20.2/features/batch_invariance/)
+- [Same Command, Different Answer: vLLM's Runtime LoRA Path Breaks Within-Configuration Reproducibility (NeurIPS 2026)](https://neurips.cc/virtual/2026/171257)
+- [Why temperature 0 still gives different answers (DEV)](https://dev.to/ji_ai/why-temperature0-still-gives-different-answers-batch-invariance-49h)
+- [vLLM 이슈 #39146 미러](https://cve.imfht.com/intel/590361)
+- [Give Me FP32 or Give Me Death? (arXiv 2506.09501)](https://arxiv.org/abs/2506.09501v2), [요약 (jianyuh.github.io)](https://jianyuh.github.io/determinism/2025/06/23/FP32-Reasoning.html)
