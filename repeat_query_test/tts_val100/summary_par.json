@@ -1,0 +1,2560 @@
+[
+ {
+  "qid": "val_439",
+  "text": "외래 방문 방문이고 입원 방문인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM visit_occurrence vo WHERE vo.person_id = p.person_id AND vo.visit_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (9202))) AND EXISTS (SELECT 1 FROM visit_occurrence vi WHERE vi.person_id = p.person_id AND vi.visit_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (9201)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_441",
+  "text": "사쿠비트릴·발사르탄 처방 이력이 있는 환자를 노출군으로 정의.",
+  "seq": "ABCCC",
+  "seq_distinct": 3,
+  "mixed": "BBCAA",
+  "mixed_flags": "oooox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 3,
+  "same": "CCCC",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719))) GROUP BY p.person_id",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 1120,
+     "hash": "d68b332c"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": true,
+    "sql": "SELECT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719))) GROUP BY p.person_id HAVING COUNT(*) >= 1;",
+    "diff_vs_A": "…BY p . person_id…  →  …BY p . person_id HAVING COUNT ( * ) > = 1 ;…",
+    "exec": {
+     "rows": 1120,
+     "hash": "d68b332c"
+    }
+   },
+   {
+    "label": "C",
+    "in_seq": true,
+    "sql": "SELECT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719))) OR EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1308842))) GROUP BY p.person_id HAVING COUNT(*) >= 1;",
+    "diff_vs_A": "…46275719 ) ) ) GROUP BY p .…  →  …46275719 ) ) ) OR EXISTS ( SELECT 1 FROM drug_exposure de WHERE de . person_id = p . person_id AND de . drug_concept_id IN ( SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN ( 1308842 ) ) ) GROUP BY p .…",
+    "exec": {
+     "rows": 13041,
+     "hash": "7c4c4960"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_440",
+  "text": "심부전 진단 또는 입원 방문인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139))) OR EXISTS (SELECT 1 FROM visit_occurrence vo WHERE vo.person_id = p.person_id AND vo.visit_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (9201)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_443",
+  "text": "발사르탄 투여군.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1308842)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_445",
+  "text": "심부전 또는 입원의 최초 발생일을 조회.",
+  "seq": "ABBAB",
+  "seq_distinct": 2,
+  "mixed": "BBBAB",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 2,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(CASE WHEN co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139, 314378, 318445, 439846, 4273632)) THEN co.condition_start_date END) AS first_event_date FROM condition_occurrence co GROUP BY co.person_id HAVING COUNT(CASE WHEN co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139, 314378, 318445, 439846, 4273632)) THEN 1 END) > 0;",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 18573,
+     "hash": "373e6b44"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139, 314378, 318445, 439846, 4273632)) GROUP BY co.person_id;",
+    "diff_vs_A": "…person_id , MIN ( CASE WHEN co . condition_concept_id IN…  →  …person_id , MIN ( co . condition_start_date ) AS first_event_date FROM condition_occurrence co WHERE co . condition_concept_id IN…",
+    "exec": {
+     "rows": 18573,
+     "hash": "373e6b44"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_446",
+  "text": "심부전 또는 입원의 최초 발생일을 확인.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139, 314378, 318445, 439846, 4273632)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_447",
+  "text": "관찰기간이 2021-01-14부터 2022-12-31까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2022-12-31' AND op.observation_period_end_date >= DATE '2021-01-14';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_448",
+  "text": "사쿠비트릴·발사르탄 최초 처방일을 기준 시점으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_444",
+  "text": "발사르탄 최초 처방일을 기준일로 하고 기준일 이전 동일 처방 이력이 없는 환자이며 심부전 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1308842)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure prior_de WHERE prior_de.person_id = de.person_id AND prior_de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1308842)) AND prior_de.drug_exposure_start_date < de.drug_exposure_start_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = de.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)) AND co.condition_start_date <= de.drug_exposure_start_date ) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_442",
+  "text": "ARNI(사쿠비트릴/발사르탄) 최초 처방일을 기준일로 하고 기준일 이전 ARNI(사쿠비트릴/발사르탄) 처방 이력이 없는 환자이며 심부전 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719, 1308842)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure prior_de WHERE prior_de.person_id = de.person_id AND prior_de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719, 1308842)) AND prior_de.drug_exposure_start_date < de.drug_exposure_start_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = de.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)) ) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_449",
+  "text": "기준시점(ARNI(사쿠비트릴/발사르탄) 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 2015년)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS (SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719, 1308842)) GROUP BY de.person_id), follow_up_candidates AS (SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, DATE '2015-12-31' AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= DATE '2015-12-31') SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '2015_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_291",
+  "text": "심부전 진단 또는 뇌졸중 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139))) OR EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (381316)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_290",
+  "text": "현재 연도 기준 연령 65세 이상이고 여성 기록이고 골다공증 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) >= 65 AND p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_450",
+  "text": "사망·자료 관찰 종료·추적기간(2015년) 도달 중 가장 먼저 오는 시점 (기준: ARNI(사쿠비트릴/발사르탄) 최초 처방일)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46275719)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, DATE '2015-12-31' AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= DATE '2015-12-31' ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '2015_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_292",
+  "text": "로모소주맙 처방 이력이 있는 환자를 노출군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_294",
+  "text": "졸레드론산 처방 이력이 있는 환자를 비교군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1524674)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_295",
+  "text": "위약/비노출 대조군: 연구 약물(로모소주맙) 미노출 — 대상: 골다공증",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502))) AND NOT EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_297",
+  "text": "관찰기간이 2021-09-15부터 2027-03-31까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2027-03-31' AND op.observation_period_end_date >= DATE '2021-09-15';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_298",
+  "text": "로모소주맙 최초 처방일을 기준 시점으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_260",
+  "text": "혈당 측정 기록이고 제2형 당뇨병 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3004501))) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (201826)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_299",
+  "text": "기준시점(로모소주맙 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 24개월)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '24' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '24' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '24_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_300",
+  "text": "사망·자료 관찰 종료·추적기간(24개월) 도달 중 가장 먼저 오는 시점 (기준: 로모소주맙 최초 처방일)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1511251)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '24' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '24' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '24_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_261",
+  "text": "인슐린 처방인 환자.",
+  "seq": "AAAAB",
+  "seq_distinct": 2,
+  "mixed": "BAABA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 2,
+  "same": "BBBA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 2,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) );",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 9103,
+     "hash": "44c2379a"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976))));",
+    "diff_vs_A": "…1516976 ) ) ) ;…  →  …1516976 ) ) ) ) ;…",
+    "exec": {
+     "error": "syntax error at or near \")\""
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_264",
+  "text": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (201826))) AND NOT EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_262",
+  "text": "인슐린 처방 이력이 있는 환자를 노출군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_265",
+  "text": "혈당 또는 당화혈색소 측정일과 측정값을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.unit_source_value FROM measurement m WHERE m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3004501)) OR m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3004410));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_267",
+  "text": "인슐린 최초 처방일을 기준 시점으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_266",
+  "text": "관찰기간이 2018-11-19부터 2021-03-25까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2021-03-25' AND op.observation_period_end_date >= DATE '2018-11-19';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_268",
+  "text": "기준시점(인슐린 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 6개월)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '6' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '6' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '6_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_269",
+  "text": "사망·자료 관찰 종료·추적기간(6개월) 도달 중 가장 먼저 오는 시점 (기준: 인슐린 최초 처방일)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '6' MONTH AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '6' MONTH ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '6_MONTH_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_415",
+  "text": "현재 연도 기준 연령 60세 이상이고 유방암 진단이고 여성 기록인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) >= 60 AND p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_263",
+  "text": "인슐린 최초 처방일을 기준일로 하고 기준일 이전 인슐린 처방 이력이 없는 환자이며 제2형 당뇨병 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure prior_de WHERE prior_de.person_id = de.person_id AND prior_de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19013926, 1502905, 35602717, 19090244, 1516976)) AND prior_de.drug_exposure_start_date < de.drug_exposure_start_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = de.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (201826)) ) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_417",
+  "text": "유방절제술 시행 이력이 있는 환자를 노출군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND po.procedure_date <= DATE '2026-11-18');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_416",
+  "text": "유방암 진단 또는 심부전 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxoo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853))) OR EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_419",
+  "text": "타목시펜 처방 이력이 있는 환자를 비교군으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1436678)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_421",
+  "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정값과 측정일을 조회한다.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.range_low, m.range_high FROM measurement m WHERE m.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_423",
+  "text": "관찰기간이 1993-05-01부터 2010-08-31까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2010-08-31' AND op.observation_period_end_date >= DATE '1993-05-01';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_422",
+  "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.value_as_concept_id FROM measurement m WHERE m.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_418",
+  "text": "유방절제술 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 유방암 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) ) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_424",
+  "text": "유방절제술 최초 시행일을 기준 시점으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_425",
+  "text": "기준시점(유방절제술 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 17년)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxoo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select po.person_id, min(po.procedure_date) as index_date from procedure_occurrence po where po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) group by po.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '17' YEAR AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '17' YEAR ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '17_YEAR_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_528",
+  "text": "총콜레스테롤 측정 기록이고 LDL 콜레스테롤 측정 기록인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3027114))) AND EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3028437)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_420",
+  "text": "유방절제술 최초 시행일을 기준일(index date)로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 유방암 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "ABBAA",
+  "mixed_flags": "xooox",
+  "mixed_new": 2,
+  "mixed_new_ours": 2,
+  "mixed_distinct": 2,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) AND co.condition_start_date <= po.procedure_date ) GROUP BY po.person_id;",
+    "diff_vs_A": null,
+    "exec": {
+     "error": "canceling statement due to statement timeout"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) ) GROUP BY po.person_id;",
+    "diff_vs_A": "…( 4112853 ) ) AND co . condition_start_date < = po . procedure_date ) GROUP BY po…  →  …( 4112853 ) ) ) GROUP BY po…",
+    "exec": {
+     "rows": 645,
+     "hash": "e9c42bfa"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_426",
+  "text": "사망·자료 관찰 종료·추적기간(17년) 도달 중 가장 먼저 오는 시점 (기준: 유방절제술 시술일)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select po.person_id, min(po.procedure_date) as index_date from procedure_occurrence po where po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) group by po.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '17' YEAR AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '17' YEAR ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '17_YEAR_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_530",
+  "text": "OMOP CDM measurement 도메인 기록이 있는 환자를 노출군으로 규정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT m.person_id FROM measurement m;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_532",
+  "text": "OMOP CDM measurement 도메인 기록이 있는 환자를 비교군으로 규정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT m.person_id FROM measurement m;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_531",
+  "text": "환자별 최초 약물 처방일을 기준일로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_529",
+  "text": "백내장 진단 또는 치매 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545))) OR EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4182210)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_535",
+  "text": "백내장 최초 진단일을 기준 시점으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_533",
+  "text": "백내장 진단 이력이 있는 환자를 비교군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_718",
+  "text": "방사선치료 시행 이력이 있는 환자를 비교군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1242725)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_720",
+  "text": "전이성 악성 신생물의 최초 발생일을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "BBBBB",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 5,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "BBBA",
+  "same_flags": "oooo",
+  "same_new": 3,
+  "same_new_ours": 3,
+  "same_distinct": 2,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (432851)) GROUP BY co.person_id;",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 6421,
+     "hash": "1faf3bae"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "WITH outcome_events AS ( SELECT co.person_id, co.condition_start_date AS event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (432851)) ) SELECT oe.person_id, MIN(oe.event_date) AS first_event_date FROM outcome_events oe GROUP BY oe.person_id;",
+    "diff_vs_A": "…SELECT co . person_id…  →  …WITH outcome_events AS ( SELECT co . person_id…",
+    "exec": {
+     "rows": 6421,
+     "hash": "1faf3bae"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_721",
+  "text": "유방암 또는 전립선암의 최초 발생일을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853, 4163261)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_462",
+  "text": "현재 연도 기준 연령 70세 이상이고 고관절 골관절염 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) >= 70 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4079749)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_723",
+  "text": "기준시점(방사선치료 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS (SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1242725)) GROUP BY po.person_id), follow_up_candidates AS (SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN f.death_date ELSE f.observation_period_end_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN 'DEATH' ELSE 'OBSERVATION_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_464",
+  "text": "골다공증 진단 이력이 있는 환자를 노출군으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT co.person_id FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_463",
+  "text": "골다공증 진단 또는 고관절 골절 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502))) OR EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4138412)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_717",
+  "text": "방사선치료 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 유방암 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1242725)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1242725)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) ) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_719",
+  "text": "유방절제술 최초 시행일을 기준 시점으로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 유방암 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) ) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_466",
+  "text": "인공고관절전치환술(THA) 시술군.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_468",
+  "text": "고관절 골관절염 대상 코호트에서 OMOP CDM measurement 테이블의 측정일과 측정값을 확인.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "ABAAB",
+  "mixed_flags": "xxxox",
+  "mixed_new": 2,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 2,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.range_low, m.range_high FROM measurement m WHERE m.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80180)) );",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 1278608,
+     "hash": "1afb1060"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.unit_source_value FROM measurement m WHERE m.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80180)) );",
+    "diff_vs_A": "…value_as_number , m . range_low , m . range_high FROM measurement m WHERE…  →  …value_as_number , m . unit_source_value FROM measurement m WHERE…",
+    "exec": {
+     "rows": 1278608,
+     "hash": "1b02e997"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "val_469",
+  "text": "외래 방문의 최초 발생일을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH outcome_events AS ( SELECT vo.person_id, vo.visit_start_date AS event_date FROM visit_occurrence vo WHERE vo.visit_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (9202)) ) SELECT oe.person_id, MIN(oe.event_date) AS first_event_date FROM outcome_events oe GROUP BY oe.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_470",
+  "text": "관찰기간이 2014-10-01부터 2018-03-31까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2018-03-31' AND op.observation_period_end_date >= DATE '2014-10-01';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_471",
+  "text": "인공고관절전치환술(THA) 최초 시행일을 기준 시점으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_465",
+  "text": "고관절 전치환술 최초 시행일을 기준 시점으로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 고관절 골관절염 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4079749)) ) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_472",
+  "text": "기준시점(인공고관절전치환술(THA) 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 5년)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select po.person_id, min(po.procedure_date) as index_date from procedure_occurrence po where po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) group by po.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '5' YEAR AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '5' YEAR ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '5_YEAR_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_467",
+  "text": "고관절 전치환술 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 고관절 골관절염 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT po.person_id, MIN(po.procedure_date) AS index_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence prior_po WHERE prior_po.person_id = po.person_id AND prior_po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND prior_po.procedure_date < po.procedure_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = po.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4079749)) ) GROUP BY po.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "val_473",
+  "text": "사망·자료 관찰 종료·추적기간(5년) 도달 중 가장 먼저 오는 시점 (기준: 인공고관절전치환술(THA) 시술일)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select po.person_id, min(po.procedure_date) as index_date from procedure_occurrence po where po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) group by po.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date, i.index_date + INTERVAL '5' YEAR AS maximum_follow_up_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date AND d.death_date <= i.index_date + INTERVAL '5' YEAR ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN f.death_date WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN f.observation_period_end_date ELSE f.maximum_follow_up_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date AND f.death_date <= f.maximum_follow_up_date THEN 'DEATH' WHEN f.observation_period_end_date <= f.maximum_follow_up_date THEN 'OBSERVATION_END' ELSE '5_YEAR_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_696_test_concept",
+  "text": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139))) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4079749)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_408_test_paraphrase",
+  "text": "위약/비노출 대조군 코호트 추출: 유방암 환자 중 연구 약물인 유방암 항암화학요법에 노출되지 않은 대상 — 1차 결과: 치료 실행가능성",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT co.person_id FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) AND NOT EXISTS ( SELECT 1 FROM procedure_occurrence de WHERE de.person_id = co.person_id AND de.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4273629)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_164_test_paraphrase",
+  "text": "관찰 코호트 노출군으로 만성콩팥병 환자를 추출하고, 최초 진단일을 기준일로 계산한다.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (46271022)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_552_test_concept",
+  "text": "메트포르민 최초 처방일을 기준일로 하고 기준일 이전 메트포르민 처방 이력이 없는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1503297)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure prior_de WHERE prior_de.person_id = de.person_id AND prior_de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1503297)) AND prior_de.drug_exposure_start_date < de.drug_exposure_start_date ) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_134_test_concept",
+  "text": "혈청/혈장 요산 측정 기록의 측정일과 측정값을 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oooxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.unit_source_value FROM measurement m WHERE m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3011904))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_649_test_paraphrase",
+  "text": "별도 대조군을 두지 않은 단일 관찰 코호트에서 고관절 골절 환자를 추출하고, 각 대상자의 지표일은 고관절 골절 최초 진단일로 정의한다.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4138412)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_598_test_concept",
+  "text": "합병증을 동반하지 않은 당뇨병 대상 코호트 중 OMOP CDM에 관찰기간이 기록된 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AABAA",
+  "mixed_flags": "xxoxo",
+  "mixed_new": 1,
+  "mixed_new_ours": 1,
+  "mixed_distinct": 2,
+  "same": "BAAA",
+  "same_flags": "oooo",
+  "same_new": 1,
+  "same_new_ours": 1,
+  "same_distinct": 2,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4008576, 201254, 4193704, 4096042)) EXCEPT SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (442793)) );",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 53832,
+     "hash": "ea019fec"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4008576, 201254, 4193704, 4096042)) );",
+    "diff_vs_A": "…, 4096042 ) ) EXCEPT SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN ( SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN ( 442793 ) ) ) ;…  →  …, 4096042 ) ) ) ;…",
+    "exec": {
+     "rows": 71615,
+     "hash": "9e74eecb"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "seed_580_test_paraphrase",
+  "text": "락툴로오스 최초 처방일을 기준시점으로, 각 환자의 사망일과 자료 관찰 종료일 중 빠른 시점까지의 추적 종료일과 종료 사유를 산출하라.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (987245)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN f.death_date ELSE f.observation_period_end_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN 'DEATH' ELSE 'OBSERVATION_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_177_test_paraphrase",
+  "text": "환자별로 혈액투석이 최초로 발생한 날짜를 조회해 주세요.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xooox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH outcome_events AS ( SELECT po.person_id, po.procedure_date AS event_date FROM procedure_occurrence po WHERE po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4120120, 4120148)) ) SELECT oe.person_id, MIN(oe.event_date) AS first_event_date FROM outcome_events oe GROUP BY oe.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_735_test_concept",
+  "text": "심부전 환자 대상",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_611_test_paraphrase",
+  "text": "메트포르민 최초 처방일을 기준으로, 각 환자의 사망일과 자료 관찰 종료일 중 더 빠른 날짜를 추적 종료일로 산출하시오.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1503297)) GROUP BY de.person_id ) SELECT i.person_id, i.index_date, CASE WHEN d.death_date IS NOT NULL AND d.death_date <= op.observation_period_end_date THEN d.death_date ELSE op.observation_period_end_date END AS followup_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_19_test_concept",
+  "text": "신장 최초 측정일의 평균값과 84일 후 평균값의 차이를 조회.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( SELECT m.person_id, MIN(m.measurement_date) AS index_date FROM measurement m WHERE m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4030518)) GROUP BY m.person_id ), baseline_values AS ( SELECT id.person_id, id.index_date, AVG(m.value_as_number) AS baseline_value FROM index_dates id JOIN measurement m ON m.person_id = id.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4030518)) AND m.measurement_date = id.index_date GROUP BY id.person_id, id.index_date ), followup_values AS ( SELECT id.person_id, AVG(m.value_as_number) AS followup_value FROM index_dates id JOIN measurement m ON m.person_id = id.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4030518)) AND m.measurement_date = id.index_date + INTERVAL '84' DAY GROUP BY id.person_id ) SELECT b.person_id, b.index_date, b.baseline_value, f.followup_value, f.followup_value - b.baseline_value AS change_value FROM baseline_values b JOIN followup_values f ON f.person_id = b.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_229_test_slot",
+  "text": "체질량지수 값이 25 초과 또는 심근경색 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3038553)) AND m.value_as_number > 25) OR EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4329847)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_361_test_concept",
+  "text": "메게스트롤 처방 이력이 있고 사이클로포스파미드 처방 이력이 없는 환자를 비교군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1300978))) AND NOT EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1310317)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_326_test_paraphrase",
+  "text": "유방암 진단력이 있는 환자들을 노출군 코호트로 추출한다.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT co.person_id FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) ;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_107_test_concept",
+  "text": "고혈압성 신부전 진단 또는 에날라프릴 처방 이력이 있는 환자를 노출군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (201313, 443919))) OR EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1341927)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_757_test_paraphrase",
+  "text": "각 환자의 심근경색, 뇌졸중, 저혈당 최초 발생일을 진단별로 집계해줘.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, co.condition_concept_id, MIN(co.condition_start_date) AS first_date FROM condition_occurrence co WHERE co.condition_start_date <= DATE '2026-11-18' AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4329847, 381316, 24609)) GROUP BY co.person_id, co.condition_concept_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_97_test_restructure",
+  "text": "OMOP CDM drug_exposure 테이블에 약물 노출 기록이 있는 환자를 비교군으로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT de.person_id FROM drug_exposure de;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_492_test_restructure",
+  "text": "본태성 고혈압 대상 코호트 중 OMOP CDM에 관찰기간이 기록된 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (320128)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_35_test_restructure",
+  "text": "암로디핀 최초 처방일부터 사망일, 자료 관찰 종료일, 3년 도달일 중 가장 이른 날짜를 추적 종료일로 정의",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1332418)) GROUP BY de.person_id ) SELECT i.person_id, i.index_date, CASE WHEN d.death_date IS NOT NULL AND d.death_date <= op.observation_period_end_date AND d.death_date <= i.index_date + INTERVAL '3' YEAR THEN d.death_date WHEN op.observation_period_end_date <= i.index_date + INTERVAL '3' YEAR THEN op.observation_period_end_date ELSE i.index_date + INTERVAL '3' YEAR END AS followup_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_747_test_paraphrase",
+  "text": "각 환자의 생존 여부(사망 또는 생존)와 사망일을 조회해 주세요.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "BAABB",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 3,
+  "mixed_new_ours": 1,
+  "mixed_distinct": 2,
+  "same": "BAAA",
+  "same_flags": "oooo",
+  "same_new": 1,
+  "same_new_ours": 1,
+  "same_distinct": 2,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT p.person_id, CASE WHEN d.death_date IS NOT NULL AND d.death_date <= DATE '2026-11-18' THEN '사망' ELSE '생존' END AS survival_status, d.death_date FROM person p LEFT JOIN death d ON d.person_id = p.person_id AND d.death_date <= DATE '2026-11-18';",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 79941,
+     "hash": "fa7ae51c"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "SELECT p.person_id, CASE WHEN d.death_date IS NOT NULL AND d.death_date <= DATE '2026-11-18' THEN '사망' ELSE '생존' END AS survival_status, d.death_date FROM person p LEFT JOIN death d ON d.person_id = p.person_id;",
+    "diff_vs_A": "…= p . person_id AND d . death_date < = DATE '2026-11-18' ;…  →  …= p . person_id ;…",
+    "exec": {
+     "rows": 79941,
+     "hash": "fa7ae51c"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "seed_71_test_slot",
+  "text": "18세 미만 또는 여성인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) < 18 OR p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_661_test_concept",
+  "text": "심부전 최초 진단일부터 사망일과 자료 관찰 종료일 중 가장 이른 날짜를 추적 종료일로 정의.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS (SELECT co.person_id, MIN(co.condition_start_date) AS index_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)) GROUP BY co.person_id) SELECT i.person_id, i.index_date, CASE WHEN d.death_date IS NOT NULL AND d.death_date <= op.observation_period_end_date THEN d.death_date ELSE op.observation_period_end_date END AS followup_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_638_test_slot",
+  "text": "metformin 유발 젖산산증(MALA: pH≤7.30 & 동맥 lactate 상승)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT m.person_id FROM measurement m WHERE m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3018405)) AND m.value_as_number > (SELECT DISTINCT mp.value_as_number FROM measurement mp WHERE mp.person_id = m.person_id AND mp.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3018405))) AND EXISTS (SELECT 1 FROM measurement p WHERE p.person_id = m.person_id AND p.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4276432)) AND p.value_as_number < 7.30);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_116_test_slot",
+  "text": "현재 연도 기준 연령 65세 이상이고 75세 이하이고 체질량지수 값이 30 초과이고 심부전 진단인 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) >= 65 AND (EXTRACT(YEAR FROM DATE '2026-11-18') - EXTRACT(YEAR FROM p.birth_datetime)) <= 75 AND EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3038553)) AND m.value_as_number > 30) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_244_test_paraphrase",
+  "text": "빌다글립틴 투약 기록이 없는 환자를 비교군으로 추출한다.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT p.person_id FROM person p WHERE NOT EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19122137)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_184_test_restructure",
+  "text": "OMOP CDM procedure_occurrence 테이블에 시술 기록이 있는 환자를 노출군으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oooox",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_477_test_restructure",
+  "text": "졸레드론산 최초 처방일을 기준 시점으로 하고 기준일 이전 졸레드론산 처방 이력이 없는 환자이며 골다공증 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1524674)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure prior_de WHERE prior_de.person_id = de.person_id AND prior_de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1524674)) AND prior_de.drug_exposure_start_date < de.drug_exposure_start_date ) AND EXISTS ( SELECT 1 FROM condition_occurrence co WHERE co.person_id = de.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)) ) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_618_test_concept",
+  "text": "심근경색·뇌졸중·전심근경색증 신규 발생(예측 대상 사건)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4329847, 381316, 4296653)) AND co.condition_start_date <= DATE '2026-11-18' GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_690_test_restructure",
+  "text": "OMOP CDM procedure 도메인 기록이 있는 환자를 비교군으로 설정.",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "BCAAB",
+  "mixed_flags": "oxxox",
+  "mixed_new": 3,
+  "mixed_new_ours": 1,
+  "mixed_distinct": 3,
+  "same": "BBBB",
+  "same_flags": "oooo",
+  "same_new": 4,
+  "same_new_ours": 4,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT DISTINCT po.person_id FROM procedure_occurrence po;",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 66454,
+     "hash": "6e66553c"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": false,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id);",
+    "diff_vs_A": "…SELECT DISTINCT po . person_id FROM…  →  …SELECT DISTINCT p . person_id FROM person p WHERE EXISTS ( SELECT 1 FROM procedure_occurrence po WHERE po . person_id =…",
+    "exec": {
+     "rows": 66454,
+     "hash": "6e66553c"
+    }
+   },
+   {
+    "label": "C",
+    "in_seq": false,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id );",
+    "diff_vs_A": "…SELECT DISTINCT po . person_id FROM…  →  …SELECT DISTINCT p . person_id FROM person p WHERE EXISTS ( SELECT 1 FROM procedure_occurrence po WHERE po . person_id =…",
+    "exec": {
+     "rows": 66454,
+     "hash": "6e66553c"
+    }
+   }
+  ]
+ },
+ {
+  "qid": "seed_514_test_concept",
+  "text": "암로디핀 최초 처방일을(를) 기준 시점(index date)으로 정의 (대상: 심근경색전증후군)",
+  "seq": "AAAAA",
+  "seq_distinct": 1,
+  "mixed": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 1,
+  "same": "AAAA",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1332418)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = de.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4121477))) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "seed_547_test_restructure",
+  "text": "기준시점(trimetazidine  최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적",
+  "seq": "AAABB",
+  "seq_distinct": 2,
+  "mixed": "BBBAB",
+  "mixed_flags": "oxxxo",
+  "mixed_new": 0,
+  "mixed_new_ours": 0,
+  "mixed_distinct": 2,
+  "same": "BBBB",
+  "same_flags": "oooo",
+  "same_new": 0,
+  "same_new_ours": 0,
+  "same_distinct": 1,
+  "variants": [
+   {
+    "label": "A",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( select de.person_id, min(de.drug_exposure_start_date) as index_date from drug_exposure de where de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19005626)) group by de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN f.death_date ELSE f.observation_period_end_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN 'DEATH' ELSE 'OBSERVATION_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 0,
+     "hash": "d7517139"
+    }
+   },
+   {
+    "label": "B",
+    "in_seq": true,
+    "sql": "WITH index_dates AS ( SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (19005626)) GROUP BY de.person_id ), follow_up_candidates AS ( SELECT i.person_id, i.index_date, d.death_date, op.observation_period_end_date FROM index_dates i JOIN observation_period op ON op.person_id = i.person_id AND i.index_date BETWEEN op.observation_period_start_date AND op.observation_period_end_date LEFT JOIN death d ON d.person_id = i.person_id AND d.death_date >= i.index_date ) SELECT f.person_id, f.index_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN f.death_date ELSE f.observation_period_end_date END AS follow_up_end_date, CASE WHEN f.death_date IS NOT NULL AND f.death_date <= f.observation_period_end_date THEN 'DEATH' ELSE 'OBSERVATION_END' END AS follow_up_end_reason FROM follow_up_candidates f;",
+    "diff_vs_A": "…WITH index_dates AS ( select de . person_id ,…  →  …WITH index_dates AS ( SELECT de . person_id ,…",
+    "exec": {
+     "rows": 0,
+     "hash": "d7517139"
+    }
+   }
+  ]
+ }
+]

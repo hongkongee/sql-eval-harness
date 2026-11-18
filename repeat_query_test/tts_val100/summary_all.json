@@ -1,0 +1,5202 @@
+[
+ {
+  "qid": "val_439",
+  "text": "외래 방문 방문이고 입원 방문인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_441",
+  "text": "사쿠비트릴·발사르탄 처방 이력이 있는 환자를 노출군으로 정의.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "ABCCC",
+  "mixed_answers": "BBCAA",
+  "mixed_flags": "oooox",
+  "same_answers": "CCCC",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 3,
+   "minority": 2
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 3,
+   "minority": 2
+  },
+  "par": {
+   "n": 9,
+   "distinct": 3,
+   "minority": 4
+  },
+  "par_ours": {
+   "n": 8,
+   "distinct": 3,
+   "minority": 3
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 3,
+   "minority": 3
+  },
+  "mixed_ours": {
+   "n": 4,
+   "distinct": 3,
+   "minority": 2
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_440",
+  "text": "심부전 진단 또는 입원 방문인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_443",
+  "text": "발사르탄 투여군.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_445",
+  "text": "심부전 또는 입원의 최초 발생일을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "ABBAB",
+  "mixed_answers": "BBBAB",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 4
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_446",
+  "text": "심부전 또는 입원의 최초 발생일을 확인.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_447",
+  "text": "관찰기간이 2021-01-14부터 2022-12-31까지의 기간과 겹치는 환자.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_448",
+  "text": "사쿠비트릴·발사르탄 최초 처방일을 기준 시점으로 정의.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_444",
+  "text": "발사르탄 최초 처방일을 기준일로 하고 기준일 이전 동일 처방 이력이 없는 환자이며 심부전 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_442",
+  "text": "ARNI(사쿠비트릴/발사르탄) 최초 처방일을 기준일로 하고 기준일 이전 ARNI(사쿠비트릴/발사르탄) 처방 이력이 없는 환자이며 심부전 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_449",
+  "text": "기준시점(ARNI(사쿠비트릴/발사르탄) 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 2015년)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_291",
+  "text": "심부전 진단 또는 뇌졸중 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_290",
+  "text": "현재 연도 기준 연령 65세 이상이고 여성 기록이고 골다공증 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_450",
+  "text": "사망·자료 관찰 종료·추적기간(2015년) 도달 중 가장 먼저 오는 시점 (기준: ARNI(사쿠비트릴/발사르탄) 최초 처방일)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_292",
+  "text": "로모소주맙 처방 이력이 있는 환자를 노출군으로 정의.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_294",
+  "text": "졸레드론산 처방 이력이 있는 환자를 비교군으로 정의.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_295",
+  "text": "위약/비노출 대조군: 연구 약물(로모소주맙) 미노출 — 대상: 골다공증",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_297",
+  "text": "관찰기간이 2021-09-15부터 2027-03-31까지의 기간과 겹치는 환자.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_298",
+  "text": "로모소주맙 최초 처방일을 기준 시점으로 정의.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_260",
+  "text": "혈당 측정 기록이고 제2형 당뇨병 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_299",
+  "text": "기준시점(로모소주맙 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 24개월)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_300",
+  "text": "사망·자료 관찰 종료·추적기간(24개월) 도달 중 가장 먼저 오는 시점 (기준: 로모소주맙 최초 처방일)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_261",
+  "text": "인슐린 처방인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAB",
+  "mixed_answers": "BAABA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "BBBA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 4
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  }
+ },
+ {
+  "qid": "val_264",
+  "text": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_262",
+  "text": "인슐린 처방 이력이 있는 환자를 노출군으로 정의.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_265",
+  "text": "혈당 또는 당화혈색소 측정일과 측정값을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_267",
+  "text": "인슐린 최초 처방일을 기준 시점으로 정의.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_266",
+  "text": "관찰기간이 2018-11-19부터 2021-03-25까지의 기간과 겹치는 환자.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_268",
+  "text": "기준시점(인슐린 최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 6개월)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_269",
+  "text": "사망·자료 관찰 종료·추적기간(6개월) 도달 중 가장 먼저 오는 시점 (기준: 인슐린 최초 처방일)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_415",
+  "text": "현재 연도 기준 연령 60세 이상이고 유방암 진단이고 여성 기록인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_263",
+  "text": "인슐린 최초 처방일을 기준일로 하고 기준일 이전 인슐린 처방 이력이 없는 환자이며 제2형 당뇨병 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_417",
+  "text": "유방절제술 시행 이력이 있는 환자를 노출군으로 정의.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_416",
+  "text": "유방암 진단 또는 심부전 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxoo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_419",
+  "text": "타목시펜 처방 이력이 있는 환자를 비교군으로 설정.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_421",
+  "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정값과 측정일을 조회한다.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_423",
+  "text": "관찰기간이 1993-05-01부터 2010-08-31까지의 기간과 겹치는 환자.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_422",
+  "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_418",
+  "text": "유방절제술 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 유방암 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_424",
+  "text": "유방절제술 최초 시행일을 기준 시점으로 설정.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_425",
+  "text": "기준시점(유방절제술 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 17년)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxoo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_528",
+  "text": "총콜레스테롤 측정 기록이고 LDL 콜레스테롤 측정 기록인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_420",
+  "text": "유방절제술 최초 시행일을 기준일(index date)로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 유방암 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "ABBAA",
+  "mixed_flags": "xooox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 2
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_426",
+  "text": "사망·자료 관찰 종료·추적기간(17년) 도달 중 가장 먼저 오는 시점 (기준: 유방절제술 시술일)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_530",
+  "text": "OMOP CDM measurement 도메인 기록이 있는 환자를 노출군으로 규정.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_532",
+  "text": "OMOP CDM measurement 도메인 기록이 있는 환자를 비교군으로 규정.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_531",
+  "text": "환자별 최초 약물 처방일을 기준일로 설정.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_529",
+  "text": "백내장 진단 또는 치매 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_535",
+  "text": "백내장 최초 진단일을 기준 시점으로 정의.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_533",
+  "text": "백내장 진단 이력이 있는 환자를 비교군으로 정의.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_718",
+  "text": "방사선치료 시행 이력이 있는 환자를 비교군으로 정의.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_720",
+  "text": "전이성 악성 신생물의 최초 발생일을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "BBBBB",
+  "mixed_flags": "xxxxx",
+  "same_answers": "BBBA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 1
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  }
+ },
+ {
+  "qid": "val_721",
+  "text": "유방암 또는 전립선암의 최초 발생일을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_462",
+  "text": "현재 연도 기준 연령 70세 이상이고 고관절 골관절염 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_723",
+  "text": "기준시점(방사선치료 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_464",
+  "text": "골다공증 진단 이력이 있는 환자를 노출군으로 설정.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_463",
+  "text": "골다공증 진단 또는 고관절 골절 진단인 환자.",
+  "set": "val",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_717",
+  "text": "방사선치료 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 유방암 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_719",
+  "text": "유방절제술 최초 시행일을 기준 시점으로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 유방암 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_466",
+  "text": "인공고관절전치환술(THA) 시술군.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_468",
+  "text": "고관절 골관절염 대상 코호트에서 OMOP CDM measurement 테이블의 측정일과 측정값을 확인.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "ABAAB",
+  "mixed_flags": "xxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 2
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_469",
+  "text": "외래 방문의 최초 발생일을 조회.",
+  "set": "val",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_470",
+  "text": "관찰기간이 2014-10-01부터 2018-03-31까지의 기간과 겹치는 환자.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_471",
+  "text": "인공고관절전치환술(THA) 최초 시행일을 기준 시점으로 설정.",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_465",
+  "text": "고관절 전치환술 최초 시행일을 기준 시점으로 하고 기준일 이전 동일 시행 이력이 없는 환자이며 고관절 골관절염 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_472",
+  "text": "기준시점(인공고관절전치환술(THA) 시술일)부터 사망·자료 관찰 종료 중 최초까지 추적 (추적기간: 5년)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_467",
+  "text": "고관절 전치환술 최초 시행일을 기준일로 하고 기준일 이전 동일 시행 이력이 없는 신규 사용자이며 고관절 골관절염 진단 이력이 있는 환자.",
+  "set": "val",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "val_473",
+  "text": "사망·자료 관찰 종료·추적기간(5년) 도달 중 가장 먼저 오는 시점 (기준: 인공고관절전치환술(THA) 시술일)",
+  "set": "val",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_696_test_concept",
+  "text": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+  "set": "eval_ready",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_408_test_paraphrase",
+  "text": "위약/비노출 대조군 코호트 추출: 유방암 환자 중 연구 약물인 유방암 항암화학요법에 노출되지 않은 대상 — 1차 결과: 치료 실행가능성",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_164_test_paraphrase",
+  "text": "관찰 코호트 노출군으로 만성콩팥병 환자를 추출하고, 최초 진단일을 기준일로 계산한다.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_552_test_concept",
+  "text": "메트포르민 최초 처방일을 기준일로 하고 기준일 이전 메트포르민 처방 이력이 없는 환자.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_134_test_concept",
+  "text": "혈청/혈장 요산 측정 기록의 측정일과 측정값을 조회.",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oooxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_649_test_paraphrase",
+  "text": "별도 대조군을 두지 않은 단일 관찰 코호트에서 고관절 골절 환자를 추출하고, 각 대상자의 지표일은 고관절 골절 최초 진단일로 정의한다.",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_598_test_concept",
+  "text": "합병증을 동반하지 않은 당뇨병 대상 코호트 중 OMOP CDM에 관찰기간이 기록된 환자.",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AABAA",
+  "mixed_flags": "xxoxo",
+  "same_answers": "BAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 2
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  }
+ },
+ {
+  "qid": "seed_580_test_paraphrase",
+  "text": "락툴로오스 최초 처방일을 기준시점으로, 각 환자의 사망일과 자료 관찰 종료일 중 빠른 시점까지의 추적 종료일과 종료 사유를 산출하라.",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_177_test_paraphrase",
+  "text": "환자별로 혈액투석이 최초로 발생한 날짜를 조회해 주세요.",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xooox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_735_test_concept",
+  "text": "심부전 환자 대상",
+  "set": "eval_ready",
+  "section": "1.연구대상자",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_611_test_paraphrase",
+  "text": "메트포르민 최초 처방일을 기준으로, 각 환자의 사망일과 자료 관찰 종료일 중 더 빠른 날짜를 추적 종료일로 산출하시오.",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxoxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_19_test_concept",
+  "text": "신장 최초 측정일의 평균값과 84일 후 평균값의 차이를 조회.",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_229_test_slot",
+  "text": "체질량지수 값이 25 초과 또는 심근경색 진단인 환자.",
+  "set": "eval_ready",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_361_test_concept",
+  "text": "메게스트롤 처방 이력이 있고 사이클로포스파미드 처방 이력이 없는 환자를 비교군으로 정의.",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxoxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_326_test_paraphrase",
+  "text": "유방암 진단력이 있는 환자들을 노출군 코호트로 추출한다.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_107_test_concept",
+  "text": "고혈압성 신부전 진단 또는 에날라프릴 처방 이력이 있는 환자를 노출군으로 정의.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_757_test_paraphrase",
+  "text": "각 환자의 심근경색, 뇌졸중, 저혈당 최초 발생일을 진단별로 집계해줘.",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 7,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 3,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_97_test_restructure",
+  "text": "OMOP CDM drug_exposure 테이블에 약물 노출 기록이 있는 환자를 비교군으로 정의.",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_492_test_restructure",
+  "text": "본태성 고혈압 대상 코호트 중 OMOP CDM에 관찰기간이 기록된 환자.",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_35_test_restructure",
+  "text": "암로디핀 최초 처방일부터 사망일, 자료 관찰 종료일, 3년 도달일 중 가장 이른 날짜를 추적 종료일로 정의",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_747_test_paraphrase",
+  "text": "각 환자의 생존 여부(사망 또는 생존)와 사망일을 조회해 주세요.",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "BAABB",
+  "mixed_flags": "oxxxx",
+  "same_answers": "BAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 4
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 2,
+   "minority": 1
+  }
+ },
+ {
+  "qid": "seed_71_test_slot",
+  "text": "18세 미만 또는 여성인 환자.",
+  "set": "eval_ready",
+  "section": "1.연구대상자",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_661_test_concept",
+  "text": "심부전 최초 진단일부터 사망일과 자료 관찰 종료일 중 가장 이른 날짜를 추적 종료일로 정의.",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "ooxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_638_test_slot",
+  "text": "metformin 유발 젖산산증(MALA: pH≤7.30 & 동맥 lactate 상승)",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "HARD",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_116_test_slot",
+  "text": "현재 연도 기준 연령 65세 이상이고 75세 이하이고 체질량지수 값이 30 초과이고 심부전 진단인 환자.",
+  "set": "eval_ready",
+  "section": "1.연구대상자",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 0,
+   "distinct": 0,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_244_test_paraphrase",
+  "text": "빌다글립틴 투약 기록이 없는 환자를 비교군으로 추출한다.",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_184_test_restructure",
+  "text": "OMOP CDM procedure_occurrence 테이블에 시술 기록이 있는 환자를 노출군으로 설정.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oooox",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 8,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_477_test_restructure",
+  "text": "졸레드론산 최초 처방일을 기준 시점으로 하고 기준일 이전 졸레드론산 처방 이력이 없는 환자이며 골다공증 진단 이력이 있는 환자.",
+  "set": "eval_ready",
+  "section": "2.노출군",
+  "difficulty": "MEDIUM",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xxxxo",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_618_test_concept",
+  "text": "심근경색·뇌졸중·전심근경색증 신규 발생(예측 대상 사건)",
+  "set": "eval_ready",
+  "section": "4.결과",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "oxxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_690_test_restructure",
+  "text": "OMOP CDM procedure 도메인 기록이 있는 환자를 비교군으로 설정.",
+  "set": "eval_ready",
+  "section": "3.비교군",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "BCAAB",
+  "mixed_flags": "oxxox",
+  "same_answers": "BBBB",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 3,
+   "minority": 3
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 3,
+   "minority": 3
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 2,
+   "minority": 1
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_514_test_concept",
+  "text": "암로디핀 최초 처방일을(를) 기준 시점(index date)으로 정의 (대상: 심근경색전증후군)",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "EASY",
+  "seq_answers": "AAAAA",
+  "mixed_answers": "AAAAA",
+  "mixed_flags": "xoxxx",
+  "same_answers": "AAAA",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par": {
+   "n": 9,
+   "distinct": 1,
+   "minority": 0
+  },
+  "par_ours": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed_ours": {
+   "n": 1,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ },
+ {
+  "qid": "seed_547_test_restructure",
+  "text": "기준시점(trimetazidine  최초 처방일)부터 사망·자료 관찰 종료 중 최초까지 추적",
+  "set": "eval_ready",
+  "section": "5.기간설정",
+  "difficulty": "HARD",
+  "seq_answers": "AAABB",
+  "mixed_answers": "BBBAB",
+  "mixed_flags": "oxxxo",
+  "same_answers": "BBBB",
+  "same_flags": "oooo",
+  "seq": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "seq_ours": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 2
+  },
+  "par": {
+   "n": 9,
+   "distinct": 2,
+   "minority": 1
+  },
+  "par_ours": {
+   "n": 6,
+   "distinct": 1,
+   "minority": 0
+  },
+  "mixed": {
+   "n": 5,
+   "distinct": 2,
+   "minority": 1
+  },
+  "mixed_ours": {
+   "n": 2,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  },
+  "same_ours": {
+   "n": 4,
+   "distinct": 1,
+   "minority": 0
+  }
+ }
+]
