@@ -5,9 +5,9 @@
 - /rag 가 실패(개념 못 찾음 등)한 질의는 버리고 다음 후보로 넘어가 --n 개를 채운다.
 - 외부 노출 서버라 호출 사이에 --delay 초 쉰다. 이미 받은 rag/*.json 은 다시 부르지 않는다(재실행 안전).
 - API 키는 환경변수 TTS_API_KEY 로만 받는다(파일에 저장하지 않음).
-실행: TTS_API_KEY=... python3 prepare.py [--n 50] [--source tts|testset] [--delay 3]
+실행: TTS_API_KEY=... python3 prepare.py [--n 50] [--source tts|testset] [--delay 3] [--exclude-rag ../tts_seq50/rag]
 """
-import argparse, json, os, random, time
+import argparse, json, os, pathlib, random, time
 import requests
 from common import ROOT, HARNESS, TTS_DIR, TTS_URL, RAG_DIR, REQUESTS, build_request, llm_url, tts_config
 
@@ -39,7 +39,12 @@ def main():
     ap.add_argument("--source", choices=["tts", "testset"], default="tts")
     ap.add_argument("--delay", type=float, default=3.0)
     ap.add_argument("--top-k", type=int, default=5)
+    ap.add_argument("--exclude-rag", action="append", default=[],
+                    help="이미 쓴 질의 제외: 이 폴더(다른 시험의 rag/)에 파일이 있는 qid 는 건너뜀. 여러 번 줄 수 있음")
     a = ap.parse_args()
+    excluded = {f.stem for d in a.exclude_rag for f in pathlib.Path(d).glob("*.json")}
+    if a.exclude_rag:
+        print(f"제외: {len(excluded)}개 질의 ({', '.join(a.exclude_rag)})")
     key = os.environ.get("TTS_API_KEY")
     if not key:
         raise SystemExit("TTS_API_KEY 환경변수가 필요합니다.")
@@ -48,6 +53,8 @@ def main():
     for c in candidates(a.source):
         if len(ok) >= a.n:
             break
+        if c["qid"] in excluded:
+            continue
         f = RAG_DIR / f"{c['qid']}.json"
         if f.exists():
             d = json.load(open(f, encoding="utf-8"))

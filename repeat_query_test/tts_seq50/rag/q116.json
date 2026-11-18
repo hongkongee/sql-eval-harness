@@ -1,0 +1,17 @@
+{
+ "qid": "q116",
+ "text": "혈당의 최고 측정값을 조회.",
+ "gold": null,
+ "rag_request": {
+  "query": "혈당의 최고 측정값을 조회.",
+  "top_k": 5
+ },
+ "rag_response": {
+  "text": "혈당의 최고 측정값을 조회.",
+  "success": false,
+  "status": "failed",
+  "error": "'측정값'에 해당하는 개념을 찾지 못했습니다.",
+  "error_kind": "concept_unmapped"
+ },
+ "fetched_at": "2026-11-17 17:54:11"
+}

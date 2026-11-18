@@ -1,0 +1,917 @@
+[
+ {
+  "qid": "q058",
+  "text": "2018년 이후 백내장 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) AND co.condition_start_date >= DATE '2018-01-01');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q104",
+  "text": "혈당 값이 200 이상인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3004501)) AND m.value_as_number >= 200);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q100",
+  "text": "알츠하이머병 진단 이력이 있고 슬관절 치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (378419))) AND EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (43531648)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q004",
+  "text": "로수바스타틴 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1510813)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q112",
+  "text": "혈청 또는 혈장 총 칼슘 값이 10.5 이상인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3006906)) AND m.value_as_number >= 10.5);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q060",
+  "text": "2018년에 인공고관절전치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND po.procedure_date BETWEEN DATE '2018-01-01' AND DATE '2018-12-31');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q074",
+  "text": "데노수맙 최종 처방일을 조회.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT de.person_id, MAX(de.drug_exposure_end_date) AS final_exposure_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (40222444)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q023",
+  "text": "유방절제술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37164749, 4066543, 4129188, 4275911, 4322169)) );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q031",
+  "text": "2015-01-01부터 2020-12-31까지 세마글루타이드 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (793143)) AND de.drug_exposure_start_date >= DATE '2015-01-01' AND de.drug_exposure_end_date <= DATE '2020-12-31');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q026",
+  "text": "2014-01-01부터 2018-12-31까지 메트포르민 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1503297)) AND de.drug_exposure_start_date >= DATE '2014-01-01' AND de.drug_exposure_start_date <= DATE '2018-12-31' );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q048",
+  "text": "지난 6개월 이내 인공고관절전치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)) AND po.procedure_date BETWEEN DATE '2026-05-17' AND DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q070",
+  "text": "메트포르민 최초 처방일을 조회.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT de.person_id, MIN(de.drug_exposure_start_date) AS index_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1503297)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q024",
+  "text": "전립선절제술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4235738)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q068",
+  "text": "백내장의 최초 발생일을 조회.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT co.person_id, MIN(co.condition_start_date) AS first_event_date FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545, 380513, 37108936, 4109548, 4237072)) GROUP BY co.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q076",
+  "text": "남성이고 골다공증 진단인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE p.gender_concept_id = 8507 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q017",
+  "text": "협심증 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (321318)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q086",
+  "text": "주상병이 본태성 고혈압인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (320128)) AND co.condition_type_concept_id = (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (32902)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q030",
+  "text": "2012-01-01부터 2016-12-31까지 데노수맙 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (40222444)) AND de.drug_exposure_start_date >= DATE '2012-01-01' AND de.drug_exposure_start_date <= DATE '2016-12-31');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q003",
+  "text": "심바스타틴 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1539403)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q077",
+  "text": "여성이고 심부전 진단인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE p.gender_concept_id = 8532 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139, 314378, 318445, 439846, 4273632)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q009",
+  "text": "도네페질 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (715997)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q108",
+  "text": "LDL 콜레스테롤 값이 160 이상인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3028437, 3009966, 3028288)) AND m.value_as_number >= 160);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q044",
+  "text": "최근 1년 이내 백내장 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545)) AND co.condition_start_date >= DATE '2025-11-17' AND co.condition_start_date <= DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q085",
+  "text": "외래 방문 기록이 있고 뇌졸중 진단인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM visit_occurrence vo WHERE vo.person_id = p.person_id AND vo.visit_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (9202))) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (381316)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q099",
+  "text": "백내장 진단 이력이 있고 인공고관절전치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (375545))) AND EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4203771)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q045",
+  "text": "최근 2년 이내 알츠하이머병 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (378419)) AND co.condition_start_date >= DATE '2024-11-17' AND co.condition_start_date <= DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q047",
+  "text": "최근 5년 이내 이상지질혈증 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4159131, 432867)) AND co.condition_start_date BETWEEN DATE '2021-11-17' AND DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q081",
+  "text": "여성이고 알츠하이머병 진단인 환자.",
+  "seq": "AAABB",
+  "n": 5,
+  "distinct": 2,
+  "n_alone": 5,
+  "distinct_alone": 2,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 3,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE p.gender_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (8532)) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (378419)));",
+    "diff_vs_A": null,
+    "exec": {
+     "rows": 1911,
+     "hash": "da3ce2f6"
+    }
+   },
+   {
+    "label": "B",
+    "count": 2,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE p.gender_concept_id = 8532 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (378419)));",
+    "diff_vs_A": "…WHERE p . gender_concept_id IN ( SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN ( 8532 ) ) AND…  →  …WHERE p . gender_concept_id = 8532 AND EXISTS (…",
+    "exec": {
+     "rows": 1911,
+     "hash": "da3ce2f6"
+    }
+   }
+  ],
+  "same_result": true
+ },
+ {
+  "qid": "q038",
+  "text": "관찰기간이 2016-11-01부터 2020-04-30까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2020-04-30' AND op.observation_period_end_date >= DATE '2016-11-01';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q011",
+  "text": "골다공증 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (80502)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q025",
+  "text": "고관절 부분치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4010119)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q049",
+  "text": "지난 12개월 이내 슬관절 치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (43531648)) AND po.procedure_date BETWEEN DATE '2025-11-17' AND DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q051",
+  "text": "지난 24개월 이내 항암화학요법을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence de WHERE de.person_id = p.person_id AND de.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4273629)) AND de.procedure_date BETWEEN DATE '2024-11-17' AND DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q105",
+  "text": "eGFR 값이 60 미만인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (37208635, 42536048, 44808279, 1092279, 37393011)) AND m.value_as_number < 60);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q094",
+  "text": "현재 연도 기준 연령 55세 이상이고 75세 미만이고 이상지질혈증 진단인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-17') - EXTRACT(YEAR FROM p.birth_datetime)) >= 55 AND (EXTRACT(YEAR FROM DATE '2026-11-17') - EXTRACT(YEAR FROM p.birth_datetime)) < 75 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4159131)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q014",
+  "text": "치매 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4182210)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q053",
+  "text": "지난 18개월 이내 전립선절제술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4235738)) AND po.procedure_date >= DATE '2026-11-17' - INTERVAL '18 MONTH' AND po.procedure_date <= DATE '2026-11-17');",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q022",
+  "text": "항암화학요법을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4273629)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q073",
+  "text": "로수바스타틴 최종 처방일을 조회.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT de.person_id, MAX(de.drug_exposure_end_date) AS final_prescription_date FROM drug_exposure de WHERE de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1510813)) GROUP BY de.person_id;",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q092",
+  "text": "현재 연도 기준 연령 50세 이상이고 70세 미만이고 알츠하이머병 진단인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE (EXTRACT(YEAR FROM DATE '2026-11-17') - EXTRACT(YEAR FROM p.birth_datetime)) >= 50 AND (EXTRACT(YEAR FROM DATE '2026-11-17') - EXTRACT(YEAR FROM p.birth_datetime)) < 70 AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (378419)))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q036",
+  "text": "관찰기간이 2019-01-01부터 2022-12-31까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2022-12-31' AND op.observation_period_end_date >= DATE '2019-01-01';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q020",
+  "text": "슬관절 치환술을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (43531648)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q007",
+  "text": "엠파글리플로진 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (45774751)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q103",
+  "text": "크레아티닌 값이 1.5 초과인 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM measurement m WHERE m.person_id = p.person_id AND m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (3016723)) AND m.value_as_number > 1.5);",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q096",
+  "text": "심부전 진단이고 아토르바스타틴 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139))) AND EXISTS (SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1545958)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q021",
+  "text": "혈액투석을 받은 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM procedure_occurrence po WHERE po.person_id = p.person_id AND po.procedure_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4120120)));",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q119",
+  "text": "PSA 측정 기록의 측정일과 측정값을 조회.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.unit_source_value FROM measurement m WHERE m.measurement_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4272032))",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q029",
+  "text": "2017-01-01부터 2021-12-31까지 로수바스타틴 처방 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = p.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1510813)) AND de.drug_exposure_start_date >= DATE '2017-01-01' AND de.drug_exposure_end_date <= DATE '2021-12-31' );",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q035",
+  "text": "관찰기간이 2012-06-15부터 2016-02-28까지의 기간과 겹치는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT op.person_id, op.observation_period_start_date, op.observation_period_end_date FROM observation_period op WHERE op.observation_period_start_date <= DATE '2016-02-28' AND op.observation_period_end_date >= DATE '2012-06-15';",
+    "diff_vs_A": null
+   }
+  ]
+ },
+ {
+  "qid": "q055",
+  "text": "2021년 이후 심부전 진단 이력이 있는 환자.",
+  "seq": "AAAAA",
+  "n": 5,
+  "distinct": 1,
+  "n_alone": 5,
+  "distinct_alone": 1,
+  "alone_flags": "ooooo",
+  "variants": [
+   {
+    "label": "A",
+    "count": 5,
+    "sql": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139)) AND co.condition_start_date >= DATE '2021-01-01');",
+    "diff_vs_A": null
+   }
+  ]
+ }
+]

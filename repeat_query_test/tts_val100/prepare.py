@@ -1,0 +1,116 @@
+"""1단계: 질의마다 TTS /rag 를 '한 번만' 불러 프롬프트를 고정하고 requests.json 을 만든다.
+
+- 질의 출처: --source file     → candidates.json (select_queries.py 결과: val 68 + eval_ready 32 + 예비, 기본)
+             --source tts      → TTS 프로젝트 tests/test_queries_100.txt
+             --source testset  → test_set/eval_ready/*.jsonl (정답 SQL 있음, 4종 고르게)
+- /rag 가 concept_unmapped 로 실패하면 테스트셋 input 의 concept_id 를 확정 개념(concepts)으로 넣어 1번만 다시 부른다
+  (지난번 seed_240·seed_263 과 같은 방식, concepts_given=True 로 표시). 그래도 실패하면 버리고 예비 후보로 채운다.
+- 외부 노출 서버라 호출 사이에 --delay 초 쉰다. 이미 받은 rag/*.json 은 다시 부르지 않는다(재실행 안전).
+- API 키는 환경변수 TTS_API_KEY 로만 받는다(파일에 저장하지 않음).
+실행: TTS_API_KEY=... python3 prepare.py [--n 50] [--source tts|testset] [--delay 3] [--exclude-rag ../tts_seq50/rag]
+"""
+import argparse, json, os, pathlib, random, re, time
+import requests
+from common import ROOT, HARNESS, TTS_DIR, TTS_URL, RAG_DIR, REQUESTS, build_request, llm_url, tts_config
+
+
+def candidates(source):
+    if source == "file":                    # select_queries.py 가 만든 목록 (val 68 → eval_ready 32 → 예비)
+        return json.load(open(ROOT / "candidates.json", encoding="utf-8"))
+    if source == "tts":
+        lines = [l.strip() for l in open(TTS_DIR / "tests/test_queries_100.txt", encoding="utf-8") if l.strip()]
+        out = [{"qid": f"q{i + 1:03d}", "text": t, "gold": None} for i, t in enumerate(lines)]
+        random.Random(0).shuffle(out)       # 파일이 유형별로 묶여 있어(앞쪽은 '처방 이력' 위주) 고르게 섞어서 뽑는다
+        return out
+    out, rng = [], random.Random(0)
+    per = {}
+    for f in sorted((HARNESS / "test_set/eval_ready").glob("*.jsonl")):
+        rows = [json.loads(l) for l in open(f, encoding="utf-8")]
+        rng.shuffle(rows); per[f.stem] = rows
+    seen = set()
+    while any(per.values()):                                   # 4종을 번갈아 하나씩, seed 중복 없이
+        for k in list(per):
+            while per[k]:
+                r = per[k].pop()
+                if r["seed_id"] not in seen:
+                    seen.add(r["seed_id"]); out.append({"qid": r["id"], "text": r["text"], "gold": r["query"]}); break
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--n", type=int, default=50)
+    ap.add_argument("--source", choices=["file", "tts", "testset"], default="file")
+    ap.add_argument("--delay", type=float, default=3.0)
+    ap.add_argument("--top-k", type=int, default=5)
+    ap.add_argument("--exclude-rag", action="append", default=[],
+                    help="이미 쓴 질의 제외: 이 폴더(다른 시험의 rag/)에 파일이 있는 qid 는 건너뜀. 여러 번 줄 수 있음")
+    a = ap.parse_args()
+    excluded = {f.stem for d in a.exclude_rag for f in pathlib.Path(d).glob("*.json")}
+    if a.exclude_rag:
+        print(f"제외: {len(excluded)}개 질의 ({', '.join(a.exclude_rag)})")
+    key = os.environ.get("TTS_API_KEY")
+    if not key:
+        raise SystemExit("TTS_API_KEY 환경변수가 필요합니다.")
+    RAG_DIR.mkdir(exist_ok=True)
+    ok, calls = [], 0
+    for c in candidates(a.source):
+        if len(ok) >= a.n:
+            break
+        if c["qid"] in excluded:
+            continue
+        f = RAG_DIR / f"{c['qid']}.json"
+        if f.exists():
+            d = json.load(open(f, encoding="utf-8"))
+        else:
+            body = {"query": c["text"], "top_k": a.top_k}
+            tries, http_ok = [], True
+            for attempt in range(2):
+                try:
+                    r = requests.post(f"{TTS_URL}/rag", json=body, timeout=180,
+                                      headers={"Content-Type": "application/json", "X-API-Key": key})
+                    if r.status_code in (401, 403):             # 키 문제 → 바로 중단 (실패를 저장하지 않음)
+                        raise SystemExit(f"/rag 인증 실패 {r.status_code}: {r.text[:200]} — TTS_API_KEY·TTS_URL({TTS_URL}) 확인")
+                    resp = r.json()
+                    http_ok = r.status_code in (200, 422)         # 422 = 개념 못 찾음 등 '질의 자체' 실패 → 저장
+                except SystemExit:
+                    raise
+                except Exception as e:                            # noqa: BLE001
+                    resp, http_ok = {"success": False, "error": f"{type(e).__name__}: {e}"}, False
+                calls += 1
+                tries.append({"request": body, "response": resp})
+                # 개념을 못 찾으면 테스트셋 input 의 '개념 값 조건'에서 concept_id 를 확정 개념으로 넣어 1번만 다시 부름
+                given = [{"keyword": k, "concept_id": int(ids.split(",")[0])}
+                         for k, ids in re.findall(r'"([^"]+)" → [\w.]+ IN \(([\d, ]+)\)', c.get("input") or "")]
+                if attempt == 0 and http_ok and resp.get("error_kind") == "concept_unmapped" and given:
+                    body = {**body, "concepts": given}
+                    time.sleep(a.delay)
+                    continue
+                break
+            d = {**c, "rag_request": body, "rag_response": resp, "concepts_given": "concepts" in body,
+                 "tries": tries, "fetched_at": time.strftime("%F %T")}
+            if http_ok:                                           # 서버 오류·타임아웃은 저장 안 함 → 재실행 때 다시 시도
+                json.dump(d, open(f, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+            time.sleep(a.delay)
+        resp = d["rag_response"]
+        good = bool(resp.get("success") and resp.get("prompt"))
+        tag = "+개념" if d.get("concepts_given") else ""
+        print(f"{c['qid']:28} {'OK  ' if good else 'SKIP'}{tag:4} {resp.get('status')} {resp.get('error_kind') or ''} | {c['text'][:50]}", flush=True)
+        if good:
+            ok.append(d)
+    reqs = {}
+    for d in ok:
+        body, restore = build_request(d["rag_response"])
+        reqs[d["qid"]] = {"text": d["text"], "gold": d["gold"], "body": body, "restore": restore,
+                          "set": d.get("set"), "section": d.get("section"), "difficulty": d.get("difficulty"),
+                          "query_type": d.get("query_type"), "concepts_given": d.get("concepts_given", False)}
+    json.dump(reqs, open(REQUESTS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f"\n/rag 호출 {calls}번, 프롬프트 확보 {len(ok)}/{a.n}개 → {REQUESTS.name}")
+    print(f"LLM 설정 (TTS config): {llm_url()} model={tts_config.NL2SQL_MODEL} "
+          f"temperature={tts_config.NL2SQL_TEMPERATURE} max_tokens={tts_config.NL2SQL_MAX_TOKENS}")
+    if len(ok) < a.n:
+        print(f"주의: 후보가 모자라 {len(ok)}개만 확보했습니다.")
+
+
+if __name__ == "__main__":
+    main()

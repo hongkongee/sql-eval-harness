@@ -1,0 +1,299 @@
+{
+ "qid": "q070",
+ "text": "메트포르민 최초 처방일을 조회.",
+ "gold": null,
+ "rag_request": {
+  "query": "메트포르민 최초 처방일을 조회.",
+  "top_k": 5
+ },
+ "rag_response": {
+  "text": "메트포르민 최초 처방일을 조회.",
+  "success": true,
+  "status": "success",
+  "concepts": [
+   {
+    "surface": "메트포르민",
+    "candidates": [
+     {
+      "concept_id": 1503297,
+      "ko": "메트포르민",
+      "en": "metformin",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.2122326203208556,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     }
+    ]
+   }
+  ],
+  "schemas": [
+   {
+    "table_name": "concept_ancestor",
+    "table_name_ko": "개념 계층",
+    "pk": null,
+    "columns": [
+     {
+      "column": "ancestor_concept_id",
+      "column_ko": "상위 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "descendant_concept_id",
+      "column_ko": "하위 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "min_levels_of_separation",
+      "column_ko": "최소 계층 간격",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "max_levels_of_separation",
+      "column_ko": "최대 계층 간격",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": null,
+    "end_date": null
+   },
+   {
+    "table_name": "drug_exposure",
+    "table_name_ko": "약물 노출",
+    "pk": "drug_exposure_id",
+    "columns": [
+     {
+      "column": "drug_exposure_id",
+      "column_ko": "약물 노출 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_concept_id",
+      "column_ko": "약물 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_start_date",
+      "column_ko": "약물 노출 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_start_datetime",
+      "column_ko": "약물 노출 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_end_date",
+      "column_ko": "약물 노출 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_end_datetime",
+      "column_ko": "약물 노출 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "drug_type_concept_id",
+      "column_ko": "약물 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "quantity",
+      "column_ko": "수량",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "days_supply",
+      "column_ko": "공급 일수",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_source_concept_id",
+      "column_ko": "약물 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "drug_exposure_start_date",
+    "end_date": "drug_exposure_end_date"
+   },
+   {
+    "table_name": "person",
+    "table_name_ko": "환자",
+    "pk": "person_id",
+    "columns": [
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "gender_concept_id",
+      "column_ko": "성별 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "MALE",
+        "id": "8507",
+        "ko": "남성"
+       },
+       {
+        "en": "FEMALE",
+        "id": "8532",
+        "ko": "여성"
+       }
+      ],
+      "enum": [
+       {
+        "id": "8507",
+        "name": "남성(MALE)"
+       },
+       {
+        "id": "8532",
+        "name": "여성(FEMALE)"
+       }
+      ]
+     },
+     {
+      "column": "birth_datetime",
+      "column_ko": "출생 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "race_concept_id",
+      "column_ko": "인종 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Korean",
+        "id": "38003585",
+        "ko": "한국인"
+       },
+       {
+        "en": "Other Race",
+        "id": "8522",
+        "ko": "기타 인종"
+       }
+      ],
+      "enum": [
+       {
+        "id": "38003585",
+        "name": "한국인(Korean)"
+       },
+       {
+        "id": "8522",
+        "name": "기타 인종(Other Race)"
+       }
+      ]
+     }
+    ],
+    "event_date": "birth_datetime",
+    "end_date": null
+   }
+  ],
+  "joins": [
+   {
+    "from": "drug_exposure.person_id",
+    "to": "person.person_id"
+   }
+  ],
+  "schema_domains": [
+   "Drug",
+   "Ethnicity",
+   "Gender",
+   "Race",
+   "Route"
+  ],
+  "prompt": "[질의]\n메트포르민 최초 처방일을 조회.\n\n[재료]\n기준일: DATE '2026-11-17'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n조건:\n  - [OPERATOR] \"최초\" (환자별 최초 시점(MIN(이벤트 날짜)) 기준)\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"메트포르민\":\n      · 1503297  metformin / 메트포르민  [Drug → drug_exposure.drug_concept_id]\n테이블(컬럼 전체):\n  # concept_ancestor(개념 계층) PK=None\n    - ancestor_concept_id (상위 개념 ID) integer  [→concept]\n    - descendant_concept_id (하위 개념 ID) integer  [→concept]\n    - min_levels_of_separation (최소 계층 간격) integer\n    - max_levels_of_separation (최대 계층 간격) integer\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - drug_exposure_end_date (약물 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n조인:\n  - drug_exposure.person_id = person.person_id"
+ },
+ "fetched_at": "2026-11-17 17:52:59"
+}
