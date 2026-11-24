@@ -1,0 +1,1513 @@
+{
+ "qid": "val_422",
+ "set": "val",
+ "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+ "gold": "SELECT m.person_id, m.measurement_concept_id, m.measurement_date, m.value_as_number, m.unit_concept_id FROM measurement m WHERE m.person_id IN ( SELECT person_id FROM condition_occurrence WHERE condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4112853)) );",
+ "input": "[재료]\n개념 값 조건:\n  - \"유방암\" → condition_occurrence.condition_concept_id IN (4112853)\n테이블(컬럼 전체):\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime\n    - device_exposure_end_date (기기 노출 종료 일자) date\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # measurement(검사) PK=measurement_id\n    - measurement_id (검사 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - measurement_concept_id (검사 개념 ID) integer  [→concept]\n    - measurement_date (검사 일자) date\n    - measurement_datetime (검사 일시) datetime\n    - measurement_time (검사 시각) varchar(10)\n    - measurement_type_concept_id (검사 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - unit_concept_id (단위 개념 ID) integer  [→concept]\n    - range_low (참조 범위 하한) float\n    - range_high (참조 범위 상한) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - measurement_source_concept_id (검사 원천 개념 ID) integer  [→concept]\n  # observation(관찰) PK=observation_id\n    - observation_id (관찰 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - observation_concept_id (관찰 개념 ID) integer  [→concept]\n    - observation_date (관찰 일자) date\n    - observation_datetime (관찰 일시) datetime\n    - observation_type_concept_id (관찰 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - observation_source_value (관찰 원천값) varchar(50)\n    - observation_source_concept_id (관찰 원천 개념 ID) integer  [→concept]\n    - unit_source_value (단위 원천값) varchar(50)\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n    - birth_datetime (출생 일시) datetime\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date\n    - condition_start_datetime (진단 시작 일시) datetime\n    - condition_end_date (진단 종료 일자) date\n    - condition_end_datetime (진단 종료 일시) datetime\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n조인:\n  - device_exposure.person_id = person.person_id\n  - measurement.person_id = person.person_id\n  - observation.person_id = person.person_id\n  - condition_occurrence.person_id = person.person_id",
+ "section": "4.결과",
+ "query_type": "VALUE_RETRIEVAL",
+ "difficulty": "EASY",
+ "template": "○ 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 V",
+ "rag_request": {
+  "query": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+  "top_k": 5
+ },
+ "rag_response": {
+  "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+  "success": true,
+  "status": "success",
+  "concepts": [
+   {
+    "surface": "유방암",
+    "candidates": [
+     {
+      "concept_id": 4112853,
+      "ko": "유방암",
+      "en": "Malignant tumor of breast",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.2727272727272727,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 73819,
+      "ko": "유방통",
+      "en": "Pain of breast",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.15384615384615385,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 444411,
+      "ko": "유방의 피부의 제자리암종",
+      "en": "Carcinoma in situ of skin of trunk",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.13333333333333333,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 37164749,
+      "ko": "유방절제",
+      "en": "Excision of breast",
+      "domain": "Procedure",
+      "target_column": "procedure_occurrence.procedure_concept_id",
+      "rrf_score": 0.12698412698412698,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 78473,
+      "ko": "유방의 낭",
+      "en": "Solitary cyst of breast",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.09791666666666667,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     }
+    ]
+   }
+  ],
+  "schemas": [
+   {
+    "table_name": "condition_occurrence",
+    "table_name_ko": "진단 발생",
+    "pk": "condition_occurrence_id",
+    "columns": [
+     {
+      "column": "condition_occurrence_id",
+      "column_ko": "진단 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_concept_id",
+      "column_ko": "진단 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_date",
+      "column_ko": "진단 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_datetime",
+      "column_ko": "진단 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_date",
+      "column_ko": "진단 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_datetime",
+      "column_ko": "진단 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "condition_type_concept_id",
+      "column_ko": "진단 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_status_concept_id",
+      "column_ko": "진단 상태 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Secondary diagnosis",
+        "id": "32908",
+        "ko": "부상병"
+       },
+       {
+        "en": "Primary diagnosis",
+        "id": "32902",
+        "ko": "주상병"
+       }
+      ],
+      "enum": [
+       {
+        "id": "32908",
+        "name": "부상병(Secondary diagnosis)"
+       },
+       {
+        "id": "32902",
+        "name": "주상병(Primary diagnosis)"
+       }
+      ]
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_source_concept_id",
+      "column_ko": "진단 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "condition_start_date",
+    "end_date": "condition_end_date"
+   },
+   {
+    "table_name": "device_exposure",
+    "table_name_ko": "기기 노출",
+    "pk": "device_exposure_id",
+    "columns": [
+     {
+      "column": "device_exposure_id",
+      "column_ko": "기기 노출 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_start_date",
+      "column_ko": "기기 노출 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_start_datetime",
+      "column_ko": "기기 노출 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_end_date",
+      "column_ko": "기기 노출 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_end_datetime",
+      "column_ko": "기기 노출 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "device_type_concept_id",
+      "column_ko": "기기 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "quantity",
+      "column_ko": "수량",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_source_value",
+      "column_ko": "기기 원천값",
+      "datatype": "varchar(50)",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_source_concept_id",
+      "column_ko": "기기 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "device_exposure_start_date",
+    "end_date": "device_exposure_end_date"
+   },
+   {
+    "table_name": "measurement",
+    "table_name_ko": "검사",
+    "pk": "measurement_id",
+    "columns": [
+     {
+      "column": "measurement_id",
+      "column_ko": "검사 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "measurement_concept_id",
+      "column_ko": "검사 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "measurement_date",
+      "column_ko": "검사 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "measurement_datetime",
+      "column_ko": "검사 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "measurement_time",
+      "column_ko": "검사 시각",
+      "datatype": "varchar(10)",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "measurement_type_concept_id",
+      "column_ko": "검사 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "value_as_number",
+      "column_ko": "숫자형 값",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "range_low",
+      "column_ko": "참조 범위 하한",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "range_high",
+      "column_ko": "참조 범위 상한",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "measurement_source_concept_id",
+      "column_ko": "검사 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "measurement_date",
+    "end_date": null
+   },
+   {
+    "table_name": "observation",
+    "table_name_ko": "관찰",
+    "pk": "observation_id",
+    "columns": [
+     {
+      "column": "observation_id",
+      "column_ko": "관찰 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "observation_concept_id",
+      "column_ko": "관찰 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "observation_date",
+      "column_ko": "관찰 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "observation_datetime",
+      "column_ko": "관찰 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD HH24:MI:SS",
+      "enum_values": null
+     },
+     {
+      "column": "observation_type_concept_id",
+      "column_ko": "관찰 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "value_as_number",
+      "column_ko": "숫자형 값",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "observation_source_value",
+      "column_ko": "관찰 원천값",
+      "datatype": "varchar(50)",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "observation_source_concept_id",
+      "column_ko": "관찰 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "unit_source_value",
+      "column_ko": "단위 원천값",
+      "datatype": "varchar(50)",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "observation_date",
+    "end_date": null
+   },
+   {
+    "table_name": "person",
+    "table_name_ko": "환자",
+    "pk": "person_id",
+    "columns": [
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "gender_concept_id",
+      "column_ko": "성별 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "MALE",
+        "id": "8507",
+        "ko": "남성"
+       },
+       {
+        "en": "FEMALE",
+        "id": "8532",
+        "ko": "여성"
+       }
+      ],
+      "enum": [
+       {
+        "id": "8507",
+        "name": "남성(MALE)"
+       },
+       {
+        "id": "8532",
+        "name": "여성(FEMALE)"
+       }
+      ]
+     },
+     {
+      "column": "birth_datetime",
+      "column_ko": "출생 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "race_concept_id",
+      "column_ko": "인종 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Korean",
+        "id": "38003585",
+        "ko": "한국인"
+       },
+       {
+        "en": "Other Race",
+        "id": "8522",
+        "ko": "기타 인종"
+       }
+      ],
+      "enum": [
+       {
+        "id": "38003585",
+        "name": "한국인(Korean)"
+       },
+       {
+        "id": "8522",
+        "name": "기타 인종(Other Race)"
+       }
+      ]
+     }
+    ],
+    "event_date": "birth_datetime",
+    "end_date": null
+   },
+   {
+    "table_name": "procedure_occurrence",
+    "table_name_ko": "시술 발생",
+    "pk": "procedure_occurrence_id",
+    "columns": [
+     {
+      "column": "procedure_occurrence_id",
+      "column_ko": "시술 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "procedure_concept_id",
+      "column_ko": "시술 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "procedure_date",
+      "column_ko": "시술 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "procedure_datetime",
+      "column_ko": "시술 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "procedure_type_concept_id",
+      "column_ko": "시술 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "quantity",
+      "column_ko": "수량",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "procedure_source_concept_id",
+      "column_ko": "시술 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "procedure_date",
+    "end_date": null
+   }
+  ],
+  "joins": [
+   {
+    "from": "condition_occurrence.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "device_exposure.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "measurement.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "observation.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "procedure_occurrence.person_id",
+    "to": "person.person_id"
+   }
+  ],
+  "schema_domains": [
+   "Device",
+   "Meas Value",
+   "Meas Value Operator",
+   "Measurement",
+   "Observation",
+   "Unit"
+  ],
+  "prompt": "[질의]\n유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"유방암\":\n      · 4112853  Malignant tumor of breast / 유방암  [Condition → condition_occurrence.condition_concept_id]\n      · 73819  Pain of breast / 유방통  [Condition → condition_occurrence.condition_concept_id]\n      · 444411  Carcinoma in situ of skin of trunk / 유방의 피부의 제자리암종  [Condition → condition_occurrence.condition_concept_id]\n      · 37164749  Excision of breast / 유방절제  [Procedure → procedure_occurrence.procedure_concept_id]\n      · 78473  Solitary cyst of breast / 유방의 낭  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - device_exposure_end_date (기기 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # measurement(검사) PK=measurement_id\n    - measurement_id (검사 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - measurement_concept_id (검사 개념 ID) integer  [→concept]\n    - measurement_date (검사 일자) date  [형식: YYYY-MM-DD]\n    - measurement_datetime (검사 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - measurement_time (검사 시각) varchar(10)\n    - measurement_type_concept_id (검사 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - range_low (참조 범위 하한) float\n    - range_high (참조 범위 상한) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - measurement_source_concept_id (검사 원천 개념 ID) integer  [→concept]\n  # observation(관찰) PK=observation_id\n    - observation_id (관찰 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - observation_concept_id (관찰 개념 ID) integer  [→concept]\n    - observation_date (관찰 일자) date  [형식: YYYY-MM-DD]\n    - observation_datetime (관찰 일시) datetime  [형식: YYYY-MM-DD HH24:MI:SS]\n    - observation_type_concept_id (관찰 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - observation_source_value (관찰 원천값) varchar(50)\n    - observation_source_concept_id (관찰 원천 개념 ID) integer  [→concept]\n    - unit_source_value (단위 원천값) varchar(50)\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # procedure_occurrence(시술 발생) PK=procedure_occurrence_id\n    - procedure_occurrence_id (시술 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - procedure_concept_id (시술 개념 ID) integer  [→concept]\n    - procedure_date (시술 일자) date  [형식: YYYY-MM-DD]\n    - procedure_datetime (시술 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - procedure_type_concept_id (시술 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - procedure_source_concept_id (시술 원천 개념 ID) integer  [→concept]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - device_exposure.person_id = person.person_id\n  - measurement.person_id = person.person_id\n  - observation.person_id = person.person_id\n  - procedure_occurrence.person_id = person.person_id"
+ },
+ "concepts_given": false,
+ "tries": [
+  {
+   "request": {
+    "query": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+    "top_k": 5
+   },
+   "response": {
+    "text": "유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.",
+    "success": true,
+    "status": "success",
+    "concepts": [
+     {
+      "surface": "유방암",
+      "candidates": [
+       {
+        "concept_id": 4112853,
+        "ko": "유방암",
+        "en": "Malignant tumor of breast",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.2727272727272727,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 73819,
+        "ko": "유방통",
+        "en": "Pain of breast",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.15384615384615385,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 444411,
+        "ko": "유방의 피부의 제자리암종",
+        "en": "Carcinoma in situ of skin of trunk",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.13333333333333333,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 37164749,
+        "ko": "유방절제",
+        "en": "Excision of breast",
+        "domain": "Procedure",
+        "target_column": "procedure_occurrence.procedure_concept_id",
+        "rrf_score": 0.12698412698412698,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 78473,
+        "ko": "유방의 낭",
+        "en": "Solitary cyst of breast",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.09791666666666667,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       }
+      ]
+     }
+    ],
+    "schemas": [
+     {
+      "table_name": "condition_occurrence",
+      "table_name_ko": "진단 발생",
+      "pk": "condition_occurrence_id",
+      "columns": [
+       {
+        "column": "condition_occurrence_id",
+        "column_ko": "진단 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_concept_id",
+        "column_ko": "진단 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_date",
+        "column_ko": "진단 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_datetime",
+        "column_ko": "진단 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_date",
+        "column_ko": "진단 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_datetime",
+        "column_ko": "진단 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "condition_type_concept_id",
+        "column_ko": "진단 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_status_concept_id",
+        "column_ko": "진단 상태 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Secondary diagnosis",
+          "id": "32908",
+          "ko": "부상병"
+         },
+         {
+          "en": "Primary diagnosis",
+          "id": "32902",
+          "ko": "주상병"
+         }
+        ],
+        "enum": [
+         {
+          "id": "32908",
+          "name": "부상병(Secondary diagnosis)"
+         },
+         {
+          "id": "32902",
+          "name": "주상병(Primary diagnosis)"
+         }
+        ]
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_source_concept_id",
+        "column_ko": "진단 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "condition_start_date",
+      "end_date": "condition_end_date"
+     },
+     {
+      "table_name": "device_exposure",
+      "table_name_ko": "기기 노출",
+      "pk": "device_exposure_id",
+      "columns": [
+       {
+        "column": "device_exposure_id",
+        "column_ko": "기기 노출 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_start_date",
+        "column_ko": "기기 노출 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_start_datetime",
+        "column_ko": "기기 노출 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_end_date",
+        "column_ko": "기기 노출 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_end_datetime",
+        "column_ko": "기기 노출 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "device_type_concept_id",
+        "column_ko": "기기 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "quantity",
+        "column_ko": "수량",
+        "datatype": "integer",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_source_value",
+        "column_ko": "기기 원천값",
+        "datatype": "varchar(50)",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_source_concept_id",
+        "column_ko": "기기 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "device_exposure_start_date",
+      "end_date": "device_exposure_end_date"
+     },
+     {
+      "table_name": "measurement",
+      "table_name_ko": "검사",
+      "pk": "measurement_id",
+      "columns": [
+       {
+        "column": "measurement_id",
+        "column_ko": "검사 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "measurement_concept_id",
+        "column_ko": "검사 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "measurement_date",
+        "column_ko": "검사 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "measurement_datetime",
+        "column_ko": "검사 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "measurement_time",
+        "column_ko": "검사 시각",
+        "datatype": "varchar(10)",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "measurement_type_concept_id",
+        "column_ko": "검사 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "value_as_number",
+        "column_ko": "숫자형 값",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "range_low",
+        "column_ko": "참조 범위 하한",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "range_high",
+        "column_ko": "참조 범위 상한",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "measurement_source_concept_id",
+        "column_ko": "검사 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "measurement_date",
+      "end_date": null
+     },
+     {
+      "table_name": "observation",
+      "table_name_ko": "관찰",
+      "pk": "observation_id",
+      "columns": [
+       {
+        "column": "observation_id",
+        "column_ko": "관찰 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "observation_concept_id",
+        "column_ko": "관찰 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "observation_date",
+        "column_ko": "관찰 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "observation_datetime",
+        "column_ko": "관찰 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD HH24:MI:SS",
+        "enum_values": null
+       },
+       {
+        "column": "observation_type_concept_id",
+        "column_ko": "관찰 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "value_as_number",
+        "column_ko": "숫자형 값",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "observation_source_value",
+        "column_ko": "관찰 원천값",
+        "datatype": "varchar(50)",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "observation_source_concept_id",
+        "column_ko": "관찰 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "unit_source_value",
+        "column_ko": "단위 원천값",
+        "datatype": "varchar(50)",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "observation_date",
+      "end_date": null
+     },
+     {
+      "table_name": "person",
+      "table_name_ko": "환자",
+      "pk": "person_id",
+      "columns": [
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "gender_concept_id",
+        "column_ko": "성별 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "MALE",
+          "id": "8507",
+          "ko": "남성"
+         },
+         {
+          "en": "FEMALE",
+          "id": "8532",
+          "ko": "여성"
+         }
+        ],
+        "enum": [
+         {
+          "id": "8507",
+          "name": "남성(MALE)"
+         },
+         {
+          "id": "8532",
+          "name": "여성(FEMALE)"
+         }
+        ]
+       },
+       {
+        "column": "birth_datetime",
+        "column_ko": "출생 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "race_concept_id",
+        "column_ko": "인종 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Korean",
+          "id": "38003585",
+          "ko": "한국인"
+         },
+         {
+          "en": "Other Race",
+          "id": "8522",
+          "ko": "기타 인종"
+         }
+        ],
+        "enum": [
+         {
+          "id": "38003585",
+          "name": "한국인(Korean)"
+         },
+         {
+          "id": "8522",
+          "name": "기타 인종(Other Race)"
+         }
+        ]
+       }
+      ],
+      "event_date": "birth_datetime",
+      "end_date": null
+     },
+     {
+      "table_name": "procedure_occurrence",
+      "table_name_ko": "시술 발생",
+      "pk": "procedure_occurrence_id",
+      "columns": [
+       {
+        "column": "procedure_occurrence_id",
+        "column_ko": "시술 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "procedure_concept_id",
+        "column_ko": "시술 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "procedure_date",
+        "column_ko": "시술 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "procedure_datetime",
+        "column_ko": "시술 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "procedure_type_concept_id",
+        "column_ko": "시술 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "quantity",
+        "column_ko": "수량",
+        "datatype": "integer",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "procedure_source_concept_id",
+        "column_ko": "시술 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "procedure_date",
+      "end_date": null
+     }
+    ],
+    "joins": [
+     {
+      "from": "condition_occurrence.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "device_exposure.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "measurement.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "observation.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "procedure_occurrence.person_id",
+      "to": "person.person_id"
+     }
+    ],
+    "schema_domains": [
+     "Device",
+     "Meas Value",
+     "Meas Value Operator",
+     "Measurement",
+     "Observation",
+     "Unit"
+    ],
+    "prompt": "[질의]\n유방암 대상 코호트에서 OMOP CDM measurement 테이블의 측정 일자와 측정값을 조회.\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"유방암\":\n      · 4112853  Malignant tumor of breast / 유방암  [Condition → condition_occurrence.condition_concept_id]\n      · 73819  Pain of breast / 유방통  [Condition → condition_occurrence.condition_concept_id]\n      · 444411  Carcinoma in situ of skin of trunk / 유방의 피부의 제자리암종  [Condition → condition_occurrence.condition_concept_id]\n      · 37164749  Excision of breast / 유방절제  [Procedure → procedure_occurrence.procedure_concept_id]\n      · 78473  Solitary cyst of breast / 유방의 낭  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - device_exposure_end_date (기기 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # measurement(검사) PK=measurement_id\n    - measurement_id (검사 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - measurement_concept_id (검사 개념 ID) integer  [→concept]\n    - measurement_date (검사 일자) date  [형식: YYYY-MM-DD]\n    - measurement_datetime (검사 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - measurement_time (검사 시각) varchar(10)\n    - measurement_type_concept_id (검사 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - range_low (참조 범위 하한) float\n    - range_high (참조 범위 상한) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - measurement_source_concept_id (검사 원천 개념 ID) integer  [→concept]\n  # observation(관찰) PK=observation_id\n    - observation_id (관찰 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - observation_concept_id (관찰 개념 ID) integer  [→concept]\n    - observation_date (관찰 일자) date  [형식: YYYY-MM-DD]\n    - observation_datetime (관찰 일시) datetime  [형식: YYYY-MM-DD HH24:MI:SS]\n    - observation_type_concept_id (관찰 유형 개념 ID) integer  [→concept]\n    - value_as_number (숫자형 값) float\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - observation_source_value (관찰 원천값) varchar(50)\n    - observation_source_concept_id (관찰 원천 개념 ID) integer  [→concept]\n    - unit_source_value (단위 원천값) varchar(50)\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # procedure_occurrence(시술 발생) PK=procedure_occurrence_id\n    - procedure_occurrence_id (시술 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - procedure_concept_id (시술 개념 ID) integer  [→concept]\n    - procedure_date (시술 일자) date  [형식: YYYY-MM-DD]\n    - procedure_datetime (시술 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - procedure_type_concept_id (시술 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - procedure_source_concept_id (시술 원천 개념 ID) integer  [→concept]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - device_exposure.person_id = person.person_id\n  - measurement.person_id = person.person_id\n  - observation.person_id = person.person_id\n  - procedure_occurrence.person_id = person.person_id"
+   }
+  }
+ ],
+ "fetched_at": "2026-11-18 11:35:12"
+}

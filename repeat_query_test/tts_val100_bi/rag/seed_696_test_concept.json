@@ -1,0 +1,1077 @@
+{
+ "qid": "seed_696_test_concept",
+ "set": "eval_ready",
+ "text": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+ "gold": "SELECT DISTINCT p.person_id FROM person p WHERE EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (316139))) AND EXISTS (SELECT 1 FROM condition_occurrence co WHERE co.person_id = p.person_id AND co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (4079749)));",
+ "input": "[재료]\n개념 값 조건:\n  - \"심부전\" → condition_occurrence.condition_concept_id IN (316139)\n  - \"고관절 골관절염\" → condition_occurrence.condition_concept_id IN (4079749)\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date\n    - condition_start_datetime (진단 시작 일시) datetime\n    - condition_end_date (진단 종료 일자) date\n    - condition_end_datetime (진단 종료 일시) datetime\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n    - birth_datetime (출생 일시) datetime\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n    - visit_start_date (방문 시작 일자) date\n    - visit_start_datetime (방문 시작 일시) datetime\n    - visit_end_date (방문 종료 일자) date\n    - visit_end_datetime (방문 종료 일시) datetime\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id",
+ "section": "1.연구대상자",
+ "query_type": "COHORT_EXTRACTION",
+ "difficulty": "MEDIUM",
+ "aug": "concept",
+ "kind_size": 24,
+ "template": "○ 진단이고 ○ 진단인 환자.",
+ "rag_request": {
+  "query": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+  "top_k": 5
+ },
+ "rag_response": {
+  "text": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+  "success": true,
+  "status": "success",
+  "concepts": [
+   {
+    "surface": "심부전",
+    "candidates": [
+     {
+      "concept_id": 316139,
+      "ko": "심부전",
+      "en": "Heart failure",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.2727272727272727,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": [
+       439846,
+       4273632,
+       314378
+      ]
+     },
+     {
+      "concept_id": 314378,
+      "ko": "고혈압성 심부전",
+      "en": "Hypertensive heart disease with congestive heart failure",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.18888888888888888,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 1,
+      "subsumes": []
+     },
+     {
+      "concept_id": 318445,
+      "ko": "심장수술후 또는 심장인공삽입물의 존재로 인한 심부전",
+      "en": "Post cardiac operation functional disturbance",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.15948275862068967,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 439846,
+      "ko": "좌심부전",
+      "en": "Left heart failure",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.13574660633484165,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 1,
+      "subsumes": []
+     },
+     {
+      "concept_id": 4273632,
+      "ko": "우심부전",
+      "en": "Right ventricular failure",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.13333333333333333,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 1,
+      "subsumes": []
+     }
+    ]
+   },
+   {
+    "surface": "고관절 골관절염",
+    "candidates": [
+     {
+      "concept_id": 80180,
+      "ko": "골관절염",
+      "en": "Osteoarthritis",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.16025641025641024,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": [
+       4079749
+      ]
+     },
+     {
+      "concept_id": 4079749,
+      "ko": "고관절 골관절염",
+      "en": "Osteoarthritis of hip",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.18181818181818182,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 1,
+      "subsumes": []
+     },
+     {
+      "concept_id": 4138412,
+      "ko": "고관절 골절",
+      "en": "Fracture of proximal end of femur",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.13392857142857142,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 37163124,
+      "ko": "만성 다초점 골수염, 고관절",
+      "en": "Chronic nonbacterial osteomyelitis/chronic recurrent multifocal osteomyelitis",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.10817307692307693,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 4347295,
+      "ko": "만성 다초점 골수염, 고관절",
+      "en": "Chronic osteomyelitis of pelvis",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.10173160173160173,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     }
+    ]
+   }
+  ],
+  "schemas": [
+   {
+    "table_name": "condition_occurrence",
+    "table_name_ko": "진단 발생",
+    "pk": "condition_occurrence_id",
+    "columns": [
+     {
+      "column": "condition_occurrence_id",
+      "column_ko": "진단 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_concept_id",
+      "column_ko": "진단 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_date",
+      "column_ko": "진단 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_datetime",
+      "column_ko": "진단 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_date",
+      "column_ko": "진단 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_datetime",
+      "column_ko": "진단 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "condition_type_concept_id",
+      "column_ko": "진단 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_status_concept_id",
+      "column_ko": "진단 상태 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Secondary diagnosis",
+        "id": "32908",
+        "ko": "부상병"
+       },
+       {
+        "en": "Primary diagnosis",
+        "id": "32902",
+        "ko": "주상병"
+       }
+      ],
+      "enum": [
+       {
+        "id": "32908",
+        "name": "부상병(Secondary diagnosis)"
+       },
+       {
+        "id": "32902",
+        "name": "주상병(Primary diagnosis)"
+       }
+      ]
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_source_concept_id",
+      "column_ko": "진단 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "condition_start_date",
+    "end_date": "condition_end_date"
+   },
+   {
+    "table_name": "person",
+    "table_name_ko": "환자",
+    "pk": "person_id",
+    "columns": [
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "gender_concept_id",
+      "column_ko": "성별 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "MALE",
+        "id": "8507",
+        "ko": "남성"
+       },
+       {
+        "en": "FEMALE",
+        "id": "8532",
+        "ko": "여성"
+       }
+      ],
+      "enum": [
+       {
+        "id": "8507",
+        "name": "남성(MALE)"
+       },
+       {
+        "id": "8532",
+        "name": "여성(FEMALE)"
+       }
+      ]
+     },
+     {
+      "column": "birth_datetime",
+      "column_ko": "출생 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "race_concept_id",
+      "column_ko": "인종 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Korean",
+        "id": "38003585",
+        "ko": "한국인"
+       },
+       {
+        "en": "Other Race",
+        "id": "8522",
+        "ko": "기타 인종"
+       }
+      ],
+      "enum": [
+       {
+        "id": "38003585",
+        "name": "한국인(Korean)"
+       },
+       {
+        "id": "8522",
+        "name": "기타 인종(Other Race)"
+       }
+      ]
+     }
+    ],
+    "event_date": "birth_datetime",
+    "end_date": null
+   },
+   {
+    "table_name": "visit_occurrence",
+    "table_name_ko": "방문 발생",
+    "pk": "visit_occurrence_id",
+    "columns": [
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_concept_id",
+      "column_ko": "방문 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Outpatient Visit",
+        "id": "9202",
+        "ko": "외래"
+       },
+       {
+        "en": "Inpatient Visit",
+        "id": "9201",
+        "ko": "입원"
+       },
+       {
+        "en": "Emergency Room and Inpatient Visit",
+        "id": "262",
+        "ko": "응급실 및 입원"
+       }
+      ],
+      "enum": [
+       {
+        "id": "9202",
+        "name": "외래(Outpatient Visit)"
+       },
+       {
+        "id": "9201",
+        "name": "입원(Inpatient Visit)"
+       },
+       {
+        "id": "262",
+        "name": "응급실 및 입원(Emergency Room and Inpatient Visit)"
+       }
+      ]
+     },
+     {
+      "column": "visit_start_date",
+      "column_ko": "방문 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "visit_start_datetime",
+      "column_ko": "방문 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "visit_end_date",
+      "column_ko": "방문 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "visit_end_datetime",
+      "column_ko": "방문 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "visit_type_concept_id",
+      "column_ko": "방문 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "discharge_to_concept_id",
+      "column_ko": "퇴원처 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Home Visit",
+        "id": "581476",
+        "ko": "가정방문"
+       }
+      ],
+      "enum": [
+       {
+        "id": "581476",
+        "name": "가정방문(Home Visit)"
+       }
+      ]
+     },
+     {
+      "column": "preceding_visit_occurrence_id",
+      "column_ko": "직전 방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "visit_start_date",
+    "end_date": "visit_end_date"
+   }
+  ],
+  "joins": [
+   {
+    "from": "condition_occurrence.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "condition_occurrence.visit_occurrence_id",
+    "to": "visit_occurrence.visit_occurrence_id"
+   },
+   {
+    "from": "visit_occurrence.person_id",
+    "to": "person.person_id"
+   }
+  ],
+  "schema_domains": [
+   "Condition",
+   "Condition Status",
+   "Ethnicity",
+   "Gender",
+   "Race",
+   "Visit"
+  ],
+  "prompt": "[질의]\n심부전 진단이고 고관절 골관절염 진단인 환자.\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"심부전\":\n      · 316139  Heart failure / 심부전  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 3종 포함]\n      · 314378  Hypertensive heart disease with congestive heart failure / 고혈압성 심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 318445  Post cardiac operation functional disturbance / 심장수술후 또는 심장인공삽입물의 존재로 인한 심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 439846  Left heart failure / 좌심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 4273632  Right ventricular failure / 우심부전  [Condition → condition_occurrence.condition_concept_id]\n  - \"고관절 골관절염\":\n      · 80180  Osteoarthritis / 골관절염  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 4079749  Osteoarthritis of hip / 고관절 골관절염  [Condition → condition_occurrence.condition_concept_id]\n      · 4138412  Fracture of proximal end of femur / 고관절 골절  [Condition → condition_occurrence.condition_concept_id]\n      · 37163124  Chronic nonbacterial osteomyelitis/chronic recurrent multifocal osteomyelitis / 만성 다초점 골수염, 고관절  [Condition → condition_occurrence.condition_concept_id]\n      · 4347295  Chronic osteomyelitis of pelvis / 만성 다초점 골수염, 고관절  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n        · 허용값: 9202=외래(Outpatient Visit), 9201=입원(Inpatient Visit), 262=응급실 및 입원(Emergency Room and Inpatient Visit)\n    - visit_start_date (방문 시작 일자) date  [형식: YYYY-MM-DD]\n    - visit_start_datetime (방문 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - visit_end_date (방문 종료 일자) date  [형식: YYYY-MM-DD]\n    - visit_end_datetime (방문 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n        · 허용값: 581476=가정방문(Home Visit)\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id"
+ },
+ "concepts_given": false,
+ "tries": [
+  {
+   "request": {
+    "query": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+    "top_k": 5
+   },
+   "response": {
+    "text": "심부전 진단이고 고관절 골관절염 진단인 환자.",
+    "success": true,
+    "status": "success",
+    "concepts": [
+     {
+      "surface": "심부전",
+      "candidates": [
+       {
+        "concept_id": 316139,
+        "ko": "심부전",
+        "en": "Heart failure",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.2727272727272727,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": [
+         439846,
+         4273632,
+         314378
+        ]
+       },
+       {
+        "concept_id": 314378,
+        "ko": "고혈압성 심부전",
+        "en": "Hypertensive heart disease with congestive heart failure",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.18888888888888888,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 1,
+        "subsumes": []
+       },
+       {
+        "concept_id": 318445,
+        "ko": "심장수술후 또는 심장인공삽입물의 존재로 인한 심부전",
+        "en": "Post cardiac operation functional disturbance",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.15948275862068967,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 439846,
+        "ko": "좌심부전",
+        "en": "Left heart failure",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.13574660633484165,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 1,
+        "subsumes": []
+       },
+       {
+        "concept_id": 4273632,
+        "ko": "우심부전",
+        "en": "Right ventricular failure",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.13333333333333333,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 1,
+        "subsumes": []
+       }
+      ]
+     },
+     {
+      "surface": "고관절 골관절염",
+      "candidates": [
+       {
+        "concept_id": 80180,
+        "ko": "골관절염",
+        "en": "Osteoarthritis",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.16025641025641024,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": [
+         4079749
+        ]
+       },
+       {
+        "concept_id": 4079749,
+        "ko": "고관절 골관절염",
+        "en": "Osteoarthritis of hip",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.18181818181818182,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 1,
+        "subsumes": []
+       },
+       {
+        "concept_id": 4138412,
+        "ko": "고관절 골절",
+        "en": "Fracture of proximal end of femur",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.13392857142857142,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 37163124,
+        "ko": "만성 다초점 골수염, 고관절",
+        "en": "Chronic nonbacterial osteomyelitis/chronic recurrent multifocal osteomyelitis",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.10817307692307693,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 4347295,
+        "ko": "만성 다초점 골수염, 고관절",
+        "en": "Chronic osteomyelitis of pelvis",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.10173160173160173,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       }
+      ]
+     }
+    ],
+    "schemas": [
+     {
+      "table_name": "condition_occurrence",
+      "table_name_ko": "진단 발생",
+      "pk": "condition_occurrence_id",
+      "columns": [
+       {
+        "column": "condition_occurrence_id",
+        "column_ko": "진단 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_concept_id",
+        "column_ko": "진단 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_date",
+        "column_ko": "진단 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_datetime",
+        "column_ko": "진단 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_date",
+        "column_ko": "진단 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_datetime",
+        "column_ko": "진단 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "condition_type_concept_id",
+        "column_ko": "진단 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_status_concept_id",
+        "column_ko": "진단 상태 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Secondary diagnosis",
+          "id": "32908",
+          "ko": "부상병"
+         },
+         {
+          "en": "Primary diagnosis",
+          "id": "32902",
+          "ko": "주상병"
+         }
+        ],
+        "enum": [
+         {
+          "id": "32908",
+          "name": "부상병(Secondary diagnosis)"
+         },
+         {
+          "id": "32902",
+          "name": "주상병(Primary diagnosis)"
+         }
+        ]
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_source_concept_id",
+        "column_ko": "진단 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "condition_start_date",
+      "end_date": "condition_end_date"
+     },
+     {
+      "table_name": "person",
+      "table_name_ko": "환자",
+      "pk": "person_id",
+      "columns": [
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "gender_concept_id",
+        "column_ko": "성별 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "MALE",
+          "id": "8507",
+          "ko": "남성"
+         },
+         {
+          "en": "FEMALE",
+          "id": "8532",
+          "ko": "여성"
+         }
+        ],
+        "enum": [
+         {
+          "id": "8507",
+          "name": "남성(MALE)"
+         },
+         {
+          "id": "8532",
+          "name": "여성(FEMALE)"
+         }
+        ]
+       },
+       {
+        "column": "birth_datetime",
+        "column_ko": "출생 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "race_concept_id",
+        "column_ko": "인종 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Korean",
+          "id": "38003585",
+          "ko": "한국인"
+         },
+         {
+          "en": "Other Race",
+          "id": "8522",
+          "ko": "기타 인종"
+         }
+        ],
+        "enum": [
+         {
+          "id": "38003585",
+          "name": "한국인(Korean)"
+         },
+         {
+          "id": "8522",
+          "name": "기타 인종(Other Race)"
+         }
+        ]
+       }
+      ],
+      "event_date": "birth_datetime",
+      "end_date": null
+     },
+     {
+      "table_name": "visit_occurrence",
+      "table_name_ko": "방문 발생",
+      "pk": "visit_occurrence_id",
+      "columns": [
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_concept_id",
+        "column_ko": "방문 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Outpatient Visit",
+          "id": "9202",
+          "ko": "외래"
+         },
+         {
+          "en": "Inpatient Visit",
+          "id": "9201",
+          "ko": "입원"
+         },
+         {
+          "en": "Emergency Room and Inpatient Visit",
+          "id": "262",
+          "ko": "응급실 및 입원"
+         }
+        ],
+        "enum": [
+         {
+          "id": "9202",
+          "name": "외래(Outpatient Visit)"
+         },
+         {
+          "id": "9201",
+          "name": "입원(Inpatient Visit)"
+         },
+         {
+          "id": "262",
+          "name": "응급실 및 입원(Emergency Room and Inpatient Visit)"
+         }
+        ]
+       },
+       {
+        "column": "visit_start_date",
+        "column_ko": "방문 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "visit_start_datetime",
+        "column_ko": "방문 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "visit_end_date",
+        "column_ko": "방문 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "visit_end_datetime",
+        "column_ko": "방문 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "visit_type_concept_id",
+        "column_ko": "방문 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "discharge_to_concept_id",
+        "column_ko": "퇴원처 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Home Visit",
+          "id": "581476",
+          "ko": "가정방문"
+         }
+        ],
+        "enum": [
+         {
+          "id": "581476",
+          "name": "가정방문(Home Visit)"
+         }
+        ]
+       },
+       {
+        "column": "preceding_visit_occurrence_id",
+        "column_ko": "직전 방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "visit_start_date",
+      "end_date": "visit_end_date"
+     }
+    ],
+    "joins": [
+     {
+      "from": "condition_occurrence.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "condition_occurrence.visit_occurrence_id",
+      "to": "visit_occurrence.visit_occurrence_id"
+     },
+     {
+      "from": "visit_occurrence.person_id",
+      "to": "person.person_id"
+     }
+    ],
+    "schema_domains": [
+     "Condition",
+     "Condition Status",
+     "Ethnicity",
+     "Gender",
+     "Race",
+     "Visit"
+    ],
+    "prompt": "[질의]\n심부전 진단이고 고관절 골관절염 진단인 환자.\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"심부전\":\n      · 316139  Heart failure / 심부전  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 3종 포함]\n      · 314378  Hypertensive heart disease with congestive heart failure / 고혈압성 심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 318445  Post cardiac operation functional disturbance / 심장수술후 또는 심장인공삽입물의 존재로 인한 심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 439846  Left heart failure / 좌심부전  [Condition → condition_occurrence.condition_concept_id]\n      · 4273632  Right ventricular failure / 우심부전  [Condition → condition_occurrence.condition_concept_id]\n  - \"고관절 골관절염\":\n      · 80180  Osteoarthritis / 골관절염  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 4079749  Osteoarthritis of hip / 고관절 골관절염  [Condition → condition_occurrence.condition_concept_id]\n      · 4138412  Fracture of proximal end of femur / 고관절 골절  [Condition → condition_occurrence.condition_concept_id]\n      · 37163124  Chronic nonbacterial osteomyelitis/chronic recurrent multifocal osteomyelitis / 만성 다초점 골수염, 고관절  [Condition → condition_occurrence.condition_concept_id]\n      · 4347295  Chronic osteomyelitis of pelvis / 만성 다초점 골수염, 고관절  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n        · 허용값: 9202=외래(Outpatient Visit), 9201=입원(Inpatient Visit), 262=응급실 및 입원(Emergency Room and Inpatient Visit)\n    - visit_start_date (방문 시작 일자) date  [형식: YYYY-MM-DD]\n    - visit_start_datetime (방문 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - visit_end_date (방문 종료 일자) date  [형식: YYYY-MM-DD]\n    - visit_end_datetime (방문 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n        · 허용값: 581476=가정방문(Home Visit)\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id"
+   }
+  }
+ ],
+ "fetched_at": "2026-11-18 11:38:01"
+}

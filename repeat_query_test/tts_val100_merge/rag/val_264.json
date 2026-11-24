@@ -1,0 +1,1549 @@
+{
+ "qid": "val_264",
+ "set": "val",
+ "text": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+ "gold": "SELECT DISTINCT co.person_id FROM condition_occurrence co WHERE co.condition_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (201826)) AND NOT EXISTS ( SELECT 1 FROM drug_exposure de WHERE de.person_id = co.person_id AND de.drug_concept_id IN (SELECT descendant_concept_id FROM concept_ancestor WHERE ancestor_concept_id IN (1502905)) );",
+ "input": "[재료]\n개념 값 조건:\n  - \"인슐린\" → drug_exposure.drug_concept_id IN (1502905)\n  - \"제2형 당뇨병\" → condition_occurrence.condition_concept_id IN (201826)\n테이블(컬럼 전체):\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime\n    - device_exposure_end_date (기기 노출 종료 일자) date\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime\n    - drug_exposure_end_date (약물 노출 종료 일자) date\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n    - birth_datetime (출생 일시) datetime\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n    - visit_start_date (방문 시작 일자) date\n    - visit_start_datetime (방문 시작 일시) datetime\n    - visit_end_date (방문 종료 일자) date\n    - visit_end_datetime (방문 종료 일시) datetime\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date\n    - condition_start_datetime (진단 시작 일시) datetime\n    - condition_end_date (진단 종료 일자) date\n    - condition_end_datetime (진단 종료 일시) datetime\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n조인:\n  - device_exposure.person_id = person.person_id\n  - device_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - drug_exposure.person_id = person.person_id\n  - drug_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id",
+ "section": "3.비교군",
+ "query_type": "COHORT_EXTRACTION",
+ "difficulty": "MEDIUM",
+ "template": "위약/비노출 G: 연구 약물(○) 미노출 — 대상: ○",
+ "rag_request": {
+  "query": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+  "top_k": 5
+ },
+ "rag_response": {
+  "text": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+  "success": true,
+  "status": "success",
+  "concepts": [
+   {
+    "surface": "인슐린",
+    "candidates": [
+     {
+      "concept_id": 19013926,
+      "ko": "인슐린",
+      "en": "insulin, protamine zinc, beef-pork",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.2,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 1502905,
+      "ko": "인슐린",
+      "en": "insulin glargine",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.19937469937469937,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 35602717,
+      "ko": "인슐린",
+      "en": "insulin degludec",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.1917494270435447,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 19090244,
+      "ko": "인슐린",
+      "en": "insulin, prompt zinc, beef",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.18899521531100477,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     },
+     {
+      "concept_id": 1516976,
+      "ko": "인슐린",
+      "en": "insulin detemir",
+      "domain": "Drug",
+      "target_column": "drug_exposure.drug_concept_id",
+      "rrf_score": 0.17483974358974358,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": []
+     }
+    ]
+   },
+   {
+    "surface": "제2형 당뇨병",
+    "candidates": [
+     {
+      "concept_id": 201826,
+      "ko": "제2형 당뇨병",
+      "en": "Type 2 diabetes mellitus",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.26515151515151514,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": [
+       43531010
+      ]
+     },
+     {
+      "concept_id": 43531010,
+      "ko": "전에 있던 2형 당뇨병",
+      "en": "Pre-existing type 2 diabetes mellitus in pregnancy",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.20098322729901677,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 1,
+      "subsumes": []
+     },
+     {
+      "concept_id": 201254,
+      "ko": "제1형 당뇨병",
+      "en": "Type 1 diabetes mellitus",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.17485380116959065,
+      "source_file": "추가분_261112.xlsx",
+      "name_type": "동의어",
+      "level": 0,
+      "subsumes": [
+       43531008
+      ]
+     },
+     {
+      "concept_id": 43531008,
+      "ko": "전에 있던 1형 당뇨병",
+      "en": "Pre-existing type 1 diabetes mellitus in pregnancy",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.15256410256410258,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 1,
+      "subsumes": []
+     },
+     {
+      "concept_id": 443732,
+      "ko": "상세불명의 합병증을 동반한 2형 당뇨병",
+      "en": "Disorder due to type 2 diabetes mellitus",
+      "domain": "Condition",
+      "target_column": "condition_occurrence.condition_concept_id",
+      "rrf_score": 0.11437908496732026,
+      "source_file": "KCD7_상병마스터.xlsx",
+      "name_type": "원문명",
+      "level": 0,
+      "subsumes": []
+     }
+    ]
+   }
+  ],
+  "schemas": [
+   {
+    "table_name": "condition_occurrence",
+    "table_name_ko": "진단 발생",
+    "pk": "condition_occurrence_id",
+    "columns": [
+     {
+      "column": "condition_occurrence_id",
+      "column_ko": "진단 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_concept_id",
+      "column_ko": "진단 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_date",
+      "column_ko": "진단 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_start_datetime",
+      "column_ko": "진단 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_date",
+      "column_ko": "진단 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "condition_end_datetime",
+      "column_ko": "진단 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "condition_type_concept_id",
+      "column_ko": "진단 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_status_concept_id",
+      "column_ko": "진단 상태 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Secondary diagnosis",
+        "id": "32908",
+        "ko": "부상병"
+       },
+       {
+        "en": "Primary diagnosis",
+        "id": "32902",
+        "ko": "주상병"
+       }
+      ],
+      "enum": [
+       {
+        "id": "32908",
+        "name": "부상병(Secondary diagnosis)"
+       },
+       {
+        "id": "32902",
+        "name": "주상병(Primary diagnosis)"
+       }
+      ]
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "condition_source_concept_id",
+      "column_ko": "진단 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "condition_start_date",
+    "end_date": "condition_end_date"
+   },
+   {
+    "table_name": "device_exposure",
+    "table_name_ko": "기기 노출",
+    "pk": "device_exposure_id",
+    "columns": [
+     {
+      "column": "device_exposure_id",
+      "column_ko": "기기 노출 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_start_date",
+      "column_ko": "기기 노출 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_start_datetime",
+      "column_ko": "기기 노출 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_end_date",
+      "column_ko": "기기 노출 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "device_exposure_end_datetime",
+      "column_ko": "기기 노출 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "device_type_concept_id",
+      "column_ko": "기기 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "quantity",
+      "column_ko": "수량",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_source_value",
+      "column_ko": "기기 원천값",
+      "datatype": "varchar(50)",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "device_source_concept_id",
+      "column_ko": "기기 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "device_exposure_start_date",
+    "end_date": "device_exposure_end_date"
+   },
+   {
+    "table_name": "drug_exposure",
+    "table_name_ko": "약물 노출",
+    "pk": "drug_exposure_id",
+    "columns": [
+     {
+      "column": "drug_exposure_id",
+      "column_ko": "약물 노출 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_concept_id",
+      "column_ko": "약물 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_start_date",
+      "column_ko": "약물 노출 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_start_datetime",
+      "column_ko": "약물 노출 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_end_date",
+      "column_ko": "약물 노출 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "drug_exposure_end_datetime",
+      "column_ko": "약물 노출 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "drug_type_concept_id",
+      "column_ko": "약물 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "quantity",
+      "column_ko": "수량",
+      "datatype": "float",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "days_supply",
+      "column_ko": "공급 일수",
+      "datatype": "integer",
+      "pk": false,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "drug_source_concept_id",
+      "column_ko": "약물 원천 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "drug_exposure_start_date",
+    "end_date": "drug_exposure_end_date"
+   },
+   {
+    "table_name": "person",
+    "table_name_ko": "환자",
+    "pk": "person_id",
+    "columns": [
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "gender_concept_id",
+      "column_ko": "성별 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "MALE",
+        "id": "8507",
+        "ko": "남성"
+       },
+       {
+        "en": "FEMALE",
+        "id": "8532",
+        "ko": "여성"
+       }
+      ],
+      "enum": [
+       {
+        "id": "8507",
+        "name": "남성(MALE)"
+       },
+       {
+        "id": "8532",
+        "name": "여성(FEMALE)"
+       }
+      ]
+     },
+     {
+      "column": "birth_datetime",
+      "column_ko": "출생 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "race_concept_id",
+      "column_ko": "인종 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Korean",
+        "id": "38003585",
+        "ko": "한국인"
+       },
+       {
+        "en": "Other Race",
+        "id": "8522",
+        "ko": "기타 인종"
+       }
+      ],
+      "enum": [
+       {
+        "id": "38003585",
+        "name": "한국인(Korean)"
+       },
+       {
+        "id": "8522",
+        "name": "기타 인종(Other Race)"
+       }
+      ]
+     }
+    ],
+    "event_date": "birth_datetime",
+    "end_date": null
+   },
+   {
+    "table_name": "visit_occurrence",
+    "table_name_ko": "방문 발생",
+    "pk": "visit_occurrence_id",
+    "columns": [
+     {
+      "column": "visit_occurrence_id",
+      "column_ko": "방문 발생 ID",
+      "datatype": "integer",
+      "pk": true,
+      "fk": null,
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "person_id",
+      "column_ko": "환자 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "person",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "visit_concept_id",
+      "column_ko": "방문 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Outpatient Visit",
+        "id": "9202",
+        "ko": "외래"
+       },
+       {
+        "en": "Inpatient Visit",
+        "id": "9201",
+        "ko": "입원"
+       },
+       {
+        "en": "Emergency Room and Inpatient Visit",
+        "id": "262",
+        "ko": "응급실 및 입원"
+       }
+      ],
+      "enum": [
+       {
+        "id": "9202",
+        "name": "외래(Outpatient Visit)"
+       },
+       {
+        "id": "9201",
+        "name": "입원(Inpatient Visit)"
+       },
+       {
+        "id": "262",
+        "name": "응급실 및 입원(Emergency Room and Inpatient Visit)"
+       }
+      ]
+     },
+     {
+      "column": "visit_start_date",
+      "column_ko": "방문 시작 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "visit_start_datetime",
+      "column_ko": "방문 시작 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 00:00:00",
+      "enum_values": null
+     },
+     {
+      "column": "visit_end_date",
+      "column_ko": "방문 종료 일자",
+      "datatype": "date",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD",
+      "enum_values": null
+     },
+     {
+      "column": "visit_end_datetime",
+      "column_ko": "방문 종료 일시",
+      "datatype": "datetime",
+      "pk": false,
+      "fk": null,
+      "format_example": "YYYY-MM-DD 23:59:59",
+      "enum_values": null
+     },
+     {
+      "column": "visit_type_concept_id",
+      "column_ko": "방문 유형 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": null
+     },
+     {
+      "column": "discharge_to_concept_id",
+      "column_ko": "퇴원처 개념 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "concept",
+      "format_example": null,
+      "enum_values": [
+       {
+        "en": "Home Visit",
+        "id": "581476",
+        "ko": "가정방문"
+       }
+      ],
+      "enum": [
+       {
+        "id": "581476",
+        "name": "가정방문(Home Visit)"
+       }
+      ]
+     },
+     {
+      "column": "preceding_visit_occurrence_id",
+      "column_ko": "직전 방문 발생 ID",
+      "datatype": "integer",
+      "pk": false,
+      "fk": "visit_occurrence",
+      "format_example": null,
+      "enum_values": null
+     }
+    ],
+    "event_date": "visit_start_date",
+    "end_date": "visit_end_date"
+   }
+  ],
+  "joins": [
+   {
+    "from": "condition_occurrence.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "condition_occurrence.visit_occurrence_id",
+    "to": "visit_occurrence.visit_occurrence_id"
+   },
+   {
+    "from": "device_exposure.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "device_exposure.visit_occurrence_id",
+    "to": "visit_occurrence.visit_occurrence_id"
+   },
+   {
+    "from": "drug_exposure.person_id",
+    "to": "person.person_id"
+   },
+   {
+    "from": "drug_exposure.visit_occurrence_id",
+    "to": "visit_occurrence.visit_occurrence_id"
+   },
+   {
+    "from": "visit_occurrence.person_id",
+    "to": "person.person_id"
+   }
+  ],
+  "schema_domains": [
+   "Device",
+   "Drug",
+   "Route",
+   "Visit"
+  ],
+  "prompt": "[질의]\n위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"인슐린\":\n      · 19013926  insulin, protamine zinc, beef-pork / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 1502905  insulin glargine / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 35602717  insulin degludec / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 19090244  insulin, prompt zinc, beef / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 1516976  insulin detemir / 인슐린  [Drug → drug_exposure.drug_concept_id]\n  - \"제2형 당뇨병\":\n      · 201826  Type 2 diabetes mellitus / 제2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 43531010  Pre-existing type 2 diabetes mellitus in pregnancy / 전에 있던 2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n      · 201254  Type 1 diabetes mellitus / 제1형 당뇨병  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 43531008  Pre-existing type 1 diabetes mellitus in pregnancy / 전에 있던 1형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n      · 443732  Disorder due to type 2 diabetes mellitus / 상세불명의 합병증을 동반한 2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - device_exposure_end_date (기기 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - drug_exposure_end_date (약물 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n        · 허용값: 9202=외래(Outpatient Visit), 9201=입원(Inpatient Visit), 262=응급실 및 입원(Emergency Room and Inpatient Visit)\n    - visit_start_date (방문 시작 일자) date  [형식: YYYY-MM-DD]\n    - visit_start_datetime (방문 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - visit_end_date (방문 종료 일자) date  [형식: YYYY-MM-DD]\n    - visit_end_datetime (방문 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n        · 허용값: 581476=가정방문(Home Visit)\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - device_exposure.person_id = person.person_id\n  - device_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - drug_exposure.person_id = person.person_id\n  - drug_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id"
+ },
+ "concepts_given": false,
+ "tries": [
+  {
+   "request": {
+    "query": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+    "top_k": 5
+   },
+   "response": {
+    "text": "위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병",
+    "success": true,
+    "status": "success",
+    "concepts": [
+     {
+      "surface": "인슐린",
+      "candidates": [
+       {
+        "concept_id": 19013926,
+        "ko": "인슐린",
+        "en": "insulin, protamine zinc, beef-pork",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.2,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 1502905,
+        "ko": "인슐린",
+        "en": "insulin glargine",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.19937469937469937,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 35602717,
+        "ko": "인슐린",
+        "en": "insulin degludec",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.1917494270435447,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 19090244,
+        "ko": "인슐린",
+        "en": "insulin, prompt zinc, beef",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.18899521531100477,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       },
+       {
+        "concept_id": 1516976,
+        "ko": "인슐린",
+        "en": "insulin detemir",
+        "domain": "Drug",
+        "target_column": "drug_exposure.drug_concept_id",
+        "rrf_score": 0.17483974358974358,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": []
+       }
+      ]
+     },
+     {
+      "surface": "제2형 당뇨병",
+      "candidates": [
+       {
+        "concept_id": 201826,
+        "ko": "제2형 당뇨병",
+        "en": "Type 2 diabetes mellitus",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.26515151515151514,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": [
+         43531010
+        ]
+       },
+       {
+        "concept_id": 43531010,
+        "ko": "전에 있던 2형 당뇨병",
+        "en": "Pre-existing type 2 diabetes mellitus in pregnancy",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.20098322729901677,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 1,
+        "subsumes": []
+       },
+       {
+        "concept_id": 201254,
+        "ko": "제1형 당뇨병",
+        "en": "Type 1 diabetes mellitus",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.17485380116959065,
+        "source_file": "추가분_261112.xlsx",
+        "name_type": "동의어",
+        "level": 0,
+        "subsumes": [
+         43531008
+        ]
+       },
+       {
+        "concept_id": 43531008,
+        "ko": "전에 있던 1형 당뇨병",
+        "en": "Pre-existing type 1 diabetes mellitus in pregnancy",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.15256410256410258,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 1,
+        "subsumes": []
+       },
+       {
+        "concept_id": 443732,
+        "ko": "상세불명의 합병증을 동반한 2형 당뇨병",
+        "en": "Disorder due to type 2 diabetes mellitus",
+        "domain": "Condition",
+        "target_column": "condition_occurrence.condition_concept_id",
+        "rrf_score": 0.11437908496732026,
+        "source_file": "KCD7_상병마스터.xlsx",
+        "name_type": "원문명",
+        "level": 0,
+        "subsumes": []
+       }
+      ]
+     }
+    ],
+    "schemas": [
+     {
+      "table_name": "condition_occurrence",
+      "table_name_ko": "진단 발생",
+      "pk": "condition_occurrence_id",
+      "columns": [
+       {
+        "column": "condition_occurrence_id",
+        "column_ko": "진단 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_concept_id",
+        "column_ko": "진단 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_date",
+        "column_ko": "진단 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_start_datetime",
+        "column_ko": "진단 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_date",
+        "column_ko": "진단 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "condition_end_datetime",
+        "column_ko": "진단 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "condition_type_concept_id",
+        "column_ko": "진단 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_status_concept_id",
+        "column_ko": "진단 상태 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Secondary diagnosis",
+          "id": "32908",
+          "ko": "부상병"
+         },
+         {
+          "en": "Primary diagnosis",
+          "id": "32902",
+          "ko": "주상병"
+         }
+        ],
+        "enum": [
+         {
+          "id": "32908",
+          "name": "부상병(Secondary diagnosis)"
+         },
+         {
+          "id": "32902",
+          "name": "주상병(Primary diagnosis)"
+         }
+        ]
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "condition_source_concept_id",
+        "column_ko": "진단 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "condition_start_date",
+      "end_date": "condition_end_date"
+     },
+     {
+      "table_name": "device_exposure",
+      "table_name_ko": "기기 노출",
+      "pk": "device_exposure_id",
+      "columns": [
+       {
+        "column": "device_exposure_id",
+        "column_ko": "기기 노출 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_start_date",
+        "column_ko": "기기 노출 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_start_datetime",
+        "column_ko": "기기 노출 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_end_date",
+        "column_ko": "기기 노출 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "device_exposure_end_datetime",
+        "column_ko": "기기 노출 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "device_type_concept_id",
+        "column_ko": "기기 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "quantity",
+        "column_ko": "수량",
+        "datatype": "integer",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_source_value",
+        "column_ko": "기기 원천값",
+        "datatype": "varchar(50)",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "device_source_concept_id",
+        "column_ko": "기기 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "device_exposure_start_date",
+      "end_date": "device_exposure_end_date"
+     },
+     {
+      "table_name": "drug_exposure",
+      "table_name_ko": "약물 노출",
+      "pk": "drug_exposure_id",
+      "columns": [
+       {
+        "column": "drug_exposure_id",
+        "column_ko": "약물 노출 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_concept_id",
+        "column_ko": "약물 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_start_date",
+        "column_ko": "약물 노출 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_start_datetime",
+        "column_ko": "약물 노출 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_end_date",
+        "column_ko": "약물 노출 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "drug_exposure_end_datetime",
+        "column_ko": "약물 노출 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "drug_type_concept_id",
+        "column_ko": "약물 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "quantity",
+        "column_ko": "수량",
+        "datatype": "float",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "days_supply",
+        "column_ko": "공급 일수",
+        "datatype": "integer",
+        "pk": false,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "drug_source_concept_id",
+        "column_ko": "약물 원천 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "drug_exposure_start_date",
+      "end_date": "drug_exposure_end_date"
+     },
+     {
+      "table_name": "person",
+      "table_name_ko": "환자",
+      "pk": "person_id",
+      "columns": [
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "gender_concept_id",
+        "column_ko": "성별 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "MALE",
+          "id": "8507",
+          "ko": "남성"
+         },
+         {
+          "en": "FEMALE",
+          "id": "8532",
+          "ko": "여성"
+         }
+        ],
+        "enum": [
+         {
+          "id": "8507",
+          "name": "남성(MALE)"
+         },
+         {
+          "id": "8532",
+          "name": "여성(FEMALE)"
+         }
+        ]
+       },
+       {
+        "column": "birth_datetime",
+        "column_ko": "출생 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "race_concept_id",
+        "column_ko": "인종 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Korean",
+          "id": "38003585",
+          "ko": "한국인"
+         },
+         {
+          "en": "Other Race",
+          "id": "8522",
+          "ko": "기타 인종"
+         }
+        ],
+        "enum": [
+         {
+          "id": "38003585",
+          "name": "한국인(Korean)"
+         },
+         {
+          "id": "8522",
+          "name": "기타 인종(Other Race)"
+         }
+        ]
+       }
+      ],
+      "event_date": "birth_datetime",
+      "end_date": null
+     },
+     {
+      "table_name": "visit_occurrence",
+      "table_name_ko": "방문 발생",
+      "pk": "visit_occurrence_id",
+      "columns": [
+       {
+        "column": "visit_occurrence_id",
+        "column_ko": "방문 발생 ID",
+        "datatype": "integer",
+        "pk": true,
+        "fk": null,
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "person_id",
+        "column_ko": "환자 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "person",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "visit_concept_id",
+        "column_ko": "방문 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Outpatient Visit",
+          "id": "9202",
+          "ko": "외래"
+         },
+         {
+          "en": "Inpatient Visit",
+          "id": "9201",
+          "ko": "입원"
+         },
+         {
+          "en": "Emergency Room and Inpatient Visit",
+          "id": "262",
+          "ko": "응급실 및 입원"
+         }
+        ],
+        "enum": [
+         {
+          "id": "9202",
+          "name": "외래(Outpatient Visit)"
+         },
+         {
+          "id": "9201",
+          "name": "입원(Inpatient Visit)"
+         },
+         {
+          "id": "262",
+          "name": "응급실 및 입원(Emergency Room and Inpatient Visit)"
+         }
+        ]
+       },
+       {
+        "column": "visit_start_date",
+        "column_ko": "방문 시작 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "visit_start_datetime",
+        "column_ko": "방문 시작 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 00:00:00",
+        "enum_values": null
+       },
+       {
+        "column": "visit_end_date",
+        "column_ko": "방문 종료 일자",
+        "datatype": "date",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD",
+        "enum_values": null
+       },
+       {
+        "column": "visit_end_datetime",
+        "column_ko": "방문 종료 일시",
+        "datatype": "datetime",
+        "pk": false,
+        "fk": null,
+        "format_example": "YYYY-MM-DD 23:59:59",
+        "enum_values": null
+       },
+       {
+        "column": "visit_type_concept_id",
+        "column_ko": "방문 유형 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": null
+       },
+       {
+        "column": "discharge_to_concept_id",
+        "column_ko": "퇴원처 개념 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "concept",
+        "format_example": null,
+        "enum_values": [
+         {
+          "en": "Home Visit",
+          "id": "581476",
+          "ko": "가정방문"
+         }
+        ],
+        "enum": [
+         {
+          "id": "581476",
+          "name": "가정방문(Home Visit)"
+         }
+        ]
+       },
+       {
+        "column": "preceding_visit_occurrence_id",
+        "column_ko": "직전 방문 발생 ID",
+        "datatype": "integer",
+        "pk": false,
+        "fk": "visit_occurrence",
+        "format_example": null,
+        "enum_values": null
+       }
+      ],
+      "event_date": "visit_start_date",
+      "end_date": "visit_end_date"
+     }
+    ],
+    "joins": [
+     {
+      "from": "condition_occurrence.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "condition_occurrence.visit_occurrence_id",
+      "to": "visit_occurrence.visit_occurrence_id"
+     },
+     {
+      "from": "device_exposure.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "device_exposure.visit_occurrence_id",
+      "to": "visit_occurrence.visit_occurrence_id"
+     },
+     {
+      "from": "drug_exposure.person_id",
+      "to": "person.person_id"
+     },
+     {
+      "from": "drug_exposure.visit_occurrence_id",
+      "to": "visit_occurrence.visit_occurrence_id"
+     },
+     {
+      "from": "visit_occurrence.person_id",
+      "to": "person.person_id"
+     }
+    ],
+    "schema_domains": [
+     "Device",
+     "Drug",
+     "Route",
+     "Visit"
+    ],
+    "prompt": "[질의]\n위약/비노출 대조군: 연구 약물(인슐린) 미노출 — 대상: 제2형 당뇨병\n\n[재료]\n기준일: DATE '2026-11-18'  — 오늘로 가정. 상대 날짜·나이 계산에 이 DATE 리터럴을 그대로 쓴다\n개념 후보 (표면어별 — 영문명으로 가장 맞는 개념 1개를 골라 그 [테이블.컬럼]에 조건을 건다. 질의에 수식어가 없으면 [상위개념](하위 포함)을 고른다. 수식어가 있으면 그에 맞는 세부 개념을 고른다. 어느 후보도 질의 개념과 실제로 맞지 않으면 억지로 고르지 말고 값 자리에 {{표면어}}(미해결)로 남긴다):\n  - \"인슐린\":\n      · 19013926  insulin, protamine zinc, beef-pork / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 1502905  insulin glargine / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 35602717  insulin degludec / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 19090244  insulin, prompt zinc, beef / 인슐린  [Drug → drug_exposure.drug_concept_id]\n      · 1516976  insulin detemir / 인슐린  [Drug → drug_exposure.drug_concept_id]\n  - \"제2형 당뇨병\":\n      · 201826  Type 2 diabetes mellitus / 제2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 43531010  Pre-existing type 2 diabetes mellitus in pregnancy / 전에 있던 2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n      · 201254  Type 1 diabetes mellitus / 제1형 당뇨병  [Condition → condition_occurrence.condition_concept_id]  [상위개념·하위 1종 포함]\n      · 43531008  Pre-existing type 1 diabetes mellitus in pregnancy / 전에 있던 1형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n      · 443732  Disorder due to type 2 diabetes mellitus / 상세불명의 합병증을 동반한 2형 당뇨병  [Condition → condition_occurrence.condition_concept_id]\n테이블(컬럼 전체):\n  # condition_occurrence(진단 발생) PK=condition_occurrence_id\n    - condition_occurrence_id (진단 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - condition_concept_id (진단 개념 ID) integer  [→concept]\n    - condition_start_date (진단 시작 일자) date  [형식: YYYY-MM-DD]\n    - condition_start_datetime (진단 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - condition_end_date (진단 종료 일자) date  [형식: YYYY-MM-DD]\n    - condition_end_datetime (진단 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - condition_type_concept_id (진단 유형 개념 ID) integer  [→concept]\n    - condition_status_concept_id (진단 상태 개념 ID) integer  [→concept]\n        · 허용값: 32908=부상병(Secondary diagnosis), 32902=주상병(Primary diagnosis)\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - condition_source_concept_id (진단 원천 개념 ID) integer  [→concept]\n  # device_exposure(기기 노출) PK=device_exposure_id\n    - device_exposure_id (기기 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - device_exposure_start_date (기기 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_start_datetime (기기 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - device_exposure_end_date (기기 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - device_exposure_end_datetime (기기 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - device_type_concept_id (기기 유형 개념 ID) integer  [→concept]\n    - quantity (수량) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - device_source_value (기기 원천값) varchar(50)\n    - device_source_concept_id (기기 원천 개념 ID) integer  [→concept]\n  # drug_exposure(약물 노출) PK=drug_exposure_id\n    - drug_exposure_id (약물 노출 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - drug_concept_id (약물 개념 ID) integer  [→concept]\n    - drug_exposure_start_date (약물 노출 시작 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_start_datetime (약물 노출 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - drug_exposure_end_date (약물 노출 종료 일자) date  [형식: YYYY-MM-DD]\n    - drug_exposure_end_datetime (약물 노출 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - drug_type_concept_id (약물 유형 개념 ID) integer  [→concept]\n    - quantity (수량) float\n    - days_supply (공급 일수) integer\n    - visit_occurrence_id (방문 발생 ID) integer  [→visit_occurrence]\n    - drug_source_concept_id (약물 원천 개념 ID) integer  [→concept]\n  # person(환자) PK=person_id\n    - person_id (환자 ID) integer  [PK]\n    - gender_concept_id (성별 개념 ID) integer  [→concept]\n        · 허용값: 8507=남성(MALE), 8532=여성(FEMALE)\n    - birth_datetime (출생 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - race_concept_id (인종 개념 ID) integer  [→concept]\n        · 허용값: 38003585=한국인(Korean), 8522=기타 인종(Other Race)\n  # visit_occurrence(방문 발생) PK=visit_occurrence_id\n    - visit_occurrence_id (방문 발생 ID) integer  [PK]\n    - person_id (환자 ID) integer  [→person]\n    - visit_concept_id (방문 개념 ID) integer  [→concept]\n        · 허용값: 9202=외래(Outpatient Visit), 9201=입원(Inpatient Visit), 262=응급실 및 입원(Emergency Room and Inpatient Visit)\n    - visit_start_date (방문 시작 일자) date  [형식: YYYY-MM-DD]\n    - visit_start_datetime (방문 시작 일시) datetime  [형식: YYYY-MM-DD 00:00:00]\n    - visit_end_date (방문 종료 일자) date  [형식: YYYY-MM-DD]\n    - visit_end_datetime (방문 종료 일시) datetime  [형식: YYYY-MM-DD 23:59:59]\n    - visit_type_concept_id (방문 유형 개념 ID) integer  [→concept]\n    - discharge_to_concept_id (퇴원처 개념 ID) integer  [→concept]\n        · 허용값: 581476=가정방문(Home Visit)\n    - preceding_visit_occurrence_id (직전 방문 발생 ID) integer  [→visit_occurrence]\n조인:\n  - condition_occurrence.person_id = person.person_id\n  - condition_occurrence.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - device_exposure.person_id = person.person_id\n  - device_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - drug_exposure.person_id = person.person_id\n  - drug_exposure.visit_occurrence_id = visit_occurrence.visit_occurrence_id\n  - visit_occurrence.person_id = person.person_id"
+   }
+  }
+ ],
+ "fetched_at": "2026-11-18 11:34:00"
+}
