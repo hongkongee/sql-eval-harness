@@ -12,6 +12,7 @@
 | 변형 · SQL 변형 | [03_test.md](03_test.md) 3.2절 | `test_set/restructure.jsonl` | 387 (집계 384*) | ✅ 완료 |
 | 변형 · concept_id 변형 | [03_test.md](03_test.md) 3.4절 | `test_set/concept.jsonl` | 455 (집계 451*) | ✅ 완료 |
 | 변형 · 슬롯 치환 (날짜·기간·나이·수치) | [03_test.md](03_test.md) 3.3절 | `test_set/slot.jsonl` | 141 (집계 138*) | ✅ 완료 |
+| 독립 테스트셋 (최종 평가, v2 병합 모델) | [04_final.md](04_final.md) | `test_set/eval_final/repaired.jsonl` | 552 | ✅ 완료 |
 
 변형 테스트셋은 학습 데이터를 네 가지 방식으로 변형한 파일 4개. 원본이 같아서 상세 분석은 `03_test.md` 한 문서에서 변형별 절로 나눠 비교합니다.
 
